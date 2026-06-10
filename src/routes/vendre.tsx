@@ -152,8 +152,8 @@ export function CheckboxGroup({ name, label, options }: { name: string; label: s
 
 function SellPage() {
   return (
-    <PageShell>
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+    <PageShell breadcrumbs={[{ label: "Vendre" }]}>
+      <section className="relative pt-10 pb-20 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{ backgroundImage: "url(https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80)" }}

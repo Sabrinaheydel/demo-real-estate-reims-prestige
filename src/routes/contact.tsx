@@ -81,8 +81,8 @@ function ContactForm() {
 
 function ContactPage() {
   return (
-    <PageShell>
-      <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden mt-20">
+    <PageShell breadcrumbs={[{ label: "Contact" }]}>
+      <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden mt-6">
         <img
           src={portraitInterior.url}
           alt="Julien Dupuis dans un appartement haussmannien à Reims"
