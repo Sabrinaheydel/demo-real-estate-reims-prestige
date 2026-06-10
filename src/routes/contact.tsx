@@ -82,14 +82,20 @@ function ContactForm() {
 function ContactPage() {
   return (
     <PageShell>
-      <section className="pt-32 pb-12 px-6 text-center">
-        <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-4">
-          Restons en contact
-        </span>
-        <h1 className="font-display text-4xl sm:text-5xl text-navy mb-4">Contactez-nous</h1>
-        <p className="text-foreground/70 max-w-2xl mx-auto">
-          Une question, un projet ? Je vous réponds personnellement sous 24h.
-        </p>
+      <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden">
+        <img
+          src={portraitInterior.url}
+          alt="Julien Dupuis dans un appartement haussmannien à Reims"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "top" }}
+        />
+        <div className="absolute inset-0" style={{ backgroundColor: "rgba(27,45,79,0.4)" }} />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+          <h1 className="font-display text-3xl sm:text-5xl text-white mb-3">Parlons de votre projet</h1>
+          <p className="text-white/90 text-base sm:text-lg max-w-xl">
+            Je réponds personnellement à chaque demande sous 24h
+          </p>
+        </div>
       </section>
 
       <section className="pb-12 px-6">
