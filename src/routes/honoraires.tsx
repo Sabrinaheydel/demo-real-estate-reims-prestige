@@ -26,7 +26,7 @@ const LOCATION = [
   { prestation: "Gestion locative mensuelle", montant: "7 % TTC des loyers encaissés" },
 ];
 
-export default function Page() {}
+
 
 function Page() {
   return (
