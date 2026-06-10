@@ -52,7 +52,7 @@ const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
   { label: "Accueil", href: "#accueil" },
-  { label: "Annonces", href: "#annonces" },
+  { label: "Annonces", href: "/annonces" },
   { label: "Vendre", href: "#services" },
   { label: "Louer", href: "#services" },
   { label: "Acheter", href: "#services" },
