@@ -585,7 +585,7 @@ function Footer() {
   );
 }
 
-import { Navbar as SiteNavbar, Footer as SiteFooter, WhatsAppBubble, CookieBanner } from "@/components/site/SiteChrome";
+import { Navbar as SiteNavbar, Footer as SiteFooter } from "@/components/site/SiteChrome";
 
 function HomePage() {
   return (
@@ -601,8 +601,6 @@ function HomePage() {
         <Contact />
       </main>
       <SiteFooter />
-      <WhatsAppBubble />
-      <CookieBanner />
     </div>
   );
 }
