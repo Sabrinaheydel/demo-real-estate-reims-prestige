@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { ListingCard } from "@/components/site/ListingCard";
 import { getListing, getSimilar } from "@/lib/listings";
