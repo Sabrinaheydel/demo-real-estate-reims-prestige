@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendreRouteImport } from './routes/vendre'
+import { Route as PolitiqueRgpdRouteImport } from './routes/politique-rgpd'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LouerRouteImport } from './routes/louer'
+import { Route as HonorairesRouteImport } from './routes/honoraires'
 import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
@@ -24,9 +27,24 @@ const VendreRoute = VendreRouteImport.update({
   path: '/vendre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PolitiqueRgpdRoute = PolitiqueRgpdRouteImport.update({
+  id: '/politique-rgpd',
+  path: '/politique-rgpd',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LouerRoute = LouerRouteImport.update({
   id: '/louer',
   path: '/louer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HonorairesRoute = HonorairesRouteImport.update({
+  id: '/honoraires',
+  path: '/honoraires',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DernieresVentesRoute = DernieresVentesRouteImport.update({
@@ -72,7 +90,10 @@ export interface FileRoutesByFullPath {
   '/annonces': typeof AnnoncesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
+  '/honoraires': typeof HonorairesRoute
   '/louer': typeof LouerRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-rgpd': typeof PolitiqueRgpdRoute
   '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
@@ -83,7 +104,10 @@ export interface FileRoutesByTo {
   '/annonces': typeof AnnoncesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
+  '/honoraires': typeof HonorairesRoute
   '/louer': typeof LouerRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-rgpd': typeof PolitiqueRgpdRoute
   '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
@@ -95,7 +119,10 @@ export interface FileRoutesById {
   '/annonces': typeof AnnoncesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
+  '/honoraires': typeof HonorairesRoute
   '/louer': typeof LouerRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-rgpd': typeof PolitiqueRgpdRoute
   '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
@@ -108,7 +135,10 @@ export interface FileRouteTypes {
     | '/annonces'
     | '/contact'
     | '/dernieres-ventes'
+    | '/honoraires'
     | '/louer'
+    | '/mentions-legales'
+    | '/politique-rgpd'
     | '/vendre'
     | '/annonces/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -119,7 +149,10 @@ export interface FileRouteTypes {
     | '/annonces'
     | '/contact'
     | '/dernieres-ventes'
+    | '/honoraires'
     | '/louer'
+    | '/mentions-legales'
+    | '/politique-rgpd'
     | '/vendre'
     | '/annonces/$id'
   id:
@@ -130,7 +163,10 @@ export interface FileRouteTypes {
     | '/annonces'
     | '/contact'
     | '/dernieres-ventes'
+    | '/honoraires'
     | '/louer'
+    | '/mentions-legales'
+    | '/politique-rgpd'
     | '/vendre'
     | '/annonces/$id'
   fileRoutesById: FileRoutesById
@@ -142,7 +178,10 @@ export interface RootRouteChildren {
   AnnoncesRoute: typeof AnnoncesRouteWithChildren
   ContactRoute: typeof ContactRoute
   DernieresVentesRoute: typeof DernieresVentesRoute
+  HonorairesRoute: typeof HonorairesRoute
   LouerRoute: typeof LouerRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
+  PolitiqueRgpdRoute: typeof PolitiqueRgpdRoute
   VendreRoute: typeof VendreRoute
 }
 
@@ -155,11 +194,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/politique-rgpd': {
+      id: '/politique-rgpd'
+      path: '/politique-rgpd'
+      fullPath: '/politique-rgpd'
+      preLoaderRoute: typeof PolitiqueRgpdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/louer': {
       id: '/louer'
       path: '/louer'
       fullPath: '/louer'
       preLoaderRoute: typeof LouerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/honoraires': {
+      id: '/honoraires'
+      path: '/honoraires'
+      fullPath: '/honoraires'
+      preLoaderRoute: typeof HonorairesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dernieres-ventes': {
@@ -233,7 +293,10 @@ const rootRouteChildren: RootRouteChildren = {
   AnnoncesRoute: AnnoncesRouteWithChildren,
   ContactRoute: ContactRoute,
   DernieresVentesRoute: DernieresVentesRoute,
+  HonorairesRoute: HonorairesRoute,
   LouerRoute: LouerRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
+  PolitiqueRgpdRoute: PolitiqueRgpdRoute,
   VendreRoute: VendreRoute,
 }
 export const routeTree = rootRouteImport

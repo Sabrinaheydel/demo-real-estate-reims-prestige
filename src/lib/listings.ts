@@ -34,10 +34,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Magnifique appartement haussmannien entièrement rénové avec goût. Hauts plafonds, parquet ancien, moulures d'époque. Séjour double lumineux, cuisine équipée ouverte, 3 chambres dont une suite parentale. Immeuble pierre de taille, ascenseur, cave. Un bien rare dans le secteur le plus recherché de Reims.",
     photos: [
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1400&q=80",
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1400&q=80",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1400&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&q=80",
+      "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=800",
+      "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=1200",
+      "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=1600",
     ],
   },
   {
@@ -56,9 +55,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Belle maison de ville années 30 pleine de caractère. Séjour avec cheminée, salle à manger, cuisine indépendante. 4 chambres à l'étage, salle de bain et salle d'eau. Jardin arboré exposé sud, garage double. Secteur calme prisé des familles, à 10 min à pied de la cathédrale.",
     photos: [
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1400&q=80",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1400&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=80",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600",
     ],
   },
   {
@@ -77,9 +76,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Studio entièrement meublé et équipé, refait à neuf. Coin nuit séparé, cuisine équipée, salle d'eau moderne. Internet fibre inclus. Immeuble sécurisé avec digicode. Idéalement situé à 5 min à pied du CHU et des transports.",
     photos: [
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1400&q=80",
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1400&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80",
+      "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800",
+      "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=1200",
+      "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=1600",
     ],
   },
   {
@@ -98,9 +97,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Appartement traversant lumineux, parfait pour investissement ou premier achat. Séjour avec coin repas, chambre séparée, cuisine équipée, salle de bain. Charges faibles. Rendement locatif estimé : 5,2% brut. Locataire en place possible.",
     photos: [
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1400&q=80",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1400&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1600",
     ],
   },
   {
@@ -119,9 +118,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Exceptionnelle villa contemporaine construite en 2018. Grandes baies vitrées, séjour cathédrale de 60 m², cuisine américaine haut de gamme, 5 chambres dont suite parentale avec dressing et salle de bain privative. Piscine chauffée, terrain paysager, double garage. Quartier résidentiel calme.",
     photos: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=80",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1400&q=80",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600",
     ],
   },
   {
@@ -140,9 +139,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Grand T3 refait à neuf dans immeuble récent. Double séjour lumineux, cuisine ouverte équipée, 2 belles chambres, salle de bain et WC séparés. Balcon orienté sud, parking privatif. Proche commerces, écoles et transports. Disponible immédiatement.",
     photos: [
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1400&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&q=80",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1400&q=80",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1600",
     ],
   },
   {
@@ -161,9 +160,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Studio entièrement rénové au cœur de Reims. Cuisine équipée, salle d'eau refaite, double vitrage. Immeuble Pierre de taille, digicode. Rentabilité brute : 6,1%. Secteur ultra-demandé, vacance locative quasi nulle.",
     photos: [
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1400&q=80",
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1400&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1600",
     ],
   },
   {
@@ -182,9 +181,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Superbe maison de caractère en pierre avec dépendance aménageable. Grandes pièces de réception, cheminée en marbre, cuisine rénovée, 4 chambres. Dépendance de 60 m² idéale pour télétravail ou chambre d'hôtes. Grand terrain arboré. Rare.",
     photos: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=80",
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1400&q=80",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1400&q=80",
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800",
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200",
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1600",
     ],
   },
   {
@@ -203,9 +202,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Beau T2 dans résidence sécurisée avec gardien. Séjour lumineux, chambre séparée, cuisine équipée, salle de bain refaite. Parking et cave inclus dans le loyer. Environnement calme et verdoyant, tous commerces à pied.",
     photos: [
-      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=1400&q=80",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1400&q=80",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1400&q=80",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1600",
     ],
   },
   {
@@ -224,9 +223,9 @@ export const LISTINGS: Listing[] = [
     description:
       "Spacieux T4 dans résidence gardiennée de standing. Grand séjour double, 3 chambres, cuisine équipée, deux salles d'eau. Parking souterrain, cave. Charges raisonnables. Idéal famille ou investissement patrimonial.",
     photos: [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=80",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1400&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600",
     ],
   },
 ];

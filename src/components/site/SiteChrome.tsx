@@ -155,9 +155,9 @@ export function Footer() {
         <div>
           <h4 className="!text-white text-sm uppercase tracking-wider mb-4 font-sans font-semibold">Informations</h4>
           <ul className="space-y-2.5 text-sm">
-            <li><a href="#" className="hover:text-gold transition-colors">Mentions légales</a></li>
-            <li><a href="#" className="hover:text-gold transition-colors">Politique RGPD</a></li>
-            <li><a href="#" className="hover:text-gold transition-colors">Honoraires</a></li>
+            <li><Link to="/mentions-legales" className="hover:text-gold transition-colors">Mentions légales</Link></li>
+            <li><Link to="/politique-rgpd" className="hover:text-gold transition-colors">Politique RGPD</Link></li>
+            <li><Link to="/honoraires" className="hover:text-gold transition-colors">Honoraires</Link></li>
             <li><Link to="/admin" className="hover:text-gold transition-colors">Espace admin</Link></li>
           </ul>
         </div>

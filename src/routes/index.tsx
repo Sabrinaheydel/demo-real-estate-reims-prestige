@@ -62,33 +62,36 @@ const NAV_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-const LISTINGS = [
+const HOME_LISTINGS = [
   {
+    id: "1",
     title: "Appartement haussmannien · 4 pièces",
     location: "Centre-ville, Reims",
     price: "395 000 €",
     beds: 3,
     baths: 2,
     surface: 98,
-    img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&q=80",
+    img: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=900",
   },
   {
+    id: "2",
     title: "Maison de caractère avec jardin",
     location: "Cormontreuil, Reims",
     price: "562 000 €",
     beds: 4,
     baths: 2,
     surface: 165,
-    img: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=900&q=80",
+    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900",
   },
   {
-    title: "Loft contemporain · Terrasse",
-    location: "Quartier Clairmarais",
-    price: "289 000 €",
-    beds: 2,
-    baths: 1,
-    surface: 76,
-    img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&q=80",
+    id: "5",
+    title: "Villa contemporaine avec piscine",
+    location: "Bezannes, Reims",
+    price: "520 000 €",
+    beds: 5,
+    baths: 3,
+    surface: 220,
+    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900",
   },
 ];
 
@@ -97,18 +100,21 @@ const SERVICES = [
     icon: Building2,
     title: "Vendre mon bien",
     desc: "Je vous accompagne de l'estimation à la signature, avec une stratégie sur-mesure.",
+    href: "/vendre",
   },
   {
     icon: Key,
     title: "Louer mon bien",
     desc: "Gestion locative complète et sérénisée. Sélection des locataires, état des lieux, suivi.",
+    href: "/louer",
   },
   {
     icon: Search,
     title: "Acheter ou investir",
     desc: "Je trouve le bien qui correspond à votre projet de vie ou patrimonial.",
+    href: "/acheter",
   },
-];
+] as const;
 
 const STEPS = [
   { icon: ClipboardCheck, title: "Estimation offerte", desc: "Sous 48 heures" },
@@ -433,9 +439,9 @@ function Services() {
                 </div>
                 <h3 className="text-xl mb-3">{s.title}</h3>
                 <p className="text-muted-foreground mb-6">{s.desc}</p>
-                <a href="#contact" className="inline-flex items-center gap-2 text-navy font-medium text-sm group-hover:text-gold transition-colors">
+                <Link to={s.href} className="inline-flex items-center gap-2 text-navy font-medium text-sm group-hover:text-gold transition-colors">
                   En savoir plus <ArrowRight size={16} />
-                </a>
+                </Link>
               </div>
             );
           })}
@@ -454,13 +460,18 @@ function Listings() {
             <span className="text-gold text-sm font-medium tracking-[0.2em] uppercase">Sélection</span>
             <h2 className="text-3xl sm:text-4xl mt-3">Biens disponibles en ce moment</h2>
           </div>
-          <a href="#annonces" className="inline-flex items-center gap-2 text-navy font-semibold hover:text-gold transition-colors">
+          <Link to="/annonces" className="inline-flex items-center gap-2 text-navy font-semibold hover:text-gold transition-colors">
             Voir toutes les annonces <ArrowRight size={18} />
-          </a>
+          </Link>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
-          {LISTINGS.map((l) => (
-            <article key={l.title} className="bg-white rounded-lg overflow-hidden shadow-soft hover:shadow-card transition-all group">
+          {HOME_LISTINGS.map((l) => (
+            <Link
+              to="/annonces/$id"
+              params={{ id: l.id }}
+              key={l.id}
+              className="block bg-white rounded-lg overflow-hidden shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+            >
               <div className="aspect-[4/3] overflow-hidden">
                 <img src={l.img} alt={l.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
@@ -476,7 +487,7 @@ function Listings() {
                 </div>
                 <div className="font-display text-2xl text-navy">{l.price}</div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>
