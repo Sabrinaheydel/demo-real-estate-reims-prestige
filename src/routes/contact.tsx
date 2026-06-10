@@ -82,7 +82,7 @@ function ContactForm() {
 function ContactPage() {
   return (
     <PageShell>
-      <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden">
+      <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden mt-20">
         <img
           src={portraitInterior.url}
           alt="Julien Dupuis dans un appartement haussmannien à Reims"
