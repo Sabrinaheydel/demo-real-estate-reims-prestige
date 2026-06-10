@@ -9,42 +9,22 @@ import {
   MapPin,
   Phone,
   Mail,
+  MessageCircle,
 } from "lucide-react";
 
-const NAV_LINKS: { label: string; href: string }[] = [
-  { label: "Accueil", href: "/" },
-  { label: "Annonces", href: "/annonces" },
-  { label: "Vendre", href: "/#services" },
-  { label: "Louer", href: "/#services" },
-  { label: "Acheter", href: "/#services" },
-  { label: "Dernières ventes", href: "/#chiffres" },
-  { label: "Contact", href: "/#contact" },
+const NAV_LINKS: { label: string; to: string }[] = [
+  { label: "Accueil", to: "/" },
+  { label: "Annonces", to: "/annonces" },
+  { label: "Vendre", to: "/vendre" },
+  { label: "Louer", to: "/louer" },
+  { label: "Acheter", to: "/acheter" },
+  { label: "Dernières ventes", to: "/dernieres-ventes" },
+  { label: "Contact", to: "/contact" },
 ];
 
-function NavItem({
-  href,
-  className,
-  onClick,
-  children,
-}: {
-  href: string;
-  className?: string;
-  onClick?: () => void;
-  children: React.ReactNode;
-}) {
-  if (href.startsWith("/") && !href.includes("#")) {
-    return (
-      <Link to={href} className={className} onClick={onClick}>
-        {children}
-      </Link>
-    );
-  }
-  return (
-    <a href={href} className={className} onClick={onClick}>
-      {children}
-    </a>
-  );
-}
+const PHONE_DISPLAY = "+33 3 26 00 00 00";
+const PHONE_TEL = "+33326000000";
+const WHATSAPP_URL = "https://wa.me/33600000000";
 
 export function Navbar({ solid = false }: { solid?: boolean }) {
   const [scrolled, setScrolled] = useState(solid);
@@ -74,25 +54,27 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
         >
           Dupuis <span className="text-gold italic">Immobilier</span>
         </Link>
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-7">
           {NAV_LINKS.map((l) => (
-            <NavItem
+            <Link
               key={l.label}
-              href={l.href}
+              to={l.to}
+              activeOptions={{ exact: l.to === "/" }}
               className={`text-sm font-medium transition-colors hover:text-gold ${
                 isSolid ? "text-navy" : "text-white/90"
               }`}
+              activeProps={{ className: "text-gold" }}
             >
               {l.label}
-            </NavItem>
+            </Link>
           ))}
         </nav>
-        <a
-          href="/#contact"
+        <Link
+          to="/vendre"
           className="hidden lg:inline-flex items-center px-5 py-2.5 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90 transition-colors shadow-soft"
         >
           Estimation gratuite
-        </a>
+        </Link>
         <button
           onClick={() => setOpen(!open)}
           className={`lg:hidden p-2 ${isSolid ? "text-navy" : "text-white"}`}
@@ -103,23 +85,29 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
       </div>
       {open && (
         <div className="lg:hidden bg-white border-t border-border shadow-card">
-          <nav className="px-6 py-6 flex flex-col gap-4">
+          <nav className="px-6 py-6 flex flex-col gap-3">
             {NAV_LINKS.map((l) => (
-              <NavItem
+              <Link
                 key={l.label}
-                href={l.href}
+                to={l.to}
                 onClick={() => setOpen(false)}
                 className="text-navy font-medium py-2"
               >
                 {l.label}
-              </NavItem>
+              </Link>
             ))}
-            <a
-              href="/#contact"
+            <Link
+              to="/vendre"
               onClick={() => setOpen(false)}
               className="mt-2 inline-flex justify-center items-center px-5 py-3 rounded-lg bg-gold text-navy font-semibold"
             >
               Estimation gratuite
+            </Link>
+            <a
+              href={`tel:${PHONE_TEL}`}
+              className="inline-flex justify-center items-center gap-2 px-5 py-3 rounded-lg border border-navy text-navy font-medium"
+            >
+              <Phone size={16} /> Appeler
             </a>
           </nav>
         </div>
@@ -150,7 +138,7 @@ export function Footer() {
           <ul className="space-y-2.5 text-sm">
             {NAV_LINKS.map((l) => (
               <li key={l.label}>
-                <NavItem href={l.href} className="hover:text-gold transition-colors">{l.label}</NavItem>
+                <Link to={l.to} className="hover:text-gold transition-colors">{l.label}</Link>
               </li>
             ))}
           </ul>
@@ -159,8 +147,8 @@ export function Footer() {
           <h4 className="!text-white text-sm uppercase tracking-wider mb-4 font-sans font-semibold">Contact</h4>
           <ul className="space-y-3 text-sm">
             <li className="flex gap-2"><MapPin size={16} className="text-gold shrink-0 mt-0.5"/><span>24 rue de Vesle, 51100 Reims</span></li>
-            <li className="flex gap-2"><Phone size={16} className="text-gold shrink-0 mt-0.5"/><span>+33 3 26 00 00 00</span></li>
-            <li className="flex gap-2"><Mail size={16} className="text-gold shrink-0 mt-0.5"/><span>contact@dupuis-immobilier.fr</span></li>
+            <li className="flex gap-2"><Phone size={16} className="text-gold shrink-0 mt-0.5"/><a href={`tel:${PHONE_TEL}`} className="hover:text-gold transition-colors">{PHONE_DISPLAY}</a></li>
+            <li className="flex gap-2"><Mail size={16} className="text-gold shrink-0 mt-0.5"/><a href="mailto:contact@dupuis-immobilier.fr" className="hover:text-gold transition-colors">contact@dupuis-immobilier.fr</a></li>
           </ul>
         </div>
         <div>
@@ -169,13 +157,97 @@ export function Footer() {
             <li><a href="#" className="hover:text-gold transition-colors">Mentions légales</a></li>
             <li><a href="#" className="hover:text-gold transition-colors">Politique RGPD</a></li>
             <li><a href="#" className="hover:text-gold transition-colors">Honoraires</a></li>
-            <li><a href="#" className="hover:text-gold transition-colors">Cookies</a></li>
+            <li><Link to="/admin" className="hover:text-gold transition-colors">Espace admin</Link></li>
           </ul>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl border-t border-white/10 mt-12 pt-6 text-xs text-white/50 text-center">
-        © {new Date().getFullYear()} Dupuis Immobilier · Tous droits réservés · Carte T n° CPI 5101 2024 000 000 000
+      <div className="mx-auto max-w-7xl border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row gap-3 justify-between items-center text-xs text-white/50 text-center">
+        <div>© {new Date().getFullYear()} Dupuis Immobilier · Tous droits réservés · Carte T n° CPI 5101 2024 000 000 000</div>
+        <div>
+          Site réalisé par{" "}
+          <a
+            href="https://www.agence360digital.fr/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold hover:underline"
+          >
+            Sabrina Heydel — Agence 360 Digital
+          </a>
+        </div>
       </div>
+      <WhatsAppBubble />
+      <CookieBanner />
     </footer>
+  );
+}
+
+export function WhatsAppBubble() {
+  return (
+    <a
+      href={WHATSAPP_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Discuter sur WhatsApp"
+      className="fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-card flex items-center justify-center transition-all hover:-translate-y-0.5"
+    >
+      <MessageCircle size={26} />
+    </a>
+  );
+}
+
+export function CookieBanner() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!localStorage.getItem("cookie-accepted")) {
+      const t = setTimeout(() => setShow(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, []);
+  if (!show) return null;
+  return (
+    <div className="fixed bottom-5 left-5 right-24 sm:right-auto sm:max-w-md z-40 bg-white border border-border shadow-card rounded-xl p-5">
+      <p className="text-sm text-foreground/80 mb-3">
+        Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre politique RGPD.
+      </p>
+      <div className="flex gap-2 justify-end">
+        <button
+          onClick={() => {
+            localStorage.setItem("cookie-accepted", "refused");
+            setShow(false);
+          }}
+          className="px-4 py-2 text-sm text-foreground/70 hover:text-navy"
+        >
+          Refuser
+        </button>
+        <button
+          onClick={() => {
+            localStorage.setItem("cookie-accepted", "accepted");
+            setShow(false);
+          }}
+          className="px-4 py-2 text-sm rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90"
+        >
+          Accepter
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function PageShell({
+  children,
+  solidNav = true,
+}: {
+  children: React.ReactNode;
+  solidNav?: boolean;
+}) {
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar solid={solidNav} />
+      <main className="flex-1">{children}</main>
+      <Footer />
+      <WhatsAppBubble />
+      <CookieBanner />
+    </div>
   );
 }

@@ -9,13 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VendreRouteImport } from './routes/vendre'
+import { Route as LouerRouteImport } from './routes/louer'
+import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AcheterRouteImport } from './routes/acheter'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnnoncesIdRouteImport } from './routes/annonces.$id'
 
+const VendreRoute = VendreRouteImport.update({
+  id: '/vendre',
+  path: '/vendre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LouerRoute = LouerRouteImport.update({
+  id: '/louer',
+  path: '/louer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DernieresVentesRoute = DernieresVentesRouteImport.update({
+  id: '/dernieres-ventes',
+  path: '/dernieres-ventes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnnoncesRoute = AnnoncesRouteImport.update({
   id: '/annonces',
   path: '/annonces',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcheterRoute = AcheterRouteImport.update({
+  id: '/acheter',
+  path: '/acheter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,40 +67,134 @@ const AnnoncesIdRoute = AnnoncesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acheter': typeof AcheterRoute
+  '/admin': typeof AdminRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/dernieres-ventes': typeof DernieresVentesRoute
+  '/louer': typeof LouerRoute
+  '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acheter': typeof AcheterRoute
+  '/admin': typeof AdminRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/dernieres-ventes': typeof DernieresVentesRoute
+  '/louer': typeof LouerRoute
+  '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/acheter': typeof AcheterRoute
+  '/admin': typeof AdminRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/dernieres-ventes': typeof DernieresVentesRoute
+  '/louer': typeof LouerRoute
+  '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/annonces' | '/annonces/$id'
+  fullPaths:
+    | '/'
+    | '/acheter'
+    | '/admin'
+    | '/annonces'
+    | '/contact'
+    | '/dernieres-ventes'
+    | '/louer'
+    | '/vendre'
+    | '/annonces/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/annonces' | '/annonces/$id'
-  id: '__root__' | '/' | '/annonces' | '/annonces/$id'
+  to:
+    | '/'
+    | '/acheter'
+    | '/admin'
+    | '/annonces'
+    | '/contact'
+    | '/dernieres-ventes'
+    | '/louer'
+    | '/vendre'
+    | '/annonces/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/acheter'
+    | '/admin'
+    | '/annonces'
+    | '/contact'
+    | '/dernieres-ventes'
+    | '/louer'
+    | '/vendre'
+    | '/annonces/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcheterRoute: typeof AcheterRoute
+  AdminRoute: typeof AdminRoute
   AnnoncesRoute: typeof AnnoncesRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  DernieresVentesRoute: typeof DernieresVentesRoute
+  LouerRoute: typeof LouerRoute
+  VendreRoute: typeof VendreRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vendre': {
+      id: '/vendre'
+      path: '/vendre'
+      fullPath: '/vendre'
+      preLoaderRoute: typeof VendreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/louer': {
+      id: '/louer'
+      path: '/louer'
+      fullPath: '/louer'
+      preLoaderRoute: typeof LouerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dernieres-ventes': {
+      id: '/dernieres-ventes'
+      path: '/dernieres-ventes'
+      fullPath: '/dernieres-ventes'
+      preLoaderRoute: typeof DernieresVentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/annonces': {
       id: '/annonces'
       path: '/annonces'
       fullPath: '/annonces'
       preLoaderRoute: typeof AnnoncesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acheter': {
+      id: '/acheter'
+      path: '/acheter'
+      fullPath: '/acheter'
+      preLoaderRoute: typeof AcheterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -98,7 +228,13 @@ const AnnoncesRouteWithChildren = AnnoncesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcheterRoute: AcheterRoute,
+  AdminRoute: AdminRoute,
   AnnoncesRoute: AnnoncesRouteWithChildren,
+  ContactRoute: ContactRoute,
+  DernieresVentesRoute: DernieresVentesRoute,
+  LouerRoute: LouerRoute,
+  VendreRoute: VendreRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
