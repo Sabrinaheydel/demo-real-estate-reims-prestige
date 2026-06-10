@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
+import { Lightbox } from "@/components/site/Lightbox";
 import { ListingCard } from "@/components/site/ListingCard";
 import { getListing, getSimilar } from "@/lib/listings";
 import {
@@ -72,6 +73,7 @@ export const Route = createFileRoute("/annonces/$id")({
 function ListingDetailPage() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
   const [activePhoto, setActivePhoto] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [intent, setIntent] = useState<"visite" | "infos" | "offre">("visite");
   const similar = getSimilar(listing);
@@ -100,28 +102,49 @@ function ListingDetailPage() {
             <ArrowLeft size={16} /> Retour aux annonces
           </Link>
 
-          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-4 mb-10">
-            <div className="rounded-xl overflow-hidden bg-cream aspect-[4/3]">
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              className="block w-full rounded-xl overflow-hidden bg-cream cursor-zoom-in group"
+              aria-label="Agrandir la photo"
+            >
               <img
                 src={listing.photos[activePhoto]}
                 alt={listing.title}
-                className="w-full h-full object-cover"
+                className="w-full object-cover transition-transform group-hover:scale-[1.01]"
+                style={{ height: "400px" }}
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {listing.photos.slice(0, 4).map((p, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActivePhoto(i)}
-                  className={`rounded-xl overflow-hidden bg-cream aspect-[4/3] border-2 transition-all ${
-                    activePhoto === i ? "border-gold" : "border-transparent hover:border-gold/40"
-                  }`}
-                >
-                  <img src={p} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+            </button>
           </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 mb-10 -mx-6 px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-5 lg:gap-4 snap-x">
+            {listing.photos.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setActivePhoto(i);
+                  setLightboxOpen(true);
+                }}
+                className={`shrink-0 w-[22vw] min-w-[110px] lg:w-auto rounded-lg overflow-hidden bg-cream aspect-[4/3] snap-start transition-all ${
+                  activePhoto === i
+                    ? "border-2 border-gold"
+                    : "border-2 border-transparent hover:border-gold/40 opacity-90"
+                }`}
+                aria-label={`Voir photo ${i + 1}`}
+              >
+                <img src={p} alt="" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+
+          <Lightbox
+            photos={listing.photos}
+            open={lightboxOpen}
+            index={activePhoto}
+            onChange={setActivePhoto}
+            onClose={() => setLightboxOpen(false)}
+            alt={listing.title}
+          />
 
           <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10">
             <div>
