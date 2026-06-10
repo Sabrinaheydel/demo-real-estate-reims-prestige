@@ -148,10 +148,10 @@ function AnnoncesPage() {
           </div>
         </section>
 
-        <div className="sticky top-20 z-30 bg-white border-y border-border shadow-[0_4px_18px_-12px_rgba(27,45,79,0.18)]">
-          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,2fr)_repeat(4,minmax(0,1fr))_auto] gap-3">
-              <div className="relative">
+        <div className="sticky top-16 sm:top-20 z-30 bg-white border-y border-border shadow-[0_4px_18px_-12px_rgba(27,45,79,0.18)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-3 sm:py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(220px,2fr)_repeat(4,minmax(0,1fr))_auto] gap-2.5 sm:gap-3">
+              <div className="relative sm:col-span-2 lg:col-span-1">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50" />
                 <input
                   type="text"
