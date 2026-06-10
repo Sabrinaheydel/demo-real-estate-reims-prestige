@@ -48,6 +48,7 @@ export const Route = createFileRoute("/")({
 });
 
 import heroAsset from "@/assets/reims-hero.png.asset.json";
+import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
 const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
