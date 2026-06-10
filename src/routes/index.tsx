@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-import heroAsset from "@/assets/reims-hero.png.asset.json";
+import heroAsset from "@/assets/hero-julien-reims.jpg.asset.json";
 import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
 const HERO_IMG = heroAsset.url;
 
@@ -281,38 +281,49 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section id="accueil" className="relative min-h-[100svh] flex items-center justify-center text-center text-white overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${HERO_IMG})` }}
+    <section id="accueil" className="relative min-h-[100svh] flex items-center text-white overflow-hidden">
+      <img
+        src={HERO_IMG}
+        alt="Julien Dupuis, agent immobilier indépendant à Reims, devant la cathédrale"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: "center right" }}
       />
-      <div className="absolute inset-0" style={{ backgroundColor: "rgba(27,45,79,0.55)" }} />
-      <div className="relative z-10 max-w-4xl px-6 py-32">
-        <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-6">
-          Agent immobilier indépendant · Reims
-        </span>
-        <h1 className="!text-white font-display text-4xl sm:text-5xl lg:text-6xl leading-tight mb-6">
-          Votre bien immobilier à Reims,<br className="hidden sm:block" /> entre de bonnes mains
-        </h1>
-        <p className="text-lg sm:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-          Estimation gratuite · Accompagnement personnalisé · Résultats prouvés
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/vendre"
-            className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all hover:-translate-y-0.5 shadow-card"
-          >
-            Estimer mon bien
-          </Link>
-          <Link
-            to="/annonces"
-            className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
-          >
-            Voir les annonces
-          </Link>
+      {/* Overlay: dark navy left → transparent right */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to right, rgba(27,45,79,0.85) 0%, rgba(27,45,79,0.7) 35%, rgba(27,45,79,0.25) 65%, rgba(27,45,79,0) 100%)",
+        }}
+      />
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32">
+        <div className="max-w-2xl text-left">
+          <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-6">
+            Agent indépendant · Reims
+          </span>
+          <h1 className="!text-white font-display text-4xl sm:text-5xl lg:text-6xl leading-tight mb-6">
+            Votre bien immobilier à Reims,<br className="hidden sm:block" /> entre de bonnes mains
+          </h1>
+          <p className="text-lg sm:text-xl text-white/90 mb-10">
+            Estimation gratuite · Accompagnement personnalisé · Résultats prouvés
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              to="/vendre"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all hover:-translate-y-0.5 shadow-card"
+            >
+              Estimer mon bien
+            </Link>
+            <Link
+              to="/annonces"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
+            >
+              Voir les annonces
+            </Link>
+          </div>
         </div>
       </div>
-      <div className="absolute bottom-6 right-6 z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm text-white">
+      <div className="absolute bottom-6 left-6 lg:left-10 z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm text-white">
         <Star size={16} className="fill-gold text-gold" />
         <span className="font-semibold">4,9/5</span>
         <span className="text-white/80">— 160 avis Google</span>
