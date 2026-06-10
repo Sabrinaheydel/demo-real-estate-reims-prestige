@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
 import { TextField, SelectField } from "./vendre";
 import { Check, MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from "lucide-react";
+import portraitInterior from "@/assets/photo-profil-3.jpg.asset.json";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
