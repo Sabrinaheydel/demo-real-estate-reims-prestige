@@ -32,7 +32,7 @@ function SoldPage() {
             Nos résultats
           </span>
           <h1 className="font-display text-4xl sm:text-5xl text-navy mb-4">
-            Ils ont vendu avec nous les succès récents
+            Ils ont vendu avec nous. Les succès récents
           </h1>
           <p className="text-foreground/70 max-w-2xl mx-auto">
             Transparence totale sur nos résultats
