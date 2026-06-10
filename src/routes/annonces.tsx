@@ -186,18 +186,18 @@ function AnnoncesPage() {
                 <option value="studio">Studio</option>
                 <option value="local">Local commercial</option>
               </select>
-              <div className="flex gap-2">
+              <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
                 <button
                   type="button"
                   onClick={() => setMoreOpen((o) => !o)}
-                  className="px-4 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium hover:border-gold inline-flex items-center gap-2"
+                  className="flex-1 lg:flex-none min-h-[48px] px-4 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium hover:border-gold inline-flex items-center justify-center gap-2"
                 >
                   <SlidersHorizontal size={16} /> Plus
                 </button>
                 <button
                   type="button"
                   onClick={() => setVisible(9)}
-                  className="px-5 py-3 rounded-lg bg-gold text-navy text-sm font-semibold hover:bg-gold/90 inline-flex items-center gap-2 shadow-sm"
+                  className="flex-1 lg:flex-none min-h-[48px] px-5 py-3 rounded-lg text-navy text-sm font-semibold inline-flex items-center justify-center gap-2 shadow-sm"
                   style={{ backgroundColor: "#C9A96E" }}
                 >
                   <Search size={16} /> Rechercher
