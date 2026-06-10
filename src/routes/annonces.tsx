@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCard } from "@/components/site/ListingCard";
 import { LISTINGS } from "@/lib/listings";
 import { Search, SlidersHorizontal, X } from "lucide-react";
@@ -133,8 +134,9 @@ function AnnoncesPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar solid />
-      <main className="pt-20 pb-24">
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 pt-8">
+      <Breadcrumbs items={[{ label: "Annonces" }]} />
+      <main className="pt-6 pb-24">
+        <section className="max-w-7xl mx-auto px-6 lg:px-10 pt-4">
           <div className="text-center mb-8">
             <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-4">
               Sélection Dupuis Immobilier

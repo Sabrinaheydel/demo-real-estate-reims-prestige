@@ -120,8 +120,8 @@ function BuyForm() {
 
 function BuyPage() {
   return (
-    <PageShell>
-      <section className="relative pt-32 pb-16 px-6 overflow-hidden">
+    <PageShell breadcrumbs={[{ label: "Acheter" }]}>
+      <section className="relative pt-10 pb-16 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-15"
           style={{ backgroundImage: "url(https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1600&q=80)" }}

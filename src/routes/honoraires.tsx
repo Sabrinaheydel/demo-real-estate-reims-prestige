@@ -30,8 +30,8 @@ const LOCATION = [
 
 function Page() {
   return (
-    <PageShell>
-      <section className="pt-32 pb-20 px-6">
+    <PageShell breadcrumbs={[{ label: "Honoraires" }]}>
+      <section className="pt-10 pb-20 px-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="font-display text-4xl text-navy mb-3">Nos honoraires</h1>
           <p className="text-foreground/70 mb-10">Barème en vigueur — conforme à la loi Alur et affiché conformément à l'arrêté du 10 janvier 2017.</p>

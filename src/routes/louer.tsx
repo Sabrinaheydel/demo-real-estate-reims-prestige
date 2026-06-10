@@ -71,8 +71,8 @@ function RentForm() {
 
 function RentPage() {
   return (
-    <PageShell>
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+    <PageShell breadcrumbs={[{ label: "Louer" }]}>
+      <section className="relative pt-10 pb-20 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{ backgroundImage: "url(https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1600&q=80)" }}

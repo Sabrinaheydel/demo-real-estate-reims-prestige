@@ -25,8 +25,8 @@ const SOLD = [
 
 function SoldPage() {
   return (
-    <PageShell>
-      <section className="pt-32 pb-16 px-6">
+    <PageShell breadcrumbs={[{ label: "Dernières ventes" }]}>
+      <section className="pt-10 pb-16 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-4">
             Nos résultats

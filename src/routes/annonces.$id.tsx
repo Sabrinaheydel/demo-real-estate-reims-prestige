@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-rout
 import { useState } from "react";
 import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCard } from "@/components/site/ListingCard";
 import { getListing, getSimilar } from "@/lib/listings";
 import {
@@ -84,7 +85,13 @@ function ListingDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar solid />
-      <main className="pt-24 pb-24">
+      <Breadcrumbs
+        items={[
+          { label: "Annonces", to: "/annonces" },
+          { label: listing.title },
+        ]}
+      />
+      <main className="pt-6 pb-24">
         <section className="max-w-7xl mx-auto px-6 lg:px-10">
           <Link
             to="/annonces"

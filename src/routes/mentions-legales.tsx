@@ -13,8 +13,8 @@ export const Route = createFileRoute("/mentions-legales")({
 
 function Page() {
   return (
-    <PageShell>
-      <section className="pt-32 pb-20 px-6">
+    <PageShell breadcrumbs={[{ label: "Mentions légales" }]}>
+      <section className="pt-10 pb-20 px-6">
         <div className="max-w-3xl mx-auto">
           <h1 className="font-display text-4xl text-navy mb-8">Mentions légales</h1>
           <div className="space-y-6 text-foreground/80 leading-relaxed">
