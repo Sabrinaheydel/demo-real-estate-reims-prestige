@@ -162,7 +162,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mx-auto max-w-7xl border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row gap-3 justify-between items-center text-xs text-white/50 text-center">
-        <div>© {new Date().getFullYear()} Dupuis Immobilier · Tous droits réservés · Carte T n° CPI 5101 2024 000 000 000</div>
+        <div>© {new Date().getFullYear()} Dupuis Immobilier · Tous droits réservés · Carte T n° CPI 5101 2026 000 000 000</div>
         <div>
           Site réalisé par{" "}
           <a

@@ -27,8 +27,8 @@ export const Route = createFileRoute("/admin")({
   component: AdminRoute,
 });
 
-const ADMIN_EMAIL = "admin@lestradet.fr";
-const ADMIN_PASSWORD = "demo2024";
+const ADMIN_EMAIL = "admin@dupuis.fr";
+const ADMIN_PASSWORD = "demo2026";
 
 type Message = {
   id: string;
@@ -109,7 +109,7 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-border text-sm focus:outline-none focus:border-gold"
-              placeholder="admin@lestradet.fr"
+              placeholder="admin@dupuis.fr"
             />
           </label>
           <label className="block">
@@ -131,7 +131,7 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
             Se connecter
           </button>
           <p className="text-xs text-center text-foreground/50 pt-2 border-t border-border">
-            Démo : <span className="font-mono">admin@lestradet.fr</span> / <span className="font-mono">demo2024</span>
+            Démo : <span className="font-mono">admin@dupuis.fr</span> / <span className="font-mono">demo2026</span>
           </p>
         </form>
       </div>
