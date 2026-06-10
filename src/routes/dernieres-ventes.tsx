@@ -70,7 +70,7 @@ function SoldPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div>
             <div className="font-display text-4xl text-gold mb-2">47</div>
-            <div className="text-sm uppercase tracking-wider text-white/70">Biens vendus en 2024</div>
+            <div className="text-sm uppercase tracking-wider text-white/70">Biens vendus en 2026</div>
           </div>
           <div>
             <div className="font-display text-4xl text-gold mb-2">98,3%</div>
