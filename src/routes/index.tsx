@@ -24,6 +24,7 @@ import {
   Phone,
   Mail,
   ArrowRight,
+  Check,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
