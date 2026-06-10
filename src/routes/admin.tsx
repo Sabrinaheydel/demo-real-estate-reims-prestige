@@ -16,6 +16,7 @@ import {
   Upload,
   ArrowLeft,
 } from "lucide-react";
+import portraitAvatar from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
