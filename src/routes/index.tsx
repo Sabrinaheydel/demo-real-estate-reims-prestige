@@ -121,13 +121,13 @@ const TESTIMONIALS = [
     name: "Marie L.",
     role: "Vendeuse",
     quote:
-      "Jérôme a vendu notre appartement en 3 semaines au prix demandé. Son suivi était impeccable, on se sentait vraiment accompagnés.",
+      "Julien a vendu notre appartement en 3 semaines au prix demandé. Son suivi était impeccable, on se sentait vraiment accompagnés.",
   },
   {
     name: "Thomas & Claire R.",
     role: "Acheteurs",
     quote:
-      "Nous cherchions depuis 6 mois. Jérôme a trouvé notre maison en 2 visites. Il a négocié 8 000 € en notre faveur. Incroyable.",
+      "Nous cherchions depuis 6 mois. Julien a trouvé notre maison en 2 visites. Il a négocié 8 000 € en notre faveur. Incroyable.",
   },
   {
     name: "Sophie D.",
@@ -139,7 +139,7 @@ const TESTIMONIALS = [
     name: "Michel V.",
     role: "Investisseur",
     quote:
-      "3 appartements achetés avec Jérôme en 2 ans. Il connaît le marché rémois comme personne. Un vrai partenaire.",
+      "3 appartements achetés avec Julien en 2 ans. Il connaît le marché rémois comme personne. Un vrai partenaire.",
   },
 ];
 
