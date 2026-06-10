@@ -128,7 +128,7 @@ function AnnoncesPage() {
   const shown = filtered.slice(0, visible);
 
   const selectClass =
-    "w-full px-3 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition";
+    "w-full min-h-[48px] px-3 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition";
 
   return (
     <div className="min-h-screen bg-background">
