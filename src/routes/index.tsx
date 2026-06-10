@@ -52,7 +52,7 @@ const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
   { label: "Accueil", href: "#accueil" },
-  { label: "Annonces", href: "#annonces" },
+  { label: "Annonces", href: "/annonces" },
   { label: "Vendre", href: "#services" },
   { label: "Louer", href: "#services" },
   { label: "Acheter", href: "#services" },
@@ -563,9 +563,9 @@ function Footer() {
         <div>
           <h4 className="!text-white text-sm uppercase tracking-wider mb-4 font-sans font-semibold">Contact</h4>
           <ul className="space-y-3 text-sm">
-            <li className="flex gap-2"><MapPin size={16} className="text-gold shrink-0 mt-0.5"/> 24 rue de Vesle, 51100 Reims</li>
-            <li className="flex gap-2"><Phone size={16} className="text-gold shrink-0 mt-0.5"/> +33 3 26 00 00 00</li>
-            <li className="flex gap-2"><Mail size={16} className="text-gold shrink-0 mt-0.5"/> contact@dupuis-immobilier.fr</li>
+            <li className="flex gap-2"><MapPin size={16} className="text-gold shrink-0 mt-0.5"/><span>24 rue de Vesle, 51100 Reims</span></li>
+            <li className="flex gap-2"><Phone size={16} className="text-gold shrink-0 mt-0.5"/><span>+33 3 26 00 00 00</span></li>
+            <li className="flex gap-2"><Mail size={16} className="text-gold shrink-0 mt-0.5"/><span>contact@dupuis-immobilier.fr</span></li>
           </ul>
         </div>
         <div>
