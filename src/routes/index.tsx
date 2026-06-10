@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Menu,
@@ -163,7 +163,7 @@ function useInView<T extends HTMLElement>() {
           obs.disconnect();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -184,10 +184,16 @@ function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) 
       const eased = 1 - Math.pow(1 - p, 3);
       setN(value * eased);
       if (p < 1) raf = requestAnimationFrame(tick);
+      else setN(value);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [seen, value]);
+  // Fallback: ensure final value is shown even if IntersectionObserver never fires
+  useEffect(() => {
+    const t = setTimeout(() => setN((cur) => (cur === 0 ? value : cur)), 2500);
+    return () => clearTimeout(t);
+  }, [value]);
   return <span ref={ref}>{n.toFixed(decimals)}</span>;
 }
 
@@ -290,18 +296,18 @@ function Hero() {
           Estimation gratuite · Accompagnement personnalisé · Résultats prouvés
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="#contact"
+          <Link
+            to="/vendre"
             className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all hover:-translate-y-0.5 shadow-card"
           >
             Estimer mon bien
-          </a>
-          <a
-            href="#annonces"
+          </Link>
+          <Link
+            to="/annonces"
             className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
           >
             Voir les annonces
-          </a>
+          </Link>
         </div>
       </div>
       <div className="absolute bottom-6 right-6 z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm text-white">
@@ -525,10 +531,10 @@ function Contact() {
           </button>
         </form>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-navy">
-          <a href="#" aria-label="Facebook" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Facebook size={18}/></a>
-          <a href="#" aria-label="Instagram" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Instagram size={18}/></a>
-          <a href="#" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Linkedin size={18}/></a>
-          <a href="#" aria-label="Google Maps" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><MapPin size={18}/></a>
+          <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Facebook size={18}/></a>
+          <a href="https://instagram.com/dupuis.immobilier" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Instagram size={18}/></a>
+          <a href="https://linkedin.com/in/julien-dupuis-immobilier" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Linkedin size={18}/></a>
+          <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><MapPin size={18}/></a>
         </div>
       </div>
     </section>

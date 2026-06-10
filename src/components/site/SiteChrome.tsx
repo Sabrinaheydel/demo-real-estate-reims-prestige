@@ -128,9 +128,10 @@ export function Footer() {
             Agent indépendant à Reims. Vente, location, investissement — un accompagnement humain et exigeant.
           </p>
           <div className="flex gap-3">
-            <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Facebook size={15}/></a>
-            <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Instagram size={15}/></a>
-            <a href="#" aria-label="LinkedIn" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Linkedin size={15}/></a>
+            <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Facebook size={15}/></a>
+            <a href="https://instagram.com/dupuis.immobilier" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Instagram size={15}/></a>
+            <a href="https://linkedin.com/in/julien-dupuis-immobilier" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Linkedin size={15}/></a>
+            <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><MapPin size={15}/></a>
           </div>
         </div>
         <div>
@@ -197,36 +198,59 @@ export function WhatsAppBubble() {
 
 export function CookieBanner() {
   const [show, setShow] = useState(false);
+  const [settings, setSettings] = useState(false);
+  const [prefs, setPrefs] = useState({ analytics: true, marketing: false });
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!localStorage.getItem("cookie-accepted")) {
+    if (!localStorage.getItem("cookie-consent")) {
       const t = setTimeout(() => setShow(true), 600);
       return () => clearTimeout(t);
     }
   }, []);
+  const save = (consent: "accepted" | "refused" | "custom") => {
+    localStorage.setItem(
+      "cookie-consent",
+      JSON.stringify({ consent, prefs: consent === "accepted" ? { analytics: true, marketing: true } : consent === "refused" ? { analytics: false, marketing: false } : prefs, date: new Date().toISOString() })
+    );
+    setShow(false);
+  };
   if (!show) return null;
   return (
-    <div className="fixed bottom-5 left-5 right-24 sm:right-auto sm:max-w-md z-40 bg-white border border-border shadow-card rounded-xl p-5">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-5 sm:right-auto sm:max-w-md z-50 bg-white border border-border shadow-card rounded-xl p-5">
+      <h3 className="font-display text-lg text-navy mb-1">Vos préférences cookies</h3>
       <p className="text-sm text-foreground/80 mb-3">
-        Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre politique RGPD.
+        Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser nos contenus. Vous pouvez accepter, refuser ou paramétrer vos choix.
       </p>
-      <div className="flex gap-2 justify-end">
-        <button
-          onClick={() => {
-            localStorage.setItem("cookie-accepted", "refused");
-            setShow(false);
-          }}
-          className="px-4 py-2 text-sm text-foreground/70 hover:text-navy"
-        >
+      {settings && (
+        <div className="mb-3 space-y-2 border-t border-border pt-3">
+          <label className="flex items-center justify-between gap-3 text-sm text-navy">
+            <span><strong>Essentiels</strong> — requis</span>
+            <input type="checkbox" checked disabled className="w-4 h-4 accent-[#C9A96E]" />
+          </label>
+          <label className="flex items-center justify-between gap-3 text-sm text-navy cursor-pointer">
+            <span><strong>Analyse</strong> — mesure d'audience</span>
+            <input type="checkbox" checked={prefs.analytics} onChange={(e) => setPrefs((p) => ({ ...p, analytics: e.target.checked }))} className="w-4 h-4 accent-[#C9A96E]" />
+          </label>
+          <label className="flex items-center justify-between gap-3 text-sm text-navy cursor-pointer">
+            <span><strong>Marketing</strong> — publicités ciblées</span>
+            <input type="checkbox" checked={prefs.marketing} onChange={(e) => setPrefs((p) => ({ ...p, marketing: e.target.checked }))} className="w-4 h-4 accent-[#C9A96E]" />
+          </label>
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 justify-end">
+        <button onClick={() => save("refused")} className="px-4 py-2 text-sm text-foreground/70 hover:text-navy">
           Refuser
         </button>
-        <button
-          onClick={() => {
-            localStorage.setItem("cookie-accepted", "accepted");
-            setShow(false);
-          }}
-          className="px-4 py-2 text-sm rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90"
-        >
+        {settings ? (
+          <button onClick={() => save("custom")} className="px-4 py-2 text-sm rounded-lg border border-navy text-navy font-medium hover:bg-navy hover:text-white transition-colors">
+            Enregistrer mes choix
+          </button>
+        ) : (
+          <button onClick={() => setSettings(true)} className="px-4 py-2 text-sm rounded-lg border border-navy text-navy font-medium hover:bg-navy hover:text-white transition-colors">
+            Paramétrer
+          </button>
+        )}
+        <button onClick={() => save("accepted")} className="px-4 py-2 text-sm rounded-lg text-navy font-semibold hover:opacity-90" style={{ backgroundColor: "#C9A96E" }}>
           Accepter
         </button>
       </div>
