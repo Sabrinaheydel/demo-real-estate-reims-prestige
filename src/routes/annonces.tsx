@@ -128,7 +128,7 @@ function AnnoncesPage() {
   const shown = filtered.slice(0, visible);
 
   const selectClass =
-    "w-full px-3 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition";
+    "w-full min-h-[48px] px-3 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition";
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,17 +148,17 @@ function AnnoncesPage() {
           </div>
         </section>
 
-        <div className="sticky top-20 z-30 bg-white border-y border-border shadow-[0_4px_18px_-12px_rgba(27,45,79,0.18)]">
-          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,2fr)_repeat(4,minmax(0,1fr))_auto] gap-3">
-              <div className="relative">
+        <div className="sticky top-16 sm:top-20 z-30 bg-white border-y border-border shadow-[0_4px_18px_-12px_rgba(27,45,79,0.18)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-3 sm:py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(220px,2fr)_repeat(4,minmax(0,1fr))_auto] gap-2.5 sm:gap-3">
+              <div className="relative sm:col-span-2 lg:col-span-1">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Ville, quartier ou adresse..."
-                  className="w-full pl-10 pr-3 py-3 rounded-lg border border-border bg-white text-navy text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
+                  className="w-full min-h-[48px] pl-10 pr-3 py-3 rounded-lg border border-border bg-white text-navy text-base sm:text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
                 />
               </div>
               <select className={selectClass} value={type} onChange={(e) => setType(e.target.value as TypeFilter)}>
@@ -186,18 +186,18 @@ function AnnoncesPage() {
                 <option value="studio">Studio</option>
                 <option value="local">Local commercial</option>
               </select>
-              <div className="flex gap-2">
+              <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
                 <button
                   type="button"
                   onClick={() => setMoreOpen((o) => !o)}
-                  className="px-4 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium hover:border-gold inline-flex items-center gap-2"
+                  className="flex-1 lg:flex-none min-h-[48px] px-4 py-3 rounded-lg border border-border bg-white text-navy text-sm font-medium hover:border-gold inline-flex items-center justify-center gap-2"
                 >
                   <SlidersHorizontal size={16} /> Plus
                 </button>
                 <button
                   type="button"
                   onClick={() => setVisible(9)}
-                  className="px-5 py-3 rounded-lg bg-gold text-navy text-sm font-semibold hover:bg-gold/90 inline-flex items-center gap-2 shadow-sm"
+                  className="flex-1 lg:flex-none min-h-[48px] px-5 py-3 rounded-lg text-navy text-sm font-semibold inline-flex items-center justify-center gap-2 shadow-sm"
                   style={{ backgroundColor: "#C9A96E" }}
                 >
                   <Search size={16} /> Rechercher
