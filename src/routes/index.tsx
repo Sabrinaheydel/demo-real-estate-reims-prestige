@@ -184,10 +184,16 @@ function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) 
       const eased = 1 - Math.pow(1 - p, 3);
       setN(value * eased);
       if (p < 1) raf = requestAnimationFrame(tick);
+      else setN(value);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [seen, value]);
+  // Fallback: ensure final value is shown even if IntersectionObserver never fires
+  useEffect(() => {
+    const t = setTimeout(() => setN((cur) => (cur === 0 ? value : cur)), 2500);
+    return () => clearTimeout(t);
+  }, [value]);
   return <span ref={ref}>{n.toFixed(decimals)}</span>;
 }
 
