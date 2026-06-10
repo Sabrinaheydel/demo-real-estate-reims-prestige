@@ -13,7 +13,7 @@ export const Route = createFileRoute("/annonces")({
       {
         name: "description",
         content:
-          "Découvrez l'ensemble des biens à vendre et à louer à Reims sélectionnés par Dupuis Immobilier — appartements, maisons, investissements.",
+          "Découvrez l'ensemble des biens à vendre et à louer à Reims sélectionnés par Dupuis Immobilier appartements, maisons, investissements.",
       },
       { property: "og:title", content: "Nos annonces immobilières à Reims" },
       {
@@ -69,9 +69,9 @@ function inferPropType(title: string): Exclude<PropType, "all"> {
 const PRICE_BUCKETS: { v: PriceBucket; label: string }[] = [
   { v: "all", label: "Tous les prix" },
   { v: "lt100", label: "Moins de 100 000 €" },
-  { v: "100-200", label: "100 000 € — 200 000 €" },
-  { v: "200-350", label: "200 000 € — 350 000 €" },
-  { v: "350-500", label: "350 000 € — 500 000 €" },
+  { v: "100-200", label: "100 000 € 200 000 €" },
+  { v: "200-350", label: "200 000 € 350 000 €" },
+  { v: "350-500", label: "350 000 € 500 000 €" },
   { v: "gt500", label: "Plus de 500 000 €" },
 ];
 

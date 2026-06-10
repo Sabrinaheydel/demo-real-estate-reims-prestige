@@ -6,8 +6,8 @@ export const Route = createFileRoute("/dernieres-ventes")({
   head: () => ({
     meta: [
       { title: "Dernières ventes · Dupuis Immobilier Reims" },
-      { name: "description", content: "Découvrez les biens récemment vendus par Dupuis Immobilier à Reims — transparence totale sur nos résultats." },
-      { property: "og:title", content: "Dernières ventes — Dupuis Immobilier" },
+      { name: "description", content: "Découvrez les biens récemment vendus par Dupuis Immobilier à Reims transparence totale sur nos résultats." },
+      { property: "og:title", content: "Dernières ventes Dupuis Immobilier" },
       { property: "og:description", content: "Transparence totale sur nos résultats de ventes à Reims." },
     ],
   }),
@@ -32,7 +32,7 @@ function SoldPage() {
             Nos résultats
           </span>
           <h1 className="font-display text-4xl sm:text-5xl text-navy mb-4">
-            Ils ont vendu avec nous — les succès récents
+            Ils ont vendu avec nous les succès récents
           </h1>
           <p className="text-foreground/70 max-w-2xl mx-auto">
             Transparence totale sur nos résultats

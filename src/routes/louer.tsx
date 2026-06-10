@@ -27,7 +27,7 @@ const STEPS = [
   { icon: Camera, title: "2. Mise en valeur", desc: "Reportage photo et description optimisée pour attirer les meilleurs profils." },
   { icon: Megaphone, title: "3. Diffusion", desc: "Annonce mise en ligne sur tous les portails et envoyée à nos locataires en recherche." },
   { icon: Users, title: "4. Sélection du locataire", desc: "Vérification approfondie des dossiers, visites organisées et présentation des candidatures." },
-  { icon: Handshake, title: "5. Signature & gestion", desc: "Rédaction du bail, état des lieux et — si vous le souhaitez — gestion complète au quotidien." },
+  { icon: Handshake, title: "5. Signature & gestion", desc: "Rédaction du bail, état des lieux et si vous le souhaitez gestion complète au quotidien." },
 ];
 
 function RentForm() {
