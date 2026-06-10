@@ -124,9 +124,9 @@ function ContactPage() {
             <div className="bg-cream rounded-xl p-6">
               <h2 className="font-display text-xl text-navy mb-4">Suivez-nous</h2>
               <div className="flex gap-3">
-                <a href="#" aria-label="Facebook" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Facebook size={18}/></a>
-                <a href="#" aria-label="Instagram" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Instagram size={18}/></a>
-                <a href="#" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Linkedin size={18}/></a>
+                <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Facebook size={18}/></a>
+                <a href="https://instagram.com/dupuis.immobilier" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Instagram size={18}/></a>
+                <a href="https://linkedin.com/in/julien-dupuis-immobilier" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Linkedin size={18}/></a>
                 <a href="https://maps.google.com/?q=Reims,France" target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><MapPin size={18}/></a>
               </div>
             </div>
