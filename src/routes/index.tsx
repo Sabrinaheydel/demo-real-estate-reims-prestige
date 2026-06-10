@@ -29,13 +29,13 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Lestradet Immobilier · Agent immobilier à Reims" },
+      { title: "Dupuis Immobilier · Agent immobilier à Reims" },
       {
         name: "description",
         content:
-          "Lestradet Immobilier — Agent indépendant à Reims. Estimation gratuite, accompagnement personnalisé, vente, location et investissement.",
+          "Dupuis Immobilier — Agent indépendant à Reims. Estimation gratuite, accompagnement personnalisé, vente, location et investissement.",
       },
-      { property: "og:title", content: "Lestradet Immobilier · Agent à Reims" },
+      { property: "og:title", content: "Dupuis Immobilier · Agent à Reims" },
       {
         property: "og:description",
         content:
@@ -47,8 +47,8 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const HERO_IMG =
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80";
+import heroAsset from "@/assets/reims-hero.png.asset.json";
+const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
   { label: "Accueil", href: "#accueil" },
@@ -215,7 +215,7 @@ function Navbar() {
             scrolled ? "text-navy" : "text-white"
           }`}
         >
-          Lestradet <span className="text-gold italic">Immobilier</span>
+          Dupuis <span className="text-gold italic">Immobilier</span>
         </a>
         <nav className="hidden lg:flex items-center gap-8">
           {NAV_LINKS.map((l) => (
@@ -414,7 +414,7 @@ function Process() {
       <div className="mx-auto max-w-7xl">
         <div className="text-center mb-16 max-w-2xl mx-auto">
           <span className="text-gold text-sm font-medium tracking-[0.2em] uppercase">Méthode</span>
-          <h2 className="text-3xl sm:text-4xl mt-3">Vendre avec Lestradet Immobilier, étape par étape</h2>
+          <h2 className="text-3xl sm:text-4xl mt-3">Vendre avec Dupuis Immobilier, étape par étape</h2>
           <div className="w-16 h-px bg-gold mx-auto mt-6" />
         </div>
         <div className="relative">
@@ -541,7 +541,7 @@ function Footer() {
       <div className="mx-auto max-w-7xl grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
           <div className="font-display text-2xl text-white mb-4">
-            Lestradet <span className="text-gold italic">Immobilier</span>
+            Dupuis <span className="text-gold italic">Immobilier</span>
           </div>
           <p className="text-sm text-white/70 mb-5">
             Agent indépendant à Reims. Vente, location, investissement — un accompagnement humain et exigeant.
@@ -565,7 +565,7 @@ function Footer() {
           <ul className="space-y-3 text-sm">
             <li className="flex gap-2"><MapPin size={16} className="text-gold shrink-0 mt-0.5"/> 24 rue de Vesle, 51100 Reims</li>
             <li className="flex gap-2"><Phone size={16} className="text-gold shrink-0 mt-0.5"/> +33 3 26 00 00 00</li>
-            <li className="flex gap-2"><Mail size={16} className="text-gold shrink-0 mt-0.5"/> contact@lestradet-immobilier.fr</li>
+            <li className="flex gap-2"><Mail size={16} className="text-gold shrink-0 mt-0.5"/> contact@dupuis-immobilier.fr</li>
           </ul>
         </div>
         <div>
@@ -579,7 +579,7 @@ function Footer() {
         </div>
       </div>
       <div className="mx-auto max-w-7xl border-t border-white/10 mt-12 pt-6 text-xs text-white/50 text-center">
-        © {new Date().getFullYear()} Lestradet Immobilier · Tous droits réservés · Carte T n° CPI 5101 2024 000 000 000
+        © {new Date().getFullYear()} Dupuis Immobilier · Tous droits réservés · Carte T n° CPI 5101 2024 000 000 000
       </div>
     </footer>
   );
