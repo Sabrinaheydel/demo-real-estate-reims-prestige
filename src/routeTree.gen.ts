@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendreRouteImport } from './routes/vendre'
 import { Route as LouerRouteImport } from './routes/louer'
 import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
 import { Route as AcheterRouteImport } from './routes/acheter'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,6 +31,11 @@ const LouerRoute = LouerRouteImport.update({
 const DernieresVentesRoute = DernieresVentesRouteImport.update({
   id: '/dernieres-ventes',
   path: '/dernieres-ventes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnnoncesRoute = AnnoncesRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/louer': typeof LouerRoute
   '/vendre': typeof VendreRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/louer': typeof LouerRoute
   '/vendre': typeof VendreRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/louer': typeof LouerRoute
   '/vendre': typeof VendreRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/annonces'
+    | '/contact'
     | '/dernieres-ventes'
     | '/louer'
     | '/vendre'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/annonces'
+    | '/contact'
     | '/dernieres-ventes'
     | '/louer'
     | '/vendre'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/annonces'
+    | '/contact'
     | '/dernieres-ventes'
     | '/louer'
     | '/vendre'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AcheterRoute: typeof AcheterRoute
   AnnoncesRoute: typeof AnnoncesRouteWithChildren
+  ContactRoute: typeof ContactRoute
   DernieresVentesRoute: typeof DernieresVentesRoute
   LouerRoute: typeof LouerRoute
   VendreRoute: typeof VendreRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/dernieres-ventes'
       fullPath: '/dernieres-ventes'
       preLoaderRoute: typeof DernieresVentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/annonces': {
@@ -190,6 +210,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcheterRoute: AcheterRoute,
   AnnoncesRoute: AnnoncesRouteWithChildren,
+  ContactRoute: ContactRoute,
   DernieresVentesRoute: DernieresVentesRoute,
   LouerRoute: LouerRoute,
   VendreRoute: VendreRoute,
