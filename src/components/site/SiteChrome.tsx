@@ -180,6 +180,8 @@ export function Footer() {
     </footer>
   );
 }
+
+export function WhatsAppBubble() {
   return (
     <a
       href={WHATSAPP_URL}
