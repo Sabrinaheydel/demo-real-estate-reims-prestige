@@ -258,16 +258,21 @@ export function CookieBanner() {
   );
 }
 
+import { Breadcrumbs, type Crumb } from "@/components/site/Breadcrumbs";
+
 export function PageShell({
   children,
   solidNav = true,
+  breadcrumbs,
 }: {
   children: React.ReactNode;
   solidNav?: boolean;
+  breadcrumbs?: Crumb[];
 }) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar solid={solidNav} />
+      {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
       <main className="flex-1">{children}</main>
       <Footer />
       <WhatsAppBubble />
