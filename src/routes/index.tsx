@@ -585,10 +585,12 @@ function Footer() {
   );
 }
 
+import { Navbar as SiteNavbar, Footer as SiteFooter, WhatsAppBubble, CookieBanner } from "@/components/site/SiteChrome";
+
 function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <SiteNavbar />
       <main>
         <Hero />
         <Stats />
@@ -598,7 +600,9 @@ function HomePage() {
         <Testimonials />
         <Contact />
       </main>
-      <Footer />
+      <SiteFooter />
+      <WhatsAppBubble />
+      <CookieBanner />
     </div>
   );
 }
