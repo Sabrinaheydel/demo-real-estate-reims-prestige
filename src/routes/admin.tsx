@@ -176,12 +176,22 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               Espace administration
             </span>
           </div>
-          <button
-            onClick={onLogout}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/80 hover:bg-white/10"
-          >
-            <LogOut size={15} /> Déconnexion
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2.5 pr-3 border-r border-white/20">
+              <img
+                src={portraitAvatar.url}
+                alt="Julien Dupuis"
+                className="w-10 h-10 rounded-full object-cover border-2 border-gold"
+              />
+              <span className="text-sm text-white/90">Bienvenue, <strong className="text-white">Julien</strong></span>
+            </div>
+            <button
+              onClick={onLogout}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/80 hover:bg-white/10"
+            >
+              <LogOut size={15} /> Déconnexion
+            </button>
+          </div>
         </div>
       </header>
 
