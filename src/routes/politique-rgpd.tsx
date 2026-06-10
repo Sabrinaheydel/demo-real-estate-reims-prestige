@@ -20,7 +20,7 @@ function Page() {
           <div className="space-y-6 text-foreground/80 leading-relaxed">
             <div>
               <h2 className="font-display text-2xl text-navy mb-2">Responsable du traitement</h2>
-              <p>Dupuis Immobilier — Julien Dupuis, 24 rue de Vesle, 51100 Reims.</p>
+              <p>Dupuis Immobilier Julien Dupuis, 24 rue de Vesle, 51100 Reims.</p>
             </div>
             <div>
               <h2 className="font-display text-2xl text-navy mb-2">Données collectées</h2>

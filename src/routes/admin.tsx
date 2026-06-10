@@ -522,7 +522,7 @@ function ListingEditor({
           type="text"
           value={draft.neighborhood}
           onChange={(e) => setDraft({ ...draft, neighborhood: e.target.value })}
-          placeholder="Ex : Centre-ville — Rue Cérès"
+          placeholder="Ex : Centre-ville Rue Cérès"
           className="w-full px-4 py-3 rounded-lg border border-border focus:outline-none focus:border-gold text-sm"
         />
       </Field>

@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Dupuis Immobilier — Agent indépendant à Reims. Estimation gratuite, accompagnement personnalisé, vente, location et investissement.",
+          "Dupuis Immobilier Agent indépendant à Reims. Estimation gratuite, accompagnement personnalisé, vente, location et investissement.",
       },
       { property: "og:title", content: "Dupuis Immobilier · Agent à Reims" },
       {
@@ -298,7 +298,7 @@ function Hero() {
   if (isMobile) {
     return (
       <section id="accueil" className="relative text-white">
-        {/* BLOC 1 — Photo */}
+        {/* BLOC 1 Photo */}
         <div className="relative h-[45vh] w-full overflow-hidden">
           <img
             src={HERO_IMG}
@@ -308,7 +308,7 @@ function Hero() {
           />
           <div className="absolute inset-0 bg-navy/20" />
         </div>
-        {/* BLOC 2 — Texte */}
+        {/* BLOC 2 Texte */}
         <div className="bg-navy px-6 py-8">
           <span className="inline-block text-gold text-xs font-medium tracking-[0.2em] uppercase mb-4">
             Agent indépendant · Reims
@@ -336,7 +336,7 @@ function Hero() {
           <div className="inline-flex items-center gap-2 text-sm text-white bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-3 py-2">
             <Star size={16} className="fill-gold text-gold" />
             <span className="font-semibold">4,9/5</span>
-            <span className="text-white/80">— 160 avis Google</span>
+            <span className="text-white/80">  160 avis Google</span>
           </div>
         </div>
       </section>
@@ -388,7 +388,7 @@ function Hero() {
       <div className="absolute bottom-6 left-6 lg:left-10 z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm text-white">
         <Star size={16} className="fill-gold text-gold" />
         <span className="font-semibold">4,9/5</span>
-        <span className="text-white/80">— 160 avis Google</span>
+        <span className="text-white/80">  160 avis Google</span>
       </div>
     </section>
   );
@@ -631,7 +631,7 @@ function Footer() {
             Dupuis <span className="text-gold italic">Immobilier</span>
           </div>
           <p className="text-sm text-white/70 mb-5">
-            Agent indépendant à Reims. Vente, location, investissement — un accompagnement humain et exigeant.
+            Agent indépendant à Reims. Vente, location, investissement un accompagnement humain et exigeant.
           </p>
           <div className="flex gap-3">
             <a href="#" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Facebook size={15}/></a>

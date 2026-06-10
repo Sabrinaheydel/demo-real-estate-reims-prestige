@@ -125,7 +125,7 @@ export function Footer() {
             Dupuis <span className="text-gold italic">Immobilier</span>
           </div>
           <p className="text-sm text-white/70 mb-5">
-            Agent indépendant à Reims. Vente, location, investissement — un accompagnement humain et exigeant.
+            Agent indépendant à Reims. Vente, location, investissement un accompagnement humain et exigeant.
           </p>
           <div className="flex gap-3">
             <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Facebook size={15}/></a>
@@ -172,7 +172,7 @@ export function Footer() {
             rel="noopener noreferrer"
             className="text-gold hover:underline"
           >
-            Sabrina Heydel — Agence 360 Digital
+            Sabrina Heydel Agence 360 Digital
           </a>
         </div>
       </div>
@@ -224,15 +224,15 @@ export function CookieBanner() {
       {settings && (
         <div className="mb-3 space-y-2 border-t border-border pt-3">
           <label className="flex items-center justify-between gap-3 text-sm text-navy">
-            <span><strong>Essentiels</strong> — requis</span>
+            <span><strong>Essentiels</strong> requis</span>
             <input type="checkbox" checked disabled className="w-4 h-4 accent-[#C9A96E]" />
           </label>
           <label className="flex items-center justify-between gap-3 text-sm text-navy cursor-pointer">
-            <span><strong>Analyse</strong> — mesure d'audience</span>
+            <span><strong>Analyse</strong> mesure d'audience</span>
             <input type="checkbox" checked={prefs.analytics} onChange={(e) => setPrefs((p) => ({ ...p, analytics: e.target.checked }))} className="w-4 h-4 accent-[#C9A96E]" />
           </label>
           <label className="flex items-center justify-between gap-3 text-sm text-navy cursor-pointer">
-            <span><strong>Marketing</strong> — publicités ciblées</span>
+            <span><strong>Marketing</strong> publicités ciblées</span>
             <input type="checkbox" checked={prefs.marketing} onChange={(e) => setPrefs((p) => ({ ...p, marketing: e.target.checked }))} className="w-4 h-4 accent-[#C9A96E]" />
           </label>
         </div>
