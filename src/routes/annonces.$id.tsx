@@ -69,7 +69,7 @@ export const Route = createFileRoute("/annonces/$id")({
 });
 
 function ListingDetailPage() {
-  const { listing } = Route.useLoaderData();
+  const { listing } = Route.useLoaderData() as { listing: Listing };
   const [activePhoto, setActivePhoto] = useState(0);
   const [sent, setSent] = useState(false);
   const [intent, setIntent] = useState<"visite" | "infos" | "offre">("visite");
