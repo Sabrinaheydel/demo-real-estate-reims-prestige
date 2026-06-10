@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-rout
 import { useState } from "react";
 import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCard } from "@/components/site/ListingCard";
 import { getListing, getSimilar } from "@/lib/listings";
 import {
