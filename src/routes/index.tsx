@@ -280,13 +280,22 @@ function Navbar() {
 }
 
 function Hero() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia("(max-width: 639px)");
+    setIsMobile(m.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    m.addEventListener("change", onChange);
+    return () => m.removeEventListener("change", onChange);
+  }, []);
+
   return (
     <section id="accueil" className="relative min-h-[100svh] flex items-center text-white overflow-hidden">
       <img
         src={HERO_IMG}
         alt="Julien Dupuis, agent immobilier indépendant à Reims, devant la cathédrale"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: "center right" }}
+        style={{ objectPosition: isMobile ? "center 20%" : "center right" }}
       />
       {/* Overlay: dark navy left → transparent right */}
       <div
@@ -304,19 +313,19 @@ function Hero() {
           <h1 className="!text-white font-display text-4xl sm:text-5xl lg:text-6xl leading-tight mb-6">
             Votre bien immobilier à Reims,<br className="hidden sm:block" /> entre de bonnes mains
           </h1>
-          <p className="text-lg sm:text-xl text-white/90 mb-10">
+          <p className="text-lg sm:text-xl text-white/90 mb-10 pb-2">
             Estimation gratuite · Accompagnement personnalisé · Résultats prouvés
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               to="/vendre"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all hover:-translate-y-0.5 shadow-card"
+              className="inline-flex items-center justify-center px-8 py-3 sm:py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all hover:-translate-y-0.5 shadow-card"
             >
               Estimer mon bien
             </Link>
             <Link
               to="/annonces"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
+              className="inline-flex items-center justify-center px-8 py-3 sm:py-4 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
             >
               Voir les annonces
             </Link>
