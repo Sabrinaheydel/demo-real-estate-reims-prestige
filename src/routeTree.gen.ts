@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnnoncesIdRouteImport } from './routes/annonces.$id'
 
+const DernieresVentesRoute = DernieresVentesRouteImport.update({
+  id: '/dernieres-ventes',
+  path: '/dernieres-ventes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnnoncesRoute = AnnoncesRouteImport.update({
   id: '/annonces',
   path: '/annonces',
@@ -32,34 +38,45 @@ const AnnoncesIdRoute = AnnoncesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/dernieres-ventes': typeof DernieresVentesRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/dernieres-ventes': typeof DernieresVentesRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/annonces': typeof AnnoncesRouteWithChildren
+  '/dernieres-ventes': typeof DernieresVentesRoute
   '/annonces/$id': typeof AnnoncesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/annonces' | '/annonces/$id'
+  fullPaths: '/' | '/annonces' | '/dernieres-ventes' | '/annonces/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/annonces' | '/annonces/$id'
-  id: '__root__' | '/' | '/annonces' | '/annonces/$id'
+  to: '/' | '/annonces' | '/dernieres-ventes' | '/annonces/$id'
+  id: '__root__' | '/' | '/annonces' | '/dernieres-ventes' | '/annonces/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnnoncesRoute: typeof AnnoncesRouteWithChildren
+  DernieresVentesRoute: typeof DernieresVentesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dernieres-ventes': {
+      id: '/dernieres-ventes'
+      path: '/dernieres-ventes'
+      fullPath: '/dernieres-ventes'
+      preLoaderRoute: typeof DernieresVentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/annonces': {
       id: '/annonces'
       path: '/annonces'
@@ -99,7 +116,18 @@ const AnnoncesRouteWithChildren = AnnoncesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnnoncesRoute: AnnoncesRouteWithChildren,
+  DernieresVentesRoute: DernieresVentesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
