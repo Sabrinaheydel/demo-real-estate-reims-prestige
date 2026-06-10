@@ -296,18 +296,18 @@ function Hero() {
           Estimation gratuite · Accompagnement personnalisé · Résultats prouvés
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="#contact"
+          <Link
+            to="/vendre"
             className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all hover:-translate-y-0.5 shadow-card"
           >
             Estimer mon bien
-          </a>
-          <a
-            href="#annonces"
+          </Link>
+          <Link
+            to="/annonces"
             className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
           >
             Voir les annonces
-          </a>
+          </Link>
         </div>
       </div>
       <div className="absolute bottom-6 right-6 z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm text-white">
