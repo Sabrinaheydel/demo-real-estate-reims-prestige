@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-import heroAsset from "@/assets/reims-hero.png.asset.json";
+import heroAsset from "@/assets/hero-julien-reims.jpg.asset.json";
 import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
 const HERO_IMG = heroAsset.url;
 
