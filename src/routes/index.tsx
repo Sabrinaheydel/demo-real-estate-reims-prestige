@@ -24,6 +24,7 @@ import {
   Phone,
   Mail,
   ArrowRight,
+  Check,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/")({
 });
 
 import heroAsset from "@/assets/reims-hero.png.asset.json";
+import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
 const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
@@ -593,6 +595,48 @@ function Footer() {
 
 import { Navbar as SiteNavbar, Footer as SiteFooter } from "@/components/site/SiteChrome";
 
+function About() {
+  return (
+    <section id="a-propos" className="py-24 px-6 bg-white">
+      <div className="mx-auto max-w-7xl grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="order-1 md:order-1">
+          <img
+            src={portraitDesk.url}
+            alt="Julien Dupuis, agent immobilier indépendant à son bureau à Reims"
+            loading="lazy"
+            className="w-full h-full max-h-[600px] object-cover rounded-lg shadow-card"
+            style={{ borderRadius: "8px" }}
+          />
+        </div>
+        <div className="order-2 md:order-2">
+          <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-3">
+            Votre agent
+          </span>
+          <h2 className="font-display text-4xl text-navy mb-2">Julien Dupuis</h2>
+          <p className="text-foreground/60 text-sm mb-6">Agent immobilier indépendant · Reims</p>
+          <p className="text-foreground/80 leading-relaxed mb-6">
+            Passionné par l'immobilier rémois depuis 7 ans, j'ai choisi l'indépendance pour vous offrir ce que les grandes agences ne peuvent pas : du temps, de l'écoute, et un engagement total sur chaque dossier. Chaque bien que je vends ou loue est traité comme si c'était le mien.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-8">
+            {["Carte T professionnelle", "Membre FNAIM", "RCP assurée"].map((b) => (
+              <span key={b} className="inline-flex items-center gap-1.5 text-sm bg-cream text-navy px-3 py-1.5 rounded-full border border-border">
+                <Check size={14} className="text-gold" /> {b}
+              </span>
+            ))}
+          </div>
+          <Link
+            to="/contact"
+            className="inline-flex items-center px-6 py-3 rounded-lg text-navy font-semibold hover:opacity-90 transition-opacity shadow-soft"
+            style={{ backgroundColor: "#C9A96E" }}
+          >
+            Prendre contact
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HomePage() {
   return (
     <div className="min-h-screen bg-background">
@@ -604,6 +648,7 @@ function HomePage() {
         <Listings />
         <Process />
         <Testimonials />
+        <About />
         <Contact />
       </main>
       <SiteFooter />

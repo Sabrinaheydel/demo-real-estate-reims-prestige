@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
 import { TextField, SelectField } from "./vendre";
 import { Check, MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from "lucide-react";
+import portraitInterior from "@/assets/photo-profil-3.jpg.asset.json";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -81,14 +82,20 @@ function ContactForm() {
 function ContactPage() {
   return (
     <PageShell>
-      <section className="pt-32 pb-12 px-6 text-center">
-        <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-4">
-          Restons en contact
-        </span>
-        <h1 className="font-display text-4xl sm:text-5xl text-navy mb-4">Contactez-nous</h1>
-        <p className="text-foreground/70 max-w-2xl mx-auto">
-          Une question, un projet ? Je vous réponds personnellement sous 24h.
-        </p>
+      <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden mt-20">
+        <img
+          src={portraitInterior.url}
+          alt="Julien Dupuis dans un appartement haussmannien à Reims"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "top" }}
+        />
+        <div className="absolute inset-0" style={{ backgroundColor: "rgba(27,45,79,0.4)" }} />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+          <h1 className="font-display text-3xl sm:text-5xl text-white mb-3">Parlons de votre projet</h1>
+          <p className="text-white/90 text-base sm:text-lg max-w-xl">
+            Je réponds personnellement à chaque demande sous 24h
+          </p>
+        </div>
       </section>
 
       <section className="pb-12 px-6">
@@ -117,9 +124,9 @@ function ContactPage() {
             <div className="bg-cream rounded-xl p-6">
               <h2 className="font-display text-xl text-navy mb-4">Suivez-nous</h2>
               <div className="flex gap-3">
-                <a href="#" aria-label="Facebook" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Facebook size={18}/></a>
-                <a href="#" aria-label="Instagram" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Instagram size={18}/></a>
-                <a href="#" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Linkedin size={18}/></a>
+                <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Facebook size={18}/></a>
+                <a href="https://instagram.com/dupuis.immobilier" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Instagram size={18}/></a>
+                <a href="https://linkedin.com/in/julien-dupuis-immobilier" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><Linkedin size={18}/></a>
                 <a href="https://maps.google.com/?q=Reims,France" target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="w-11 h-11 rounded-full bg-navy text-white flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"><MapPin size={18}/></a>
               </div>
             </div>

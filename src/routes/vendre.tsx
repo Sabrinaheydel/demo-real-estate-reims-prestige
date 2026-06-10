@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
-import { Check, Target, Camera, Megaphone, ClipboardCheck, Users, Handshake } from "lucide-react";
+import { Check, Target, Camera, Megaphone, ClipboardCheck, Users, Handshake, Phone } from "lucide-react";
+import portraitOutdoor from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/vendre")({
   head: () => ({
@@ -209,6 +210,33 @@ function SellPage() {
           </div>
         </div>
       </section>
+
+      <section className="py-16 px-6 bg-cream">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-[300px_1fr] gap-8 md:gap-12 items-center">
+          <img
+            src={portraitOutdoor.url}
+            alt="Julien Dupuis, agent immobilier indépendant à Reims"
+            loading="lazy"
+            className="w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] object-cover rounded-full mx-auto md:mx-0 shadow-card border-4 border-white"
+          />
+          <div className="text-center md:text-left">
+            <h2 className="font-display text-2xl sm:text-3xl text-navy mb-3">
+              Julien Dupuis vous répond personnellement
+            </h2>
+            <p className="text-foreground/80 leading-relaxed mb-6">
+              Pas de secrétariat, pas de standardiste. Votre dossier est entre mes mains du premier rendez-vous jusqu'à la signature.
+            </p>
+            <a
+              href="tel:+33326000000"
+              className="inline-flex items-center gap-3 font-display text-2xl sm:text-3xl text-navy hover:text-gold transition-colors"
+            >
+              <Phone size={26} className="text-gold" />
+              +33 3 26 00 00 00
+            </a>
+          </div>
+        </div>
+      </section>
+
 
       <section id="form" className="bg-cream py-20 px-6">
         <div className="max-w-3xl mx-auto">
