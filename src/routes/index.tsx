@@ -531,10 +531,10 @@ function Contact() {
           </button>
         </form>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-navy">
-          <a href="#" aria-label="Facebook" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Facebook size={18}/></a>
-          <a href="#" aria-label="Instagram" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Instagram size={18}/></a>
-          <a href="#" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Linkedin size={18}/></a>
-          <a href="#" aria-label="Google Maps" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><MapPin size={18}/></a>
+          <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Facebook size={18}/></a>
+          <a href="https://instagram.com/dupuis.immobilier" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Instagram size={18}/></a>
+          <a href="https://linkedin.com/in/julien-dupuis-immobilier" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Linkedin size={18}/></a>
+          <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><MapPin size={18}/></a>
         </div>
       </div>
     </section>
