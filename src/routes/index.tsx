@@ -289,15 +289,62 @@ function Hero() {
     return () => m.removeEventListener("change", onChange);
   }, []);
 
+  if (isMobile) {
+    return (
+      <section id="accueil" className="relative text-white">
+        {/* BLOC 1 — Photo */}
+        <div className="relative h-[45vh] w-full overflow-hidden">
+          <img
+            src={HERO_IMG}
+            alt="Julien Dupuis, agent immobilier indépendant à Reims"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: "right center" }}
+          />
+          <div className="absolute inset-0 bg-navy/20" />
+        </div>
+        {/* BLOC 2 — Texte */}
+        <div className="bg-navy px-6 py-8">
+          <span className="inline-block text-gold text-xs font-medium tracking-[0.2em] uppercase mb-4">
+            Agent indépendant · Reims
+          </span>
+          <h1 className="!text-white font-display text-3xl leading-tight mb-4">
+            Votre bien immobilier à Reims, entre de bonnes mains
+          </h1>
+          <p className="text-base text-white/85 mb-6">
+            Estimation gratuite · Accompagnement personnalisé · Résultats prouvés
+          </p>
+          <div className="flex flex-col gap-3 mb-6">
+            <Link
+              to="/vendre"
+              className="inline-flex items-center justify-center w-full px-6 py-3 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all shadow-card"
+            >
+              Estimer mon bien
+            </Link>
+            <Link
+              to="/annonces"
+              className="inline-flex items-center justify-center w-full px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
+            >
+              Voir les annonces
+            </Link>
+          </div>
+          <div className="inline-flex items-center gap-2 text-sm text-white bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-3 py-2">
+            <Star size={16} className="fill-gold text-gold" />
+            <span className="font-semibold">4,9/5</span>
+            <span className="text-white/80">— 160 avis Google</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="accueil" className="relative min-h-[100svh] flex items-center text-white overflow-hidden">
       <img
         src={HERO_IMG}
         alt="Julien Dupuis, agent immobilier indépendant à Reims, devant la cathédrale"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: isMobile ? "center 20%" : "center right" }}
+        style={{ objectPosition: "center right" }}
       />
-      {/* Overlay: dark navy left → transparent right */}
       <div
         className="absolute inset-0"
         style={{
@@ -339,6 +386,7 @@ function Hero() {
       </div>
     </section>
   );
+
 }
 
 function Stats() {
