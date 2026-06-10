@@ -13,6 +13,7 @@ import { Route as VendreRouteImport } from './routes/vendre'
 import { Route as LouerRouteImport } from './routes/louer'
 import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
+import { Route as AcheterRouteImport } from './routes/acheter'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnnoncesIdRouteImport } from './routes/annonces.$id'
 
@@ -36,6 +37,11 @@ const AnnoncesRoute = AnnoncesRouteImport.update({
   path: '/annonces',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcheterRoute = AcheterRouteImport.update({
+  id: '/acheter',
+  path: '/acheter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,6 +55,7 @@ const AnnoncesIdRoute = AnnoncesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acheter': typeof AcheterRoute
   '/annonces': typeof AnnoncesRouteWithChildren
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/louer': typeof LouerRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acheter': typeof AcheterRoute
   '/annonces': typeof AnnoncesRouteWithChildren
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/louer': typeof LouerRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/acheter': typeof AcheterRoute
   '/annonces': typeof AnnoncesRouteWithChildren
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/louer': typeof LouerRoute
@@ -76,6 +85,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/acheter'
     | '/annonces'
     | '/dernieres-ventes'
     | '/louer'
@@ -84,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/acheter'
     | '/annonces'
     | '/dernieres-ventes'
     | '/louer'
@@ -92,6 +103,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/acheter'
     | '/annonces'
     | '/dernieres-ventes'
     | '/louer'
@@ -101,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcheterRoute: typeof AcheterRoute
   AnnoncesRoute: typeof AnnoncesRouteWithChildren
   DernieresVentesRoute: typeof DernieresVentesRoute
   LouerRoute: typeof LouerRoute
@@ -137,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnnoncesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/acheter': {
+      id: '/acheter'
+      path: '/acheter'
+      fullPath: '/acheter'
+      preLoaderRoute: typeof AcheterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -168,6 +188,7 @@ const AnnoncesRouteWithChildren = AnnoncesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcheterRoute: AcheterRoute,
   AnnoncesRoute: AnnoncesRouteWithChildren,
   DernieresVentesRoute: DernieresVentesRoute,
   LouerRoute: LouerRoute,
