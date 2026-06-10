@@ -30,7 +30,7 @@ export const LISTINGS: Listing[] = [
     bedrooms: 3,
     parking: false,
     features: ["Cave", "Ascenseur", "Parquet ancien"],
-    neighborhood: "Centre-ville Rue Cérès",
+    neighborhood: "Centre-ville. Rue Cérès",
     description:
       "Magnifique appartement haussmannien entièrement rénové avec goût. Hauts plafonds, parquet ancien, moulures d'époque. Séjour double lumineux, cuisine équipée ouverte, 3 chambres dont une suite parentale. Immeuble pierre de taille, ascenseur, cave. Un bien rare dans le secteur le plus recherché de Reims.",
     photos: [
@@ -45,7 +45,7 @@ export const LISTINGS: Listing[] = [
     price: 347000,
     priceLabel: "347 000 €",
     isRental: false,
-    title: "Maison familiale avec jardin Secteur Clairmarais",
+    title: "Maison familiale avec jardin. Secteur Clairmarais",
     surface: 138,
     rooms: 6,
     bedrooms: 4,
@@ -66,13 +66,13 @@ export const LISTINGS: Listing[] = [
     price: 780,
     priceLabel: "780 €/mois",
     isRental: true,
-    title: "Studio design proche CHU idéal étudiant/jeune actif",
+    title: "Studio design proche CHU. Idéal étudiant/jeune actif",
     surface: 32,
     rooms: 1,
     bedrooms: null,
     parking: false,
     features: ["Meublé", "Fibre incluse", "Digicode"],
-    neighborhood: "Jean Jaurès Proximité CHU",
+    neighborhood: "Jean Jaurès. Proximité CHU",
     description:
       "Studio entièrement meublé et équipé, refait à neuf. Coin nuit séparé, cuisine équipée, salle d'eau moderne. Internet fibre inclus. Immeuble sécurisé avec digicode. Idéalement situé à 5 min à pied du CHU et des transports.",
     photos: [
@@ -87,7 +87,7 @@ export const LISTINGS: Listing[] = [
     price: 165000,
     priceLabel: "165 000 €",
     isRental: false,
-    title: "2 pièces traversant Investissement locatif idéal",
+    title: "2 pièces traversant. Investissement locatif idéal",
     surface: 48,
     rooms: 2,
     bedrooms: 1,
@@ -108,13 +108,13 @@ export const LISTINGS: Listing[] = [
     price: 520000,
     priceLabel: "520 000 €",
     isRental: false,
-    title: "Villa contemporaine avec piscine Reims Sud",
+    title: "Villa contemporaine avec piscine. Reims Sud",
     surface: 220,
     rooms: 7,
     bedrooms: 5,
     parking: true,
     features: ["Piscine chauffée", "Terrain 800 m²", "Double garage"],
-    neighborhood: "Bezannes Reims Sud",
+    neighborhood: "Bezannes. Reims Sud",
     description:
       "Exceptionnelle villa contemporaine construite en 2018. Grandes baies vitrées, séjour cathédrale de 60 m², cuisine américaine haut de gamme, 5 chambres dont suite parentale avec dressing et salle de bain privative. Piscine chauffée, terrain paysager, double garage. Quartier résidentiel calme.",
     photos: [
@@ -129,7 +129,7 @@ export const LISTINGS: Listing[] = [
     price: 1150,
     priceLabel: "1 150 €/mois",
     isRental: true,
-    title: "Appartement T3 lumineux Quartier des Sacres",
+    title: "Appartement T3 lumineux. Quartier des Sacres",
     surface: 72,
     rooms: 3,
     bedrooms: 2,
@@ -150,13 +150,13 @@ export const LISTINGS: Listing[] = [
     price: 98000,
     priceLabel: "98 000 €",
     isRental: false,
-    title: "Studio rénové Idéal premier investissement",
+    title: "Studio rénové. Idéal premier investissement",
     surface: 28,
     rooms: 1,
     bedrooms: null,
     parking: false,
     features: ["Digicode", "Interphone", "Double vitrage"],
-    neighborhood: "Hypercentre Rue de Vesle",
+    neighborhood: "Hypercentre. Rue de Vesle",
     description:
       "Studio entièrement rénové au cœur de Reims. Cuisine équipée, salle d'eau refaite, double vitrage. Immeuble Pierre de taille, digicode. Rentabilité brute : 6,1%. Secteur ultra-demandé, vacance locative quasi nulle.",
     photos: [
@@ -171,13 +171,13 @@ export const LISTINGS: Listing[] = [
     price: 412000,
     priceLabel: "412 000 €",
     isRental: false,
-    title: "Maison de caractère avec dépendance Village proche Reims",
+    title: "Maison de caractère avec dépendance. Village proche Reims",
     surface: 185,
     rooms: 7,
     bedrooms: 4,
     parking: true,
     features: ["Dépendance 60 m²", "Terrain 1200 m²", "Cheminée marbre"],
-    neighborhood: "Cormontreuil 8 min de Reims",
+    neighborhood: "Cormontreuil. 8 min de Reims",
     description:
       "Superbe maison de caractère en pierre avec dépendance aménageable. Grandes pièces de réception, cheminée en marbre, cuisine rénovée, 4 chambres. Dépendance de 60 m² idéale pour télétravail ou chambre d'hôtes. Grand terrain arboré. Rare.",
     photos: [
@@ -192,7 +192,7 @@ export const LISTINGS: Listing[] = [
     price: 490,
     priceLabel: "490 €/mois",
     isRental: true,
-    title: "T2 calme et lumineux Résidence sécurisée",
+    title: "T2 calme et lumineux. Résidence sécurisée",
     surface: 44,
     rooms: 2,
     bedrooms: 1,
@@ -213,13 +213,13 @@ export const LISTINGS: Listing[] = [
     price: 236000,
     priceLabel: "236 000 €",
     isRental: false,
-    title: "Appartement T4 familial Résidence de standing",
+    title: "Appartement T4 familial. Résidence de standing",
     surface: 89,
     rooms: 4,
     bedrooms: 3,
     parking: true,
     features: ["Parking souterrain", "Gardien", "Cave"],
-    neighborhood: "Laon Clairmarais",
+    neighborhood: "Laon. Clairmarais",
     description:
       "Spacieux T4 dans résidence gardiennée de standing. Grand séjour double, 3 chambres, cuisine équipée, deux salles d'eau. Parking souterrain, cave. Charges raisonnables. Idéal famille ou investissement patrimonial.",
     photos: [
@@ -231,7 +231,7 @@ export const LISTINGS: Listing[] = [
 ];
 
 export const NEIGHBORHOODS = Array.from(
-  new Set(LISTINGS.map((l) => l.neighborhood.split(" ")[0].trim()))
+  new Set(LISTINGS.map((l) => l.neighborhood.split(". ")[0].trim()))
 ).sort();
 
 export function getListing(id: string): Listing | undefined {

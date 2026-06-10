@@ -20,7 +20,7 @@ function Page() {
           <div className="space-y-6 text-foreground/80 leading-relaxed">
             <div>
               <h2 className="font-display text-2xl text-navy mb-2">Éditeur du site</h2>
-              <p>Dupuis Immobilier Julien Dupuis, agent immobilier indépendant.<br/>
+              <p>Dupuis Immobilier. Julien Dupuis, agent immobilier indépendant.<br/>
               24 rue de Vesle, 51100 Reims<br/>
               SIRET : 000 000 000 00000 RCS Reims<br/>
               Carte professionnelle T n° CPI 5101 2026 000 000 000 délivrée par la CCI Marne en Champagne.<br/>

@@ -125,7 +125,7 @@ export function Footer() {
             Dupuis <span className="text-gold italic">Immobilier</span>
           </div>
           <p className="text-sm text-white/70 mb-5">
-            Agent indépendant à Reims. Vente, location, investissement un accompagnement humain et exigeant.
+            Agent indépendant à Reims. Vente, location, investissement. Un accompagnement humain et exigeant.
           </p>
           <div className="flex gap-3">
             <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold hover:text-navy hover:border-gold transition-colors"><Facebook size={15}/></a>
