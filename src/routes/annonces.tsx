@@ -158,7 +158,7 @@ function AnnoncesPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Ville, quartier ou adresse..."
-                  className="w-full pl-10 pr-3 py-3 rounded-lg border border-border bg-white text-navy text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
+                  className="w-full min-h-[48px] pl-10 pr-3 py-3 rounded-lg border border-border bg-white text-navy text-base sm:text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
                 />
               </div>
               <select className={selectClass} value={type} onChange={(e) => setType(e.target.value as TypeFilter)}>
