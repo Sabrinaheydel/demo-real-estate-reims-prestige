@@ -47,8 +47,8 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const HERO_IMG =
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80";
+import heroAsset from "@/assets/reims-hero.png.asset.json";
+const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
   { label: "Accueil", href: "#accueil" },
