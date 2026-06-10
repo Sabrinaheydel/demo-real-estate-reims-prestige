@@ -163,7 +163,7 @@ function useInView<T extends HTMLElement>() {
           obs.disconnect();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
