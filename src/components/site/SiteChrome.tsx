@@ -175,11 +175,11 @@ export function Footer() {
           </a>
         </div>
       </div>
+      <WhatsAppBubble />
+      <CookieBanner />
     </footer>
   );
 }
-
-export function WhatsAppBubble() {
   return (
     <a
       href={WHATSAPP_URL}
