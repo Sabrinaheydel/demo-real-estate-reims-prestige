@@ -403,34 +403,25 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             openId={openSubmissionId}
             onClearOpen={() => setOpenSubmissionId(null)}
             onToggle={toggleSubmission}
+            testRow={testRow}
+            testFading={testFading}
           />
         )}
 
-        <div className="mt-12 pt-6 border-t border-border/40 flex justify-end">
+        <div className="mt-12 pt-6 border-t border-border/40 flex flex-col items-center gap-1.5">
           <button
             type="button"
-            onClick={() => {
-              const fake: FormSubmission = {
-                id: `test-${Date.now()}`,
-                created_at: new Date().toISOString(),
-                form_type: "estimation-vendre",
-                prenom: "Marie",
-                nom: "Dupont",
-                email: "marie@example.com",
-                telephone: "06 12 34 56 78",
-                reference_annonce: null,
-                donnees_completes: { typeBien: "T3 Clairmarais · Simulation démo", quartier: "Clairmarais" },
-                statut: "nouveau",
-                traite: false,
-              };
-              showSubmissionNotification(fake);
-              playDing();
-            }}
-            className="text-xs text-foreground/50 hover:text-navy underline"
+            onClick={triggerTestNotification}
+            style={{ fontSize: 13, padding: "8px 16px", border: "1px solid #E0E5EB", borderRadius: 6 }}
+            className="inline-flex items-center gap-2 bg-white text-foreground/70 hover:bg-gray-50 transition-colors"
           >
-            🧪 Tester la notification
+            <span aria-hidden>🧪</span> Tester la notification push
           </button>
+          <p className="text-[11px] italic text-foreground/40">
+            Simulation uniquement · Aucune donnée réelle enregistrée
+          </p>
         </div>
+
 
       </div>
     </div>
