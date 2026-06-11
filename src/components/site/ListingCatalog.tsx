@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import { Link } from "@tanstack/react-router";
 import { Search, List, Map as MapIcon } from "lucide-react";
-import { LISTINGS, type Listing } from "@/lib/listings";
+import { type Listing } from "@/lib/listings";
+import { useListings } from "@/lib/admin-storage";
 import { ListingCard } from "@/components/site/ListingCard";
 
 const MapView = lazy(() => import("@/components/site/MapView").then((m) => ({ default: m.MapView })));
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export function ListingCatalog({ initialType = "all", title, subtitle }: Props) {
+  const LISTINGS = useListings();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<TypeFilter>(initialType);
   const [sort, setSort] = useState<SortMode>("newest");
@@ -61,7 +63,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
     if (sort === "price-asc") res = [...res].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") res = [...res].sort((a, b) => b.price - a.price);
     return res;
-  }, [availability, furnishedFilter, query, rentalBudget, sort, type]);
+  }, [LISTINGS, availability, furnishedFilter, query, rentalBudget, sort, type]);
 
   const shown = filtered.slice(0, visible);
   const saleCount = LISTINGS.filter((l) => !l.isRental).length;
