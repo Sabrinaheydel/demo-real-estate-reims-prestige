@@ -218,11 +218,62 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const newMessagesThisWeek = submissions.filter((s) => !s.traite).length;
 
+  // --- Test notification (demo) ------------------------------------------
+  const [testRow, setTestRow] = useState<FormSubmission | null>(null);
+  const [testFading, setTestFading] = useState(false);
+  const testTimers = useRef<number[]>([]);
+  useEffect(() => () => { testTimers.current.forEach((t) => clearTimeout(t)); }, []);
+
+  const triggerTestNotification = useCallback(() => {
+    if (!notifIsSupported() || !notifIsEnabled()) {
+      toast.warning("Activez d'abord les notifications avec le bouton 🔔 en haut");
+      return;
+    }
+    if (isNightMode()) {
+      toast.info("Mode nuit actif — notification suspendue (20h–8h)");
+    }
+    const fake: FormSubmission = {
+      id: `test-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      form_type: "estimation-vendre",
+      prenom: "Marie",
+      nom: "Dupont",
+      email: "marie.dupont@example.com",
+      telephone: "06 12 34 56 78",
+      reference_annonce: null,
+      donnees_completes: {
+        typeBien: "Appartement T3",
+        quartier: "Clairmarais",
+        message: "Simulation démo — aucune donnée enregistrée",
+      },
+      statut: "nouveau",
+      traite: false,
+    };
+    showRawNotification({
+      title: "🏠 Démo — Nouvelle estimation",
+      body: "Marie Dupont — Appartement T3 · Clairmarais\nDemande reçue à l'instant",
+      tag: fake.id,
+      url: "/admin",
+    });
+    playDing();
+    toast.success("✅ Notification test envoyée !", { duration: 3000 });
+    // Insert ephemeral row
+    setTestFading(false);
+    setTestRow(fake);
+    setTab("messages");
+    testTimers.current.forEach((t) => clearTimeout(t));
+    testTimers.current = [
+      window.setTimeout(() => setTestFading(true), 9500),
+      window.setTimeout(() => { setTestRow(null); setTestFading(false); }, 10000),
+    ];
+  }, []);
+
   async function toggleSubmission(id: string, traite: boolean) {
     setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, traite, statut: traite ? "traite" : "nouveau" } : s)));
     try { await markTraite({ data: { id, traite } }); }
     catch (e) { console.warn("[submissions] toggle failed", e); refreshSubmissions(); }
   }
+
 
 
   async function saveListing(l: Listing) {
