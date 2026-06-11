@@ -1,11 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { z } from "zod";
 import { PageShell } from "@/components/site/SiteChrome";
 import { TextField, SelectField } from "./vendre";
 import { Check, MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from "lucide-react";
 import portraitInterior from "@/assets/photo-profil-3.jpg.asset.json";
 
+const contactSearchSchema = z.object({
+  reference: z.string().trim().max(30).optional(),
+  listing: z.string().trim().max(160).optional(),
+  intent: z.enum(["infos", "visite"]).optional(),
+});
+
 export const Route = createFileRoute("/contact")({
+  validateSearch: (search) => contactSearchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "Contact · Dupuis Immobilier Reims" },
@@ -17,27 +25,78 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-function ContactForm() {
+type ContactFormProps = {
+  reference?: string;
+  listing?: string;
+  intent?: "infos" | "visite";
+};
+
+function ContactForm({ reference, listing, intent }: ContactFormProps) {
   const [sent, setSent] = useState(false);
   const [rgpd, setRgpd] = useState(false);
+
+  const defaultObject = intent === "visite" ? "Demande de visite" : reference ? "Infos sur un bien" : "Acheter";
+  const defaultMessage = useMemo(() => {
+    if (!reference && !listing) return "";
+    return `Bonjour,\n\nJe souhaite ${intent === "visite" ? "organiser une visite" : "obtenir plus d'informations"} concernant ${listing ? `le bien « ${listing} »` : "ce bien"}${reference ? ` (${reference})` : ""}.`;
+  }, [intent, listing, reference]);
+
   if (sent) {
     return (
       <div className="bg-cream rounded-xl p-10 text-center">
         <Check size={36} className="mx-auto text-gold mb-3" />
-        <h3 className="font-display text-2xl text-navy mb-2">Message envoyé</h3>
-        <p className="text-foreground/70">Je reviens vers vous sous 24h ouvrées.</p>
+        <h3 className="font-display text-2xl text-navy mb-2">Email préparé</h3>
+        <p className="text-foreground/70">Votre logiciel de messagerie s'ouvre avec la référence du bien déjà renseignée.</p>
       </div>
     );
   }
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         if (!rgpd) return;
+        const data = new FormData(e.currentTarget);
+        const firstName = String(data.get("firstname") ?? "").trim();
+        const lastName = String(data.get("lastname") ?? "").trim();
+        const email = String(data.get("email") ?? "").trim();
+        const phone = String(data.get("phone") ?? "").trim();
+        const object = String(data.get("object") ?? defaultObject).trim();
+        const message = String(data.get("message") ?? "").trim();
+
+        const subject = `${object}${reference ? ` - ${reference}` : ""}`;
+        const body = [
+          "Bonjour,",
+          "",
+          listing || reference
+            ? `Je vous contacte au sujet ${listing ? `du bien « ${listing} »` : "de ce bien"}${reference ? ` (${reference})` : ""}.`
+            : "Je vous contacte concernant mon projet immobilier.",
+          "",
+          `Prénom : ${firstName}`,
+          `Nom : ${lastName}`,
+          `Email : ${email}`,
+          `Téléphone : ${phone}`,
+          `Objet : ${object}`,
+          reference ? `Référence : ${reference}` : undefined,
+          "",
+          "Message :",
+          message,
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+        window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         setSent(true);
       }}
       className="bg-white rounded-xl shadow-soft border border-border p-6 lg:p-10 space-y-5"
     >
+      {(reference || listing) && (
+        <div className="rounded-lg border border-gold/30 bg-cream px-4 py-3 text-sm text-navy">
+          <div className="font-semibold">Bien concerné</div>
+          <div className="text-foreground/80">{listing || "Annonce immobilière"}</div>
+          {reference && <div className="text-gold font-medium mt-1">Réf. {reference}</div>}
+        </div>
+      )}
       <div className="grid sm:grid-cols-2 gap-4">
         <TextField name="firstname" label="Prénom" required />
         <TextField name="lastname" label="Nom" required />
@@ -46,13 +105,15 @@ function ContactForm() {
         <TextField name="email" type="email" label="Email" required />
         <TextField name="phone" type="tel" label="Téléphone" required />
       </div>
-      <SelectField name="object" label="Objet" options={["Vendre", "Louer", "Acheter", "Estimation", "Autre"]} />
+      <SelectField name="object" label="Objet" options={["Vendre", "Louer", "Acheter", "Demande de visite", "Infos sur un bien", "Estimation", "Autre"]} />
       <label className="block">
         <span className="block text-sm font-medium text-navy mb-2">Message <span className="text-gold">*</span></span>
         <textarea
+          name="message"
           required
-          rows={5}
+          rows={6}
           maxLength={1000}
+          defaultValue={defaultMessage}
           placeholder="Détaillez votre demande…"
           className="w-full px-4 py-3 rounded-lg border border-border bg-white text-navy text-sm focus:outline-none focus:border-gold resize-none"
         />
@@ -80,8 +141,10 @@ function ContactForm() {
 }
 
 function ContactPage() {
+  const search = Route.useSearch();
+
   return (
-    <PageShell breadcrumbs={[{ label: "Contact" }]}>
+    <PageShell breadcrumbs={[{ label: "Contact" }]}> 
       <section className="relative w-full h-[250px] sm:h-[400px] overflow-hidden mt-6">
         <img
           src={portraitInterior.url}
@@ -131,7 +194,7 @@ function ContactPage() {
               </div>
             </div>
           </aside>
-          <ContactForm />
+          <ContactForm reference={search.reference} listing={search.listing} intent={search.intent} />
         </div>
       </section>
     </PageShell>
