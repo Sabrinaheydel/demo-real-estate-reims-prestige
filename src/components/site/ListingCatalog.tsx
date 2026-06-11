@@ -97,7 +97,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
               value={type}
               onChange={(e) => {
                 setType(e.target.value as TypeFilter);
-                setVisible(9);
+                setVisible(LISTINGS.length);
               }}
             >
               <option value="vente">À vendre ({saleCount})</option>
