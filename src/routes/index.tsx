@@ -31,18 +31,12 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Dupuis Immobilier · Agent immobilier à Reims" },
-      {
-        name: "description",
-        content:
-          "Dupuis Immobilier Agent indépendant à Reims. Estimation gratuite, accompagnement personnalisé, vente, location et investissement.",
-      },
-      { property: "og:title", content: "Dupuis Immobilier · Agent à Reims" },
-      {
-        property: "og:description",
-        content:
-          "Votre bien immobilier à Reims entre de bonnes mains. Estimation gratuite et accompagnement sur-mesure.",
-      },
+      { name: "description", content: "Estimation gratuite · Vente · Location · Gestion locative à Reims" },
+      { property: "og:title", content: "Dupuis Immobilier · Agent immobilier à Reims" },
+      { property: "og:description", content: "Estimation gratuite · Vente · Location · Gestion locative à Reims" },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Dupuis Immobilier · Agent immobilier à Reims" },
+      { name: "twitter:description", content: "Estimation gratuite · Vente · Location · Gestion locative à Reims" },
     ],
   }),
   component: HomePage,
