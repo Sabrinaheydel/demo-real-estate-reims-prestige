@@ -6,9 +6,11 @@ export const Route = createFileRoute("/dernieres-ventes")({
   head: () => ({
     meta: [
       { title: "Dernières ventes · Dupuis Immobilier Reims" },
-      { name: "description", content: "Découvrez les biens récemment vendus par Dupuis Immobilier à Reims transparence totale sur nos résultats." },
-      { property: "og:title", content: "Dernières ventes Dupuis Immobilier" },
-      { property: "og:description", content: "Transparence totale sur nos résultats de ventes à Reims." },
+      { name: "description", content: "Découvrez nos ventes récentes à Reims. Résultats prouvés, délai moyen 31 jours." },
+      { property: "og:title", content: "Dernières ventes · Dupuis Immobilier Reims" },
+      { property: "og:description", content: "Découvrez nos ventes récentes à Reims. Résultats prouvés, délai moyen 31 jours." },
+      { name: "twitter:title", content: "Dernières ventes · Dupuis Immobilier Reims" },
+      { name: "twitter:description", content: "Découvrez nos ventes récentes à Reims. Résultats prouvés, délai moyen 31 jours." },
     ],
   }),
   component: SoldPage,
