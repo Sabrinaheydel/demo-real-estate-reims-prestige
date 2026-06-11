@@ -68,7 +68,7 @@ const HOME_LISTINGS = [
     beds: 3,
     baths: 2,
     surface: 98,
-    img: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=900",
+    img: haussmannienSalon.url,
   },
   {
     id: "2",
