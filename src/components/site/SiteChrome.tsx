@@ -200,6 +200,15 @@ export function Footer() {
                 <Link to={l.to} className="hover:text-gold transition-colors">{l.label}</Link>
               </li>
             ))}
+            <li>
+              <Link
+                to="/annonces"
+                search={{ type: "location" }}
+                className="hover:text-gold transition-colors text-white/60"
+              >
+                Trouver un logement →
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
