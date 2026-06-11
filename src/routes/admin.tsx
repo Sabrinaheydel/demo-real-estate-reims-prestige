@@ -303,6 +303,10 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
         )}
 
+        <NotificationBanner />
+
+
+
 
         {tab === "annonces" && !editing && (
           <ListingsList
