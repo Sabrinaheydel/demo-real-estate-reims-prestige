@@ -121,6 +121,27 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
   );
 }
 
+function ProfileNavIndicator({ isSolid }: { isSolid: boolean }) {
+  const profile = useProfile();
+  const filled = !!profile && !!profile.revenus_mensuels;
+  return (
+    <Link
+      to={profile?.type_recherche === "achat" ? "/acheter" : "/louer"}
+      hash="profil"
+      className={`relative inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-gold ${
+        isSolid ? "text-navy" : "text-white/90"
+      }`}
+      title={filled ? "Profil renseigné" : "Renseigner mon profil"}
+    >
+      <User size={16} />
+      <span>Mon profil</span>
+      {filled && (
+        <span className="absolute -top-0.5 -right-1.5 w-2 h-2 rounded-full bg-rental ring-2 ring-white" />
+      )}
+    </Link>
+  );
+}
+
 export function Footer() {
   return (
     <footer className="bg-navy text-white/80 pt-16 pb-8 px-6">
