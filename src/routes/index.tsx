@@ -90,7 +90,7 @@ const HOME_LISTINGS = [
     beds: 5,
     baths: 3,
     surface: 220,
-    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900",
+    img: villaPiscine.url,
   },
 ];
 
