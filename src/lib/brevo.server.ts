@@ -1,19 +1,16 @@
 // Server-only Brevo helpers. The .server.ts suffix prevents this file from
-// being bundled into the client. All calls go through the Lovable connector
-// gateway — BREVO_API_KEY and LOVABLE_API_KEY are read inside functions
-// (per-request), never at module scope.
+// being bundled into the client. Calls go DIRECTLY to the Brevo API
+// (api.brevo.com) using BREVO_API_KEY stored as a server secret.
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
+const BREVO_API_URL = "https://api.brevo.com";
 
 function brevoHeaders(): Record<string, string> {
-  const lovableKey = process.env.LOVABLE_API_KEY;
   const brevoKey = process.env.BREVO_API_KEY;
-  if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
   if (!brevoKey) throw new Error("BREVO_API_KEY is not configured");
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${lovableKey}`,
-    "X-Connection-Api-Key": brevoKey,
+    accept: "application/json",
+    "api-key": brevoKey,
   };
 }
 
