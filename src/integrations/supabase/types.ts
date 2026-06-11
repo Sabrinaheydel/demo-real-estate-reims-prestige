@@ -14,7 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      form_submissions: {
+        Row: {
+          created_at: string
+          donnees_completes: Json
+          email: string | null
+          form_type: string
+          id: string
+          nom: string | null
+          prenom: string | null
+          reference_annonce: string | null
+          statut: string
+          telephone: string | null
+          traite: boolean
+        }
+        Insert: {
+          created_at?: string
+          donnees_completes?: Json
+          email?: string | null
+          form_type: string
+          id?: string
+          nom?: string | null
+          prenom?: string | null
+          reference_annonce?: string | null
+          statut?: string
+          telephone?: string | null
+          traite?: boolean
+        }
+        Update: {
+          created_at?: string
+          donnees_completes?: Json
+          email?: string | null
+          form_type?: string
+          id?: string
+          nom?: string | null
+          prenom?: string | null
+          reference_annonce?: string | null
+          statut?: string
+          telephone?: string | null
+          traite?: boolean
+        }
+        Relationships: []
+      }
+      properties: {
+        Row: {
+          cave: boolean | null
+          chambres: number | null
+          created_at: string
+          description: string | null
+          dpe: string | null
+          id: string
+          legacy_id: string | null
+          meta: Json
+          meuble: boolean | null
+          parking: boolean | null
+          photo_principale: string | null
+          pieces: number | null
+          prix: number
+          quartier: string | null
+          reference: string
+          statut: string
+          surface: number | null
+          titre: string
+          type: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          cave?: boolean | null
+          chambres?: number | null
+          created_at?: string
+          description?: string | null
+          dpe?: string | null
+          id?: string
+          legacy_id?: string | null
+          meta?: Json
+          meuble?: boolean | null
+          parking?: boolean | null
+          photo_principale?: string | null
+          pieces?: number | null
+          prix?: number
+          quartier?: string | null
+          reference: string
+          statut?: string
+          surface?: number | null
+          titre: string
+          type?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          cave?: boolean | null
+          chambres?: number | null
+          created_at?: string
+          description?: string | null
+          dpe?: string | null
+          id?: string
+          legacy_id?: string | null
+          meta?: Json
+          meuble?: boolean | null
+          parking?: boolean | null
+          photo_principale?: string | null
+          pieces?: number | null
+          prix?: number
+          quartier?: string | null
+          reference?: string
+          statut?: string
+          surface?: number | null
+          titre?: string
+          type?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
