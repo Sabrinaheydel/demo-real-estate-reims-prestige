@@ -372,7 +372,8 @@ export function RentSimulator() {
               {marketTip ? (
                 <div
                   key={marketTip.text}
-                  className="bg-white rounded-lg p-4 border border-border animate-fade-in"
+                  className="rounded-lg p-4 border animate-fade-in transition-all duration-300"
+                  style={{ backgroundColor: marketTip.bg, borderColor: marketTip.border }}
                 >
                   <p className="text-sm text-navy">
                     <span className="mr-2">{marketTip.emoji}</span>
