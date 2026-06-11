@@ -1,10 +1,13 @@
 import annonce1Asset from "@/assets/annonce-1-appartement-haussmannien.png.asset.json";
 import annonce2Asset from "@/assets/annonce-2-maison-familiale.png.asset.json";
 import annonce3Asset from "@/assets/annonce-3-deux-pieces-traversant.png.asset.json";
+import annonce3NewAsset from "@/assets/annonce-3-studio-design-proche-chu.png.asset.json";
 import annonce4Asset from "@/assets/annonce-4-villa-contemporaine.png.asset.json";
 import annonce5Asset from "@/assets/annonce-5-studio-renove.png.asset.json";
 import annonce6Asset from "@/assets/annonce-6-maison-de-caractere.png.asset.json";
+import annonce6NewAsset from "@/assets/annonce-6-appartement-t3-lumineux-sacres.png.asset.json";
 import annonce7Asset from "@/assets/annonce-7-appartement-t4-standing.png.asset.json";
+import annonce9NewAsset from "@/assets/annonce-9-t2-calme-lumineux-securisee.png.asset.json";
 import loc1Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_05_3.png.asset.json";
 import loc2Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_06_6.png.asset.json";
 import loc3Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_05_4.png.asset.json";
@@ -113,51 +116,7 @@ export const LISTINGS: Listing[] = [
     neighborhood: "Jean Jaurès. Proximité CHU",
     description:
       "Studio entièrement rénové, idéal pour un premier achat ou un investissement patrimonial. Coin nuit séparé, cuisine équipée, salle d'eau moderne et très belle luminosité. Immeuble sécurisé avec digicode. Situation recherchée à proximité du CHU et des transports.",
-    photos: [annonce3Asset.url, annonce3Asset.url, annonce3Asset.url],
-  },
-  {
-    id: "4",
-    reference: "DI-2024-004",
-    status: ["vente"],
-    price: 165000,
-    priceLabel: "165 000 €",
-    isRental: false,
-    title: "2 pièces traversant. Investissement locatif idéal",
-    propertyType: "appartement",
-    surface: 48,
-    rooms: 2,
-    bedrooms: 1,
-    parking: false,
-    floor: "1er",
-    cellar: true,
-    dpe: "D",
-    features: ["Cave", "Traversant", "Charges faibles"],
-    neighborhood: "Boulevard Lundy",
-    description:
-      "Appartement traversant lumineux, parfait pour investissement ou premier achat. Séjour avec coin repas, chambre séparée, cuisine équipée, salle de bain. Charges faibles. Rendement locatif estimé : 5,2% brut. Locataire en place possible.",
-    photos: [annonce3Asset.url, annonce3Asset.url, annonce3Asset.url],
-  },
-  {
-    id: "5",
-    reference: "DI-2024-005",
-    status: ["vente", "exclusivite"],
-    price: 520000,
-    priceLabel: "520 000 €",
-    isRental: false,
-    title: "Villa contemporaine avec piscine. Reims Sud",
-    propertyType: "villa",
-    surface: 220,
-    rooms: 7,
-    bedrooms: 5,
-    parking: true,
-    floor: "Maison",
-    cellar: false,
-    dpe: "A",
-    features: ["Piscine chauffée", "Terrain 800 m²", "Double garage"],
-    neighborhood: "Bezannes. Reims Sud",
-    description:
-      "Exceptionnelle villa contemporaine construite en 2018. Grandes baies vitrées, séjour cathédrale de 60 m², cuisine américaine haut de gamme, 5 chambres dont suite parentale avec dressing et salle de bain privative. Piscine chauffée, terrain paysager, double garage. Quartier résidentiel calme.",
-    photos: [annonce4Asset.url, annonce4Asset.url, annonce4Asset.url],
+    photos: [annonce3NewAsset.url, annonce3NewAsset.url, annonce3NewAsset.url],
   },
   {
     id: "6",
@@ -179,51 +138,7 @@ export const LISTINGS: Listing[] = [
     neighborhood: "Quartier des Sacres",
     description:
       "Bel appartement familial refait à neuf dans un immeuble récent. Double séjour lumineux, cuisine ouverte équipée, 2 belles chambres, salle de bain et WC séparés. Balcon orienté sud, parking privatif. Proche commerces, écoles et transports.",
-    photos: [annonce5Asset.url, annonce5Asset.url, annonce5Asset.url],
-  },
-  {
-    id: "7",
-    reference: "DI-2024-007",
-    status: ["vente"],
-    price: 98000,
-    priceLabel: "98 000 €",
-    isRental: false,
-    title: "Studio rénové. Idéal premier investissement",
-    propertyType: "studio",
-    surface: 28,
-    rooms: 1,
-    bedrooms: null,
-    parking: false,
-    floor: "4e",
-    cellar: false,
-    dpe: "D",
-    features: ["Digicode", "Interphone", "Double vitrage"],
-    neighborhood: "Hypercentre. Rue de Vesle",
-    description:
-      "Studio entièrement rénové au cœur de Reims. Cuisine équipée, salle d'eau refaite, double vitrage. Immeuble pierre de taille, digicode. Rentabilité brute : 6,1%. Secteur ultra-demandé, vacance locative quasi nulle.",
-    photos: [annonce5Asset.url, annonce5Asset.url, annonce5Asset.url],
-  },
-  {
-    id: "8",
-    reference: "DI-2024-008",
-    status: ["vente"],
-    price: 412000,
-    priceLabel: "412 000 €",
-    isRental: false,
-    title: "Maison de caractère avec dépendance. Village proche Reims",
-    propertyType: "maison",
-    surface: 185,
-    rooms: 7,
-    bedrooms: 4,
-    parking: true,
-    floor: "Maison",
-    cellar: true,
-    dpe: "C",
-    features: ["Dépendance 60 m²", "Terrain 1200 m²", "Cheminée marbre"],
-    neighborhood: "Cormontreuil. 8 min de Reims",
-    description:
-      "Superbe maison de caractère en pierre avec dépendance aménageable. Grandes pièces de réception, cheminée en marbre, cuisine rénovée, 4 chambres. Dépendance de 60 m² idéale pour télétravail ou chambre d'hôtes. Grand terrain arboré. Rare.",
-    photos: [annonce6Asset.url, annonce6Asset.url, annonce6Asset.url],
+    photos: [annonce6NewAsset.url, annonce6NewAsset.url, annonce6NewAsset.url],
   },
   {
     id: "9",
@@ -245,7 +160,7 @@ export const LISTINGS: Listing[] = [
     neighborhood: "Avenue de Laon",
     description:
       "Beau T2 dans résidence sécurisée avec gardien. Séjour lumineux, chambre séparée, cuisine équipée, salle de bain refaite. Parking et cave inclus. Environnement calme et verdoyant, tous commerces à pied.",
-    photos: [annonce6Asset.url, annonce6Asset.url, annonce6Asset.url],
+    photos: [annonce9NewAsset.url, annonce9NewAsset.url, annonce9NewAsset.url],
   },
   {
     id: "10",
