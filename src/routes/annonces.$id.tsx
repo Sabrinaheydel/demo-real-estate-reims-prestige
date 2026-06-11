@@ -6,6 +6,9 @@ import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Lightbox } from "@/components/site/Lightbox";
 import { ListingCard } from "@/components/site/ListingCard";
 import { getListing, getSimilar, getListingReference, getDpe } from "@/lib/listings";
+import { FURNISHED_ITEMS } from "@/lib/listings-extra";
+import { computeCompat, REVENU_OPTIONS } from "@/lib/profile";
+import { useProfile } from "@/hooks/useProfile";
 import {
   ArrowLeft,
   MapPin,
@@ -16,6 +19,8 @@ import {
   Check,
   Package,
   Building2,
+  Sofa,
+  ChevronDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/annonces/$id")({
@@ -79,14 +84,104 @@ const DPE_STYLES: Record<"A" | "B" | "C" | "D", string> = {
   D: "bg-orange-500 text-white",
 };
 
-type Intent = "visite" | "infos" | "offre" | "rappel";
-
-const INTENT_LABEL: Record<Intent, string> = {
+type SaleIntent = "visite" | "infos" | "offre" | "rappel";
+const SALE_INTENT_LABEL: Record<SaleIntent, string> = {
   visite: "Organiser une visite",
   infos: "Obtenir plus d'informations",
   offre: "Faire une offre",
   rappel: "Être rappelé(e)",
 };
+
+const REVENU_VALUES = REVENU_OPTIONS;
+
+const DOCUMENT_OPTIONS = [
+  "3 derniers bulletins de salaire",
+  "Dernier avis d'imposition",
+  "Pièce d'identité",
+  "Justificatif de domicile actuel",
+  "Contrat de travail",
+];
+
+function CompatBlock({ listing }: { listing: Listing }) {
+  const profile = useProfile();
+  const compat = computeCompat(listing.price, profile);
+  if (compat.status === "missing") {
+    return (
+      <div className="mb-8 rounded-xl border border-dashed border-border bg-cream/60 p-5 text-sm">
+        <p className="text-navy font-medium mb-2">Votre compatibilité</p>
+        <p className="text-foreground/70 mb-3">
+          Renseignez votre profil pour vérifier si ce loyer est compatible avec vos revenus.
+        </p>
+        <Link
+          to="/louer"
+          hash="profil"
+          className="inline-flex items-center px-4 py-2 rounded-lg bg-navy text-white text-sm font-semibold hover:bg-gold hover:text-navy transition-colors"
+        >
+          Renseigner mon profil
+        </Link>
+      </div>
+    );
+  }
+  const tone =
+    compat.tone === "green"
+      ? "border-emerald-200 bg-emerald-50"
+      : compat.tone === "orange"
+        ? "border-amber-200 bg-amber-50"
+        : "border-red-200 bg-red-50";
+  const pct = (compat.ratio * 100).toFixed(1).replace(".", ",");
+  const recommendation =
+    compat.status === "ko"
+      ? "📌 Recommandation : prévoir un garant ou justifier de revenus du foyer plus élevés."
+      : compat.status === "limit"
+        ? "📌 Recommandation : un garant ou des revenus complémentaires renforceront votre dossier."
+        : "✅ Votre dossier est conforme aux critères bancaires (≤ 33% des revenus).";
+  return (
+    <div className={`mb-8 rounded-xl border ${tone} p-5 text-sm`}>
+      <p className="text-navy font-medium mb-1">Votre compatibilité</p>
+      <p className="text-foreground/80 mb-1">
+        Basé sur vos revenus déclarés ({profile!.revenus_mensuels.toLocaleString("fr-FR")}€/mois) :
+      </p>
+      <p className="text-navy font-semibold mb-2">
+        Loyer : {listing.price}€ = {pct}% de vos revenus
+      </p>
+      <p className="text-foreground/80 mb-3">{recommendation}</p>
+      <Link
+        to="/louer"
+        hash="profil"
+        className="inline-flex items-center text-xs font-semibold text-navy underline hover:text-gold"
+      >
+        Mettre à jour mon profil
+      </Link>
+    </div>
+  );
+}
+
+function FurnishedExpander() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-[#7C3AED]/30 bg-[#7C3AED]/5 px-4 py-3 col-span-2 sm:col-span-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between text-sm text-navy font-semibold"
+      >
+        <span className="flex items-center gap-2">
+          <Sofa size={16} className="text-[#7C3AED]" /> Meublé : Oui (liste fournie)
+        </span>
+        <ChevronDown size={16} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <ul className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-foreground/80">
+          {FURNISHED_ITEMS.map((item) => (
+            <li key={item} className="flex items-center gap-1.5">
+              <Check size={12} className="text-[#7C3AED]" /> {item}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function ListingDetailPage() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
@@ -96,17 +191,28 @@ function ListingDetailPage() {
   const similar = getSimilar(listing);
   const reference = getListingReference(listing.id);
   const dpe = getDpe(listing.id);
+  const profile = useProfile();
 
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    intent: "visite" as Intent,
+    intent: "visite" as SaleIntent,
     day: "",
     slot: "",
     message: "",
     rgpd: false,
+    // rental specific
+    profession: "",
+    revenusLabel: profile?.revenus_label ?? "",
+    revenusValue: profile?.revenus_mensuels ?? 0,
+    revenusFoyerLabel: "",
+    revenusFoyerValue: 0,
+    contractDetail: "",
+    garantType: "",
+    documents: [] as string[],
+    entryDate: "",
   });
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
 
@@ -116,15 +222,73 @@ function ListingDetailPage() {
     exclusivite: "Exclusivité",
   };
 
+  function toggleDoc(doc: string) {
+    setForm((f) => ({
+      ...f,
+      documents: f.documents.includes(doc) ? f.documents.filter((d) => d !== doc) : [...f.documents, doc],
+    }));
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!emailValid || !form.rgpd) return;
 
     const fullName = `${form.firstName} ${form.lastName}`.trim();
-    const intentLabel = INTENT_LABEL[form.intent];
-    const subject = `🏠 Nouvelle demande — Réf. ${reference} — ${fullName} — ${intentLabel}`;
     const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
+    if (listing.isRental) {
+      const ratio = form.revenusValue ? (listing.price / form.revenusValue) * 100 : 0;
+      const tauxStr = ratio ? `${ratio.toFixed(1).replace(".", ",")}%` : "—";
+      const conform = ratio && ratio <= 33 ? "✅ Conforme" : ratio && ratio <= 40 ? "⚠️ Limite" : "❌ À renforcer";
+      const subject = `🔑 Pré-dossier complet — Réf. ${reference} — ${fullName} — Revenus : ${form.revenusValue}€ — Taux effort : ${tauxStr}`;
+      const lines = [
+        "═══════════════════════════",
+        `CANDIDATURE — Réf. ${reference}`,
+        `${listing.title} — ${listing.priceLabel}`,
+        "═══════════════════════════",
+        "",
+        "👤 PROFIL CANDIDAT",
+        `Nom : ${fullName}`,
+        `Email : ${form.email}`,
+        `Téléphone : ${form.phone}`,
+        `Situation : ${form.profession || "—"}${form.contractDetail ? ` (${form.contractDetail})` : ""}`,
+        `Revenus nets : ${form.revenusValue ? form.revenusValue + "€/mois" : "—"} (${form.revenusLabel || "—"})`,
+        `Revenus foyer : ${form.revenusFoyerValue ? form.revenusFoyerValue + "€/mois" : "—"}`,
+        "",
+        "📊 ANALYSE FINANCIÈRE",
+        `Loyer demandé : ${listing.price}€/mois`,
+        `Taux d'effort : ${tauxStr} des revenus`,
+        `Statut : ${conform}`,
+        "",
+        "🛡️ GARANTIES",
+        `Garant : ${form.garantType ? `Oui · ${form.garantType}` : "Non précisé"}`,
+        `Documents disponibles :`,
+        ...(form.documents.length ? form.documents.map((d) => `  • ${d}`) : ["  • Aucun document coché"]),
+        "",
+        "📅 PROJET",
+        `Date d'entrée souhaitée : ${form.entryDate || "—"}`,
+        `Demande : ${form.intent === "visite" ? "Visite" : form.intent === "infos" ? "Infos" : "Candidature"}`,
+        ...(form.intent === "visite" && (form.day || form.slot) ? [`Disponibilités : ${form.day || "—"} / ${form.slot || "—"}`] : []),
+        "",
+        "💬 MESSAGE",
+        form.message.trim() || "—",
+        "",
+        ...(pageUrl ? [`Lien de l'annonce : ${pageUrl}`, ""] : []),
+        "═══════════════════════════",
+        "Dossier généré automatiquement",
+        "par Dupuis Immobilier · Système digital",
+        "═══════════════════════════",
+      ];
+      const body = lines.join("\n");
+      window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(
+        subject
+      )}&body=${encodeURIComponent(body)}`;
+      setSent(true);
+      return;
+    }
+
+    const intentLabel = SALE_INTENT_LABEL[form.intent];
+    const subject = `🏠 Nouvelle demande — Réf. ${reference} — ${fullName} — ${intentLabel}`;
     const lines = [
       `Référence : ${reference}`,
       `Bien : ${listing.title}`,
@@ -146,7 +310,6 @@ function ListingDetailPage() {
       lines.push("", `Lien de l'annonce : ${pageUrl}`);
     }
     const body = lines.join("\n");
-
     window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
@@ -223,6 +386,11 @@ function ListingDetailPage() {
           <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10">
             <div>
               <div className="flex flex-wrap gap-2 mb-4">
+                {listing.furnished && (
+                  <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full bg-[#7C3AED] text-white">
+                    🛋️ Meublé
+                  </span>
+                )}
                 {listing.status.map((s) => (
                   <span
                     key={s}
@@ -230,7 +398,7 @@ function ListingDetailPage() {
                       s === "exclusivite"
                         ? "bg-gold text-navy"
                         : s === "location"
-                          ? "bg-emerald-600 text-white"
+                          ? "bg-rental text-white"
                           : "bg-navy text-white"
                     }`}
                   >
@@ -243,16 +411,21 @@ function ListingDetailPage() {
                 <MapPin size={16} className="text-gold" />
                 <span>{listing.neighborhood}, Reims</span>
               </div>
-              <div className="font-display text-4xl sm:text-5xl text-navy mb-8">{listing.priceLabel}</div>
+              <div className="font-display text-4xl sm:text-5xl text-navy mb-2">{listing.priceLabel}</div>
+              {listing.priceNote && (
+                <div className="text-xs text-foreground/50 mb-6">{listing.priceNote}</div>
+              )}
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
+              {listing.isRental && <CompatBlock listing={listing} />}
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                 {[
                   { icon: Maximize, label: "Surface", value: `${listing.surface} m²` },
                   listing.rooms !== null && { icon: HomeIcon, label: "Pièces", value: `${listing.rooms}` },
                   listing.bedrooms !== null && { icon: Bed, label: "Chambres", value: `${listing.bedrooms}` },
                   { icon: Car, label: "Parking", value: listing.parking ? "Oui" : "Non" },
-                  { icon: Building2, label: "Étage", value: "—" },
-                  { icon: Package, label: "Cave", value: listing.features.some((f) => f.toLowerCase().includes("cave")) ? "Oui" : "—" },
+                  { icon: Building2, label: "Étage", value: listing.floor ?? "—" },
+                  { icon: Package, label: "Cave", value: listing.cellar || listing.features.some((f) => f.toLowerCase().includes("cave")) ? "Oui" : "—" },
                 ]
                   .filter(Boolean)
                   .map((row) => {
@@ -268,6 +441,12 @@ function ListingDetailPage() {
                     );
                   })}
               </div>
+
+              {listing.furnished && (
+                <div className="mb-10 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <FurnishedExpander />
+                </div>
+              )}
 
               <hr className="border-0 h-px bg-gold/40 mb-10" />
 
@@ -304,7 +483,7 @@ function ListingDetailPage() {
             <aside className="lg:sticky lg:top-28 self-start">
               <div className="bg-navy text-white rounded-xl p-7 shadow-card">
                 <h3 className="font-display text-2xl text-white mb-1">
-                  Vous êtes intéressé(e) ?
+                  {listing.isRental ? "Constituez votre pré-dossier" : "Vous êtes intéressé(e) ?"}
                 </h3>
                 <p className="text-gold text-xs font-semibold tracking-wider mb-6">
                   Réf. {reference}
@@ -313,11 +492,10 @@ function ListingDetailPage() {
                   <div className="bg-gold/15 border border-gold/40 rounded-lg p-5 text-center">
                     <Check size={28} className="mx-auto text-gold mb-3" />
                     <p className="text-white font-semibold mb-2">
-                      ✅ Votre demande a été envoyée !
+                      ✅ Votre {listing.isRental ? "pré-dossier" : "demande"} a été envoyé !
                     </p>
                     <p className="text-white/80 text-sm">
                       Julien Dupuis vous recontacte sous 24h pour la Réf. {reference}.
-                      Un email de confirmation vous a été envoyé.
                     </p>
                   </div>
                 ) : (
@@ -342,19 +520,142 @@ function ListingDetailPage() {
                     </div>
                     <input required type="tel" placeholder="Téléphone" maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} />
 
+                    {listing.isRental && (
+                      <>
+                        <div className="pt-2">
+                          <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Situation professionnelle</p>
+                          <select required value={form.profession} onChange={(e) => setForm({ ...form, profession: e.target.value })} className={inputCls}>
+                            <option value="" className="text-navy">Sélectionner...</option>
+                            {["CDI", "CDD", "Freelance / Indépendant", "Étudiant", "Retraité", "Autre"].map((s) => (
+                              <option key={s} value={s} className="text-navy">{s}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {(form.profession === "CDI" || form.profession === "CDD") && (
+                          <div>
+                            <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Détail du contrat</p>
+                            <div className="space-y-1.5 text-sm">
+                              {(form.profession === "CDI"
+                                ? ["CDI période d'essai terminée", "CDI période d'essai en cours"]
+                                : ["CDD < 6 mois", "CDD 6-12 mois", "CDD > 12 mois"]
+                              ).map((opt) => (
+                                <label key={opt} className="flex items-center gap-2 cursor-pointer text-white/90">
+                                  <input
+                                    type="radio"
+                                    name="contractDetail"
+                                    checked={form.contractDetail === opt}
+                                    onChange={() => setForm({ ...form, contractDetail: opt })}
+                                    className="accent-[var(--color-gold)]"
+                                  />
+                                  {opt}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Revenus mensuels nets</p>
+                          <select
+                            required
+                            value={form.revenusLabel}
+                            onChange={(e) => {
+                              const opt = REVENU_VALUES.find((o) => o.label === e.target.value);
+                              setForm({ ...form, revenusLabel: opt?.label ?? "", revenusValue: opt?.value ?? 0 });
+                            }}
+                            className={inputCls}
+                          >
+                            <option value="" className="text-navy">Sélectionner...</option>
+                            {REVENU_VALUES.map((o) => (
+                              <option key={o.label} value={o.label} className="text-navy">{o.label}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Revenus du foyer (optionnel)</p>
+                          <select
+                            value={form.revenusFoyerLabel}
+                            onChange={(e) => {
+                              const opt = REVENU_VALUES.find((o) => o.label === e.target.value);
+                              setForm({ ...form, revenusFoyerLabel: opt?.label ?? "", revenusFoyerValue: opt?.value ?? 0 });
+                            }}
+                            className={inputCls}
+                          >
+                            <option value="" className="text-navy">Aucun / non concerné</option>
+                            {REVENU_VALUES.map((o) => (
+                              <option key={o.label} value={o.label} className="text-navy">{o.label}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Garant</p>
+                          <select
+                            value={form.garantType}
+                            onChange={(e) => setForm({ ...form, garantType: e.target.value })}
+                            className={inputCls}
+                          >
+                            <option value="" className="text-navy">Pas de garant</option>
+                            <option value="Personne physique" className="text-navy">Personne physique</option>
+                            <option value="Garantie Visale (Action Logement)" className="text-navy">Garantie Visale</option>
+                            <option value="Assurance loyers impayés" className="text-navy">Assurance loyers impayés</option>
+                            <option value="Autre" className="text-navy">Autre</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Documents disponibles</p>
+                          <div className="space-y-1.5 text-sm">
+                            {DOCUMENT_OPTIONS.map((doc) => (
+                              <label key={doc} className="flex items-start gap-2 cursor-pointer text-white/90">
+                                <input
+                                  type="checkbox"
+                                  checked={form.documents.includes(doc)}
+                                  onChange={() => toggleDoc(doc)}
+                                  className="mt-0.5 accent-[var(--color-gold)]"
+                                />
+                                <span>{doc}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Date d'entrée souhaitée</p>
+                          <input
+                            type="date"
+                            value={form.entryDate}
+                            onChange={(e) => setForm({ ...form, entryDate: e.target.value })}
+                            className={inputCls}
+                          />
+                        </div>
+                      </>
+                    )}
+
                     <div className="pt-1">
-                      <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Je souhaite</p>
+                      <p className="text-xs uppercase tracking-wider text-white/60 mb-2">
+                        {listing.isRental ? "Type de demande" : "Je souhaite"}
+                      </p>
                       <div className="space-y-2">
-                        {(Object.keys(INTENT_LABEL) as Intent[]).map((val) => (
-                          <label key={val} className="flex items-center gap-2.5 text-sm cursor-pointer">
+                        {(listing.isRental
+                          ? [
+                              { val: "visite" as SaleIntent, label: "Organiser une visite" },
+                              { val: "infos" as SaleIntent, label: "Obtenir plus d'informations" },
+                              { val: "offre" as SaleIntent, label: "Déposer ma candidature" },
+                            ]
+                          : (Object.keys(SALE_INTENT_LABEL) as SaleIntent[]).map((val) => ({ val, label: SALE_INTENT_LABEL[val] }))
+                        ).map((it) => (
+                          <label key={it.val} className="flex items-center gap-2.5 text-sm cursor-pointer">
                             <input
                               type="radio"
                               name="intent"
-                              checked={form.intent === val}
-                              onChange={() => setForm({ ...form, intent: val })}
+                              checked={form.intent === it.val}
+                              onChange={() => setForm({ ...form, intent: it.val })}
                               className="accent-[var(--color-gold)]"
                             />
-                            <span className="text-white/90">{INTENT_LABEL[val]}</span>
+                            <span className="text-white/90">{it.label}</span>
                           </label>
                         ))}
                       </div>
@@ -378,7 +679,7 @@ function ListingDetailPage() {
                     )}
 
                     <textarea
-                      placeholder="Questions particulières sur ce bien ?"
+                      placeholder={listing.isRental ? "Présentation rapide (optionnel)" : "Questions particulières sur ce bien ?"}
                       rows={3}
                       maxLength={1000}
                       value={form.message}
@@ -395,7 +696,7 @@ function ListingDetailPage() {
                         className="mt-0.5 accent-[var(--color-gold)]"
                       />
                       <span>
-                        J'accepte que mes informations soient utilisées pour me recontacter au sujet de cette annonce (RGPD).
+                        J'accepte que mes informations soient utilisées pour traiter ma demande (RGPD).
                       </span>
                     </label>
 
@@ -404,7 +705,7 @@ function ListingDetailPage() {
                       disabled={!form.rgpd || !emailValid}
                       className="w-full px-5 py-3.5 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Envoyer ma demande
+                      {listing.isRental ? "Envoyer mon pré-dossier" : "Envoyer ma demande"}
                     </button>
                   </form>
                 )}

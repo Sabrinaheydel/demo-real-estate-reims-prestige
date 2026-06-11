@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCatalog } from "@/components/site/ListingCatalog";
+import { ProfileForm } from "@/components/site/ProfileForm";
 
 export const Route = createFileRoute("/louer")({
   head: () => ({
@@ -21,6 +22,9 @@ function RentPage() {
       <Navbar solid />
       <Breadcrumbs items={[{ label: "Louer" }]} />
       <main className="pt-6">
+        <section className="max-w-5xl mx-auto px-6 lg:px-10 mb-10">
+          <ProfileForm defaultType="location" />
+        </section>
         <ListingCatalog
           initialType="location"
           title="Biens à louer"

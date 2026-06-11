@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Maximize, Home as HomeIcon, Bed, Car, MapPin } from "lucide-react";
 import { type Listing } from "@/lib/listings";
+import { computeCompat } from "@/lib/profile";
+import { useProfile } from "@/hooks/useProfile";
 
 type ListingCardProps = {
   listing: Listing;
@@ -10,7 +12,7 @@ function StatusBadges({ listing }: { listing: Listing }) {
   const badges = listing.isRental
     ? [
         {
-          label: listing.furnished ? "🛋️ À louer · Meublé" : "À louer",
+          label: "À louer",
           className: "bg-rental text-white",
         },
       ]
@@ -31,6 +33,11 @@ function StatusBadges({ listing }: { listing: Listing }) {
 
   return (
     <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+      {listing.furnished && (
+        <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-soft bg-[#7C3AED] text-white">
+          🛋️ Meublé
+        </span>
+      )}
       {badges.map((badge) => (
         <span
           key={badge.label}
@@ -39,6 +46,36 @@ function StatusBadges({ listing }: { listing: Listing }) {
           {badge.label}
         </span>
       ))}
+    </div>
+  );
+}
+
+function CompatBadge({ listing }: { listing: Listing }) {
+  const profile = useProfile();
+  if (!listing.isRental) return null;
+  const compat = computeCompat(listing.price, profile);
+  const toneCls =
+    compat.tone === "green"
+      ? "bg-emerald-500/90 text-white"
+      : compat.tone === "orange"
+        ? "bg-amber-500/90 text-white"
+        : compat.tone === "red"
+          ? "bg-red-500/90 text-white"
+          : "bg-foreground/10 text-foreground/70";
+  if (compat.status === "missing") {
+    return (
+      <Link
+        to="/louer"
+        hash="profil"
+        className="block text-center text-[12px] py-2 rounded-b-xl bg-foreground/5 text-foreground/70 hover:bg-foreground/10 transition-colors"
+      >
+        {compat.badge}
+      </Link>
+    );
+  }
+  return (
+    <div className={`text-center text-[12px] font-medium py-2 rounded-b-xl ${toneCls}`}>
+      {compat.badge}
     </div>
   );
 }
@@ -95,6 +132,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           <span className="text-[10px] uppercase tracking-wider text-foreground/45 whitespace-nowrap">Réf. {listing.reference}</span>
         </div>
       </div>
+      <CompatBadge listing={listing} />
     </article>
   );
 }

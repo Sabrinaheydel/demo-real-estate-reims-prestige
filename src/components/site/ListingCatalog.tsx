@@ -1,11 +1,16 @@
-import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, List, Map as MapIcon } from "lucide-react";
 import { LISTINGS, type Listing } from "@/lib/listings";
 import { ListingCard } from "@/components/site/ListingCard";
+import { MapView } from "@/components/site/MapView";
 
 type TypeFilter = "vente" | "location" | "all";
 type SortMode = "newest" | "price-asc" | "price-desc";
 type AvailabilityFilter = "all" | "immediate" | "this-month" | "within-3-months";
+type FurnishedFilter = "all" | "yes" | "no";
+type ViewMode = "list" | "map";
+
+const VIEW_KEY = "di_catalog_view";
 
 type Props = {
   initialType?: TypeFilter;
@@ -19,8 +24,19 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
   const [sort, setSort] = useState<SortMode>("newest");
   const [visible, setVisible] = useState(9);
   const [rentalBudget, setRentalBudget] = useState(1500);
-  const [furnishedOnly, setFurnishedOnly] = useState(false);
+  const [furnishedFilter, setFurnishedFilter] = useState<FurnishedFilter>("all");
   const [availability, setAvailability] = useState<AvailabilityFilter>("all");
+  const [view, setView] = useState<ViewMode>("list");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem(VIEW_KEY);
+    if (stored === "map" || stored === "list") setView(stored);
+  }, []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(VIEW_KEY, view);
+  }, [view]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -31,9 +47,10 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
         const hay = `${l.title} ${l.neighborhood} ${l.description} ${l.reference}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
+      if (furnishedFilter === "yes" && !l.furnished) return false;
+      if (furnishedFilter === "no" && l.furnished) return false;
       if (type === "location") {
         if (l.price > rentalBudget) return false;
-        if (furnishedOnly && !l.furnished) return false;
         if (availability !== "all" && l.availabilityTag !== availability) return false;
       }
       return true;
@@ -42,7 +59,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
     if (sort === "price-asc") res = [...res].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") res = [...res].sort((a, b) => b.price - a.price);
     return res;
-  }, [availability, furnishedOnly, query, rentalBudget, sort, type]);
+  }, [availability, furnishedFilter, query, rentalBudget, sort, type]);
 
   const shown = filtered.slice(0, visible);
   const saleCount = LISTINGS.filter((l) => !l.isRental).length;
@@ -97,13 +114,54 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
               <option value="price-desc">Prix décroissant</option>
             </select>
 
-            <div className="min-h-[48px] px-4 py-3 rounded-lg bg-cream text-sm text-navy flex items-center justify-center font-medium">
-              {filtered.length} bien{filtered.length > 1 ? "s" : ""}
+            <div className="min-h-[48px] flex items-center gap-2">
+              <div className="flex-1 px-3 py-2 rounded-lg bg-cream text-sm text-navy flex items-center justify-center font-medium">
+                {filtered.length} bien{filtered.length > 1 ? "s" : ""}
+              </div>
+              <div className="inline-flex rounded-lg border border-border overflow-hidden" role="tablist" aria-label="Vue liste ou carte">
+                <button
+                  type="button"
+                  onClick={() => setView("list")}
+                  aria-pressed={view === "list"}
+                  className={`px-3 py-2 text-sm font-medium flex items-center gap-1 ${view === "list" ? "bg-navy text-white" : "bg-white text-navy hover:bg-cream"}`}
+                >
+                  <List size={16} /> <span className="hidden sm:inline">Liste</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setView("map")}
+                  aria-pressed={view === "map"}
+                  className={`px-3 py-2 text-sm font-medium flex items-center gap-1 ${view === "map" ? "bg-navy text-white" : "bg-white text-navy hover:bg-cream"}`}
+                >
+                  <MapIcon size={16} /> <span className="hidden sm:inline">Carte</span>
+                </button>
+              </div>
             </div>
           </div>
 
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <label className="inline-flex items-center gap-2 text-sm text-navy bg-cream px-3 py-1.5 rounded-full cursor-pointer">
+              <input
+                type="checkbox"
+                checked={furnishedFilter === "yes"}
+                onChange={(e) => setFurnishedFilter(e.target.checked ? "yes" : "all")}
+                className="h-4 w-4 accent-[#7C3AED]"
+              />
+              <span>🛋️ Meublé uniquement</span>
+            </label>
+            <select
+              className="text-sm text-navy bg-white border border-border rounded-full px-3 py-1.5 focus:outline-none focus:border-gold"
+              value={furnishedFilter}
+              onChange={(e) => setFurnishedFilter(e.target.value as FurnishedFilter)}
+            >
+              <option value="all">Meublé : indifférent</option>
+              <option value="yes">Meublé</option>
+              <option value="no">Non meublé</option>
+            </select>
+          </div>
+
           {type === "location" && (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
               <label className="rounded-lg border border-border bg-white px-4 py-3">
                 <span className="block text-xs uppercase tracking-wider text-foreground/60 mb-2">Budget loyer max</span>
                 <input
@@ -116,19 +174,6 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
                   className="w-full accent-[var(--color-rental)]"
                 />
                 <span className="text-sm font-medium text-navy">Jusqu'à {rentalBudget} €/mois</span>
-              </label>
-
-              <label className="rounded-lg border border-border bg-white px-4 py-3 flex items-center justify-between gap-4">
-                <div>
-                  <span className="block text-xs uppercase tracking-wider text-foreground/60 mb-1">Meublé uniquement</span>
-                  <span className="text-sm text-navy">Afficher seulement les logements meublés</span>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={furnishedOnly}
-                  onChange={(e) => setFurnishedOnly(e.target.checked)}
-                  className="h-4 w-4 accent-[var(--color-rental)]"
-                />
               </label>
 
               <label className="rounded-lg border border-border bg-white px-4 py-3">
@@ -150,7 +195,9 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
       </div>
 
       <section className="max-w-7xl mx-auto px-6 lg:px-10 mt-10 pb-24">
-        {shown.length === 0 ? (
+        {view === "map" ? (
+          <MapView listings={filtered} />
+        ) : shown.length === 0 ? (
           <div className="bg-cream rounded-xl p-12 text-center">
             <p className="text-navy font-display text-xl mb-2">Aucun bien ne correspond</p>
             <p className="text-foreground/70">Essayez d'élargir vos critères de recherche.</p>
@@ -163,7 +210,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
           </div>
         )}
 
-        {visible < filtered.length && (
+        {view === "list" && visible < filtered.length && (
           <div className="text-center mt-12">
             <button
               onClick={() => setVisible((v) => v + 6)}

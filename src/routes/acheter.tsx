@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
+import { ProfileForm } from "@/components/site/ProfileForm";
 import { TextField, RadioGroup, CheckboxGroup } from "./vendre";
 import { Check, Search } from "lucide-react";
 
@@ -139,8 +140,9 @@ function BuyPage() {
         </div>
       </section>
 
-      <section className="pb-24 px-6">
-        <div className="max-w-3xl mx-auto">
+      <section className="pb-12 px-6">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <ProfileForm defaultType="achat" />
           <BuyForm />
         </div>
       </section>
