@@ -57,19 +57,51 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
           Dupuis <span className="text-gold italic">Immobilier</span>
         </Link>
         <nav className="hidden lg:flex items-center gap-7">
-          {NAV_LINKS.map((l) => (
-            <Link
-              key={l.label}
-              to={l.to}
-              activeOptions={{ exact: l.to === "/" }}
-              className={`text-sm font-medium transition-colors hover:text-gold ${
-                isSolid ? "text-navy" : "text-white/90"
-              }`}
-              activeProps={{ className: "text-gold" }}
-            >
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l) =>
+            l.label === "Annonces" ? (
+              <div key={l.label} className="relative group">
+                <Link
+                  to={l.to}
+                  className={`text-sm font-medium transition-colors hover:text-gold ${
+                    isSolid ? "text-navy" : "text-white/90"
+                  }`}
+                  activeProps={{ className: "text-gold" }}
+                >
+                  {l.label}
+                </Link>
+                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <div className="bg-white rounded-lg shadow-card border border-border py-2 min-w-[180px]">
+                    <Link
+                      to="/annonces"
+                      search={{ type: "vente" }}
+                      className="block px-4 py-2 text-sm text-navy hover:bg-cream hover:text-gold transition-colors"
+                    >
+                      À vendre
+                    </Link>
+                    <Link
+                      to="/annonces"
+                      search={{ type: "location" }}
+                      className="block px-4 py-2 text-sm text-navy hover:bg-cream hover:text-gold transition-colors"
+                    >
+                      À louer
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                key={l.label}
+                to={l.to}
+                activeOptions={{ exact: l.to === "/" }}
+                className={`text-sm font-medium transition-colors hover:text-gold ${
+                  isSolid ? "text-navy" : "text-white/90"
+                }`}
+                activeProps={{ className: "text-gold" }}
+              >
+                {l.label}
+              </Link>
+            )
+          )}
         </nav>
         <div className="hidden lg:flex items-center gap-3">
           <ProfileNavIndicator isSolid={isSolid} />
