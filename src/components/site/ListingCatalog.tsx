@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { Link } from "@tanstack/react-router";
 import { Search, List, Map as MapIcon } from "lucide-react";
 import { LISTINGS, type Listing } from "@/lib/listings";
 import { ListingCard } from "@/components/site/ListingCard";
