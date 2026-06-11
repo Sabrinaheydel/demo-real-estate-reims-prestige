@@ -326,7 +326,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 className="w-10 h-10 rounded-full object-cover border-2 border-gold"
               />
               <span className="text-sm text-white/90">Bienvenue, <strong className="text-white">Julien</strong></span>
-              <NotificationStatus />
+              <NotificationStatus onTest={triggerTestNotification} />
             </div>
             <button
               onClick={onLogout}
