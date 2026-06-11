@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { PageShell } from "@/components/site/SiteChrome";
 import { TextField, SelectField } from "./vendre";
 import { Check, MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from "lucide-react";
-import { openAgentMailto } from "@/lib/email-helpers";
+import { submitBrevoForm } from "@/lib/brevo.functions";
 import portraitInterior from "@/assets/photo-profil-3.jpg.asset.json";
 
 const contactSearchSchema = z.object({
@@ -35,8 +36,11 @@ type ContactFormProps = {
 };
 
 function ContactForm({ reference, listing, intent }: ContactFormProps) {
+  const submit = useServerFn(submitBrevoForm);
   const [sent, setSent] = useState(false);
   const [rgpd, setRgpd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const defaultObject = intent === "visite" ? "Demande de visite" : reference ? "Infos sur un bien" : "Acheter";
   const defaultMessage = useMemo(() => {
@@ -48,17 +52,17 @@ function ContactForm({ reference, listing, intent }: ContactFormProps) {
     return (
       <div className="bg-cream rounded-xl p-10 text-center">
         <Check size={36} className="mx-auto text-gold mb-3" />
-        <h3 className="font-display text-2xl text-navy mb-2">Email préparé</h3>
-        <p className="text-foreground/70">Votre logiciel de messagerie s'ouvre avec la référence du bien déjà renseignée.</p>
+        <h3 className="font-display text-2xl text-navy mb-2">Votre demande a bien été envoyée.</h3>
+        <p className="text-foreground/70">Julien Dupuis vous répond sous 24h.</p>
       </div>
     );
   }
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        if (!rgpd) return;
+        if (!rgpd || loading) return;
         const data = new FormData(e.currentTarget);
         const firstName = String(data.get("firstname") ?? "").trim();
         const lastName = String(data.get("lastname") ?? "").trim();
@@ -67,38 +71,29 @@ function ContactForm({ reference, listing, intent }: ContactFormProps) {
         const object = String(data.get("object") ?? defaultObject).trim();
         const message = String(data.get("message") ?? "").trim();
 
-        const lowerObj = object.toLowerCase();
-        let emoji = "📩";
-        if (lowerObj.includes("estimation")) emoji = "💰";
-        else if (lowerObj.includes("visite")) emoji = "🟡";
-        else if (lowerObj.includes("infos")) emoji = "🟠";
-        else if (lowerObj.includes("urgent") || message.toLowerCase().includes("urgent")) emoji = "🚨";
-        const subject = `${emoji} ${object}${reference ? ` — Réf. ${reference}` : ""} — ${firstName} ${lastName}`.trim();
-        const lines = [
-          "Bonjour,",
-          "",
-          listing || reference
-            ? `Je vous contacte au sujet ${listing ? `du bien « ${listing} »` : "de ce bien"}${reference ? ` (${reference})` : ""}.`
-            : "Je vous contacte concernant mon projet immobilier.",
-          "",
-          `Prénom : ${firstName}`,
-          `Nom : ${lastName}`,
-          `Email : ${email}`,
-          `Téléphone : ${phone}`,
-          `Objet : ${object}`,
-          ...(reference ? [`Référence : ${reference}`] : []),
-          "",
-          "Message :",
-          message,
-        ];
-        openAgentMailto(subject, lines, {
-          firstName,
-          prospectEmail: email,
-          prospectPhone: phone,
-          reference,
-          listingTitle: listing,
-        });
-        setSent(true);
+        setLoading(true);
+        setError(null);
+        try {
+          await submit({
+            data: {
+              formType: "contact-general",
+              prenom: firstName,
+              nom: lastName,
+              email,
+              telephone: phone,
+              typeDemande: object || "Contact général",
+              message,
+              referenceAnnonce: reference || undefined,
+              titreAnnonce: listing || undefined,
+            },
+          });
+          setSent(true);
+        } catch (err) {
+          console.error("[contact-general] submit failed", err);
+          setError("Une erreur est survenue. Merci de réessayer ou de nous contacter directement.");
+        } finally {
+          setLoading(false);
+        }
       }}
       className="bg-white rounded-xl shadow-soft border border-border p-6 lg:p-10 space-y-5"
     >
@@ -141,12 +136,15 @@ function ContactForm({ reference, listing, intent }: ContactFormProps) {
           J'accepte que mes données soient utilisées pour traiter ma demande, conformément à la politique RGPD.
         </span>
       </label>
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
+      )}
       <button
         type="submit"
-        disabled={!rgpd}
+        disabled={!rgpd || loading}
         className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-colors shadow-card disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Envoyer
+        {loading ? "Envoi en cours…" : "Envoyer"}
       </button>
     </form>
   );

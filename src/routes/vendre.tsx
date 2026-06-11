@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { PageShell } from "@/components/site/SiteChrome";
 import { Check, Target, Camera, Megaphone, ClipboardCheck, Users, Handshake, Phone } from "lucide-react";
-import { openAgentMailto } from "@/lib/email-helpers";
+import { submitBrevoForm } from "@/lib/brevo.functions";
 import portraitOutdoor from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/vendre")({
@@ -34,20 +35,24 @@ const STEPS = [
 ];
 
 export function EstimationForm() {
+  const submit = useServerFn(submitBrevoForm);
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   if (sent) {
     return (
       <div className="bg-cream rounded-xl p-10 text-center">
         <Check size={36} className="mx-auto text-gold mb-3" />
-        <h3 className="font-display text-2xl text-navy mb-2">Demande envoyée</h3>
+        <h3 className="font-display text-2xl text-navy mb-2">Votre demande a bien été envoyée.</h3>
         <p className="text-foreground/70">Vous recevrez votre estimation sous 48h ouvrées.</p>
       </div>
     );
   }
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
+        if (loading) return;
         const data = new FormData(e.currentTarget);
         const get = (k: string) => String(data.get(k) ?? "").trim();
         const firstName = get("firstname");
@@ -59,27 +64,33 @@ export function EstimationForm() {
         const state = get("state");
         const address = get("address");
         const callback = get("callback");
-        const subject = `💰 Estimation — ${type || "Bien"} ${surface || ""} — ${address || "Reims"} — ${firstName}`.trim();
-        const lines = [
-          "Demande d'estimation gratuite",
-          "",
-          `Prénom : ${firstName}`,
-          `Email : ${email}`,
-          `Téléphone : ${phone}`,
-          "",
-          `Type de bien : ${type || "—"}`,
-          `Surface : ${surface || "—"}`,
-          `Pièces : ${rooms || "—"}`,
-          `État : ${state || "—"}`,
-          `Adresse / quartier : ${address || "—"}`,
-          `Rappel : ${callback || "—"}`,
-        ];
-        openAgentMailto(subject, lines, {
-          firstName,
-          prospectEmail: email,
-          prospectPhone: phone,
-        });
-        setSent(true);
+        const messageParts = [
+          rooms ? `Pièces : ${rooms}` : null,
+          state ? `État : ${state}` : null,
+          callback ? `Rappel : ${callback}` : null,
+        ].filter(Boolean) as string[];
+        setLoading(true);
+        setError(null);
+        try {
+          await submit({
+            data: {
+              formType: "estimation-vendre",
+              prenom: firstName,
+              email,
+              telephone: phone,
+              typeBien: type || undefined,
+              surface: surface || undefined,
+              quartier: address || undefined,
+              message: messageParts.join(" · "),
+            },
+          });
+          setSent(true);
+        } catch (err) {
+          console.error("[estimation-vendre] submit failed", err);
+          setError("Une erreur est survenue. Merci de réessayer ou de nous contacter directement.");
+        } finally {
+          setLoading(false);
+        }
       }}
       className="bg-white rounded-xl shadow-soft border border-border p-6 lg:p-10 space-y-6"
     >
@@ -98,11 +109,15 @@ export function EstimationForm() {
         label="Souhaitez-vous être rappelé(e) ?"
         options={["Oui, dès que possible", "Cette semaine", "Je préfère qu'on m'écrive"]}
       />
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
+      )}
       <button
         type="submit"
-        className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-colors shadow-card"
+        disabled={loading}
+        className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-colors shadow-card disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        Recevoir mon estimation gratuite
+        {loading ? "Envoi en cours…" : "Recevoir mon estimation gratuite"}
       </button>
     </form>
   );

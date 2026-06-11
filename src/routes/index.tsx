@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { submitBrevoForm } from "@/lib/brevo.functions";
 import {
   Menu,
   X,
@@ -561,7 +563,10 @@ function Testimonials() {
 }
 
 function Contact() {
+  const submit = useServerFn(submitBrevoForm);
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   return (
     <section
       id="contact"
@@ -575,36 +580,67 @@ function Contact() {
           Laissez-moi vos coordonnées, je vous rappelle sous 24 heures avec un premier échange offert et sans engagement.
         </p>
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            setSent(true);
+            if (loading) return;
+            const data = new FormData(e.currentTarget);
+            const [prenomEl, emailEl, phoneEl] = ["prenom", "email", "phone"].map((n) => String(data.get(n) ?? "").trim());
+            setLoading(true);
+            setError(null);
+            try {
+              await submit({
+                data: {
+                  formType: "rappel-rapide-homepage",
+                  prenom: prenomEl,
+                  email: emailEl,
+                  telephone: phoneEl,
+                  message: "Demande de rappel rapide depuis la page d'accueil.",
+                },
+              });
+              setSent(true);
+            } catch (err) {
+              console.error("[rappel-rapide-homepage] submit failed", err);
+              setError("Une erreur est survenue. Merci de réessayer ou de nous contacter directement.");
+            } finally {
+              setLoading(false);
+            }
           }}
           className="bg-white rounded-lg p-6 shadow-card grid sm:grid-cols-[1fr_1fr_1fr_auto] gap-3"
         >
           <input
             required
+            name="prenom"
             placeholder="Prénom"
             className="px-4 py-3 rounded-lg bg-cream border border-border focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20"
           />
           <input
             required
+            name="email"
             type="email"
             placeholder="Email"
             className="px-4 py-3 rounded-lg bg-cream border border-border focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20"
           />
           <input
             required
+            name="phone"
             type="tel"
             placeholder="Téléphone"
             className="px-4 py-3 rounded-lg bg-cream border border-border focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20"
           />
           <button
             type="submit"
-            className="px-6 py-3 rounded-lg bg-navy text-white font-semibold hover:bg-navy-soft transition-colors whitespace-nowrap"
+            disabled={loading || sent}
+            className="px-6 py-3 rounded-lg bg-navy text-white font-semibold hover:bg-navy-soft transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {sent ? "Merci !" : "Je veux être rappelé(e)"}
+            {sent ? "Merci !" : loading ? "Envoi…" : "Je veux être rappelé(e)"}
           </button>
         </form>
+        {sent && (
+          <p className="mt-4 text-sm text-navy/80">Votre demande a bien été envoyée.</p>
+        )}
+        {error && (
+          <p className="mt-4 text-sm text-red-600">{error}</p>
+        )}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-navy">
           <a href="https://facebook.com/dupuisimmobilierreims" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Facebook size={18}/></a>
           <a href="https://instagram.com/dupuis.immobilier" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center hover:bg-navy hover:text-white transition-colors"><Instagram size={18}/></a>
