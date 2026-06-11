@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Lightbox } from "@/components/site/Lightbox";
 import { ListingCard } from "@/components/site/ListingCard";
 import { getListing, getSimilar, getListingReference, getDpe } from "@/lib/listings";
+import { useListing } from "@/lib/admin-storage";
 import { FURNISHED_ITEMS } from "@/lib/listings-extra";
 import { computeCompat, REVENU_OPTIONS } from "@/lib/profile";
 import { useProfile } from "@/hooks/useProfile";
