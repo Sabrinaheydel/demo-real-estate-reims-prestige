@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
+import { ProfileForm } from "@/components/site/ProfileForm";
 import { TextField, RadioGroup, CheckboxGroup } from "./vendre";
 import { Check, Search } from "lucide-react";
 
