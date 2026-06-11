@@ -195,12 +195,15 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           seenIdsRef.current.add(row.id);
           setSubmissions((prev) => [row, ...prev]);
           showSubmissionNotification(row);
+          const { title, body } = formatNotification(row);
+          toast(title, { description: body });
           if (document.visibilityState === "visible") playDing();
         },
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [refreshSubmissions]);
+
 
   // Open ?open=<submission-id> on mount → focus messages tab + open detail
   useEffect(() => {
