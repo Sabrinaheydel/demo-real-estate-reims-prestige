@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
+import { RentSimulator } from "@/components/site/RentSimulator";
 import portraitJulien from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/louer")({
@@ -147,6 +148,7 @@ function LouerPage() {
         <Hero />
         <Benefits />
         <Included />
+        <RentSimulator />
         <Pricing />
         <Process />
         <QuoteForm />
