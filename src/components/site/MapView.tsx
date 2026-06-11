@@ -133,7 +133,9 @@ export function MapView({ listings }: Props) {
           center: [49.2583, 4.0317],
           zoom: 13,
           scrollWheelZoom: true,
+          zoomControl: false,
         });
+        L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: "© OpenStreetMap",
           maxZoom: 19,
