@@ -18,9 +18,11 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact · Dupuis Immobilier Reims" },
-      { name: "description", content: "Contactez Dupuis Immobilier à Reims agence située rue de Vesle. Vente, location, estimation gratuite." },
-      { property: "og:title", content: "Contactez Dupuis Immobilier à Reims" },
-      { property: "og:description", content: "Adresse, téléphone et formulaire de contact." },
+      { name: "description", content: "Contactez Julien Dupuis, agent immobilier indépendant à Reims. Réponse sous 24h." },
+      { property: "og:title", content: "Contact · Dupuis Immobilier Reims" },
+      { property: "og:description", content: "Contactez Julien Dupuis, agent immobilier indépendant à Reims. Réponse sous 24h." },
+      { name: "twitter:title", content: "Contact · Dupuis Immobilier Reims" },
+      { name: "twitter:description", content: "Contactez Julien Dupuis, agent immobilier indépendant à Reims. Réponse sous 24h." },
     ],
   }),
   component: ContactPage,
