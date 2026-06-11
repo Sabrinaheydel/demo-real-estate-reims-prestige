@@ -250,11 +250,14 @@ export function MapView({ listings }: Props) {
       />
 
       {/* Counter badge */}
-      <div className="pointer-events-none absolute top-3 right-3 z-[400] bg-white rounded-lg shadow-card px-3 py-2 text-xs text-navy font-semibold">
+      <div className="pointer-events-none absolute top-3 right-3 z-[400] max-w-[60%] md:max-w-none bg-white rounded-lg shadow-card px-3 py-2 text-xs text-navy font-semibold leading-tight">
         {counter.filteredLabel ? (
-          <span>📍 {counter.filteredLabel}</span>
+          <>
+            <span className="hidden md:inline">📍 {counter.filteredLabel}</span>
+            <span className="md:hidden">📍 {counter.filteredLabel.split(" à ")[0]} dans la zone</span>
+          </>
         ) : (
-          <span>{counter.total} bien{counter.total > 1 ? "s" : ""} affiché{counter.total > 1 ? "s" : ""}</span>
+          <span>{counter.total} bien{counter.total > 1 ? "s" : ""}</span>
         )}
       </div>
 
