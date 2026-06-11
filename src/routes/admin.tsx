@@ -149,12 +149,69 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     return supabaseListings.length > 0 ? [...supabaseListings, ...extras] : localListings;
   }, [supabaseListings, localListings]);
   const updateListing = useUpdateListing();
-  const [messages, setMessages] = useLocalState<Message[]>("admin-messages", SEED_MESSAGES);
   const [tab, setTab] = useState<Tab>("annonces");
   const [editing, setEditing] = useState<Listing | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const newMessagesThisWeek = messages.filter((m) => !m.handled).length;
+  // --- Submissions (Supabase + realtime) -----------------------------------
+  const fetchSubmissions = useServerFn(listSubmissionsFn);
+  const markTraite = useServerFn(setSubmissionTraiteFn);
+  const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
+  const [openSubmissionId, setOpenSubmissionId] = useState<string | null>(null);
+  const seenIdsRef = useRef<Set<string>>(new Set());
+
+  const refreshSubmissions = useCallback(async () => {
+    try {
+      const rows = await fetchSubmissions();
+      seenIdsRef.current = new Set(rows.map((r) => r.id));
+      setSubmissions(rows);
+    } catch (e) {
+      console.warn("[submissions] load failed", e);
+    }
+  }, [fetchSubmissions]);
+
+  useEffect(() => {
+    refreshSubmissions();
+    const channel = supabase
+      .channel("form_submissions_push")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "form_submissions" },
+        (payload) => {
+          const row = payload.new as FormSubmission;
+          if (seenIdsRef.current.has(row.id)) return;
+          seenIdsRef.current.add(row.id);
+          setSubmissions((prev) => [row, ...prev]);
+          showSubmissionNotification(row);
+          if (document.visibilityState === "visible") playDing();
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [refreshSubmissions]);
+
+  // Open ?open=<submission-id> on mount → focus messages tab + open detail
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const open = params.get("open");
+    if (open) {
+      setTab("messages");
+      setOpenSubmissionId(open);
+    }
+  }, []);
+
+  // Register service worker once
+  useEffect(() => { registerAdminServiceWorker(); }, []);
+
+  const newMessagesThisWeek = submissions.filter((s) => !s.traite).length;
+
+  async function toggleSubmission(id: string, traite: boolean) {
+    setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, traite, statut: traite ? "traite" : "nouveau" } : s)));
+    try { await markTraite({ data: { id, traite } }); }
+    catch (e) { console.warn("[submissions] toggle failed", e); refreshSubmissions(); }
+  }
+
 
   async function saveListing(l: Listing) {
     setSaveError(null);
