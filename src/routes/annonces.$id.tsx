@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
@@ -9,12 +10,8 @@ import { getListing, getSimilar, getListingReference, getDpe } from "@/lib/listi
 import { FURNISHED_ITEMS } from "@/lib/listings-extra";
 import { computeCompat, REVENU_OPTIONS } from "@/lib/profile";
 import { useProfile } from "@/hooks/useProfile";
-import {
-  openAgentMailto,
-  rentalScoreEmoji,
-  saleIntentEmoji,
-  type SaleIntent as MailSaleIntent,
-} from "@/lib/email-helpers";
+import { submitBrevoForm } from "@/lib/brevo.functions";
+import type { SaleIntent } from "@/lib/email-helpers";
 import {
   ArrowLeft,
   MapPin,
