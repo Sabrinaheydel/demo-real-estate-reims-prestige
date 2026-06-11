@@ -64,8 +64,14 @@ function ContactForm({ reference, listing, intent }: ContactFormProps) {
         const object = String(data.get("object") ?? defaultObject).trim();
         const message = String(data.get("message") ?? "").trim();
 
-        const subject = `${object}${reference ? ` - ${reference}` : ""}`;
-        const body = [
+        const lowerObj = object.toLowerCase();
+        let emoji = "📩";
+        if (lowerObj.includes("estimation")) emoji = "💰";
+        else if (lowerObj.includes("visite")) emoji = "🟡";
+        else if (lowerObj.includes("infos")) emoji = "🟠";
+        else if (lowerObj.includes("urgent") || message.toLowerCase().includes("urgent")) emoji = "🚨";
+        const subject = `${emoji} ${object}${reference ? ` — Réf. ${reference}` : ""} — ${firstName} ${lastName}`.trim();
+        const lines = [
           "Bonjour,",
           "",
           listing || reference
@@ -77,15 +83,18 @@ function ContactForm({ reference, listing, intent }: ContactFormProps) {
           `Email : ${email}`,
           `Téléphone : ${phone}`,
           `Objet : ${object}`,
-          reference ? `Référence : ${reference}` : undefined,
+          ...(reference ? [`Référence : ${reference}`] : []),
           "",
           "Message :",
           message,
-        ]
-          .filter(Boolean)
-          .join("\n");
-
-        window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        ];
+        openAgentMailto(subject, lines, {
+          firstName,
+          prospectEmail: email,
+          prospectPhone: phone,
+          reference,
+          listingTitle: listing,
+        });
         setSent(true);
       }}
       className="bg-white rounded-xl shadow-soft border border-border p-6 lg:p-10 space-y-5"
