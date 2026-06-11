@@ -1,34 +1,49 @@
 import { Link } from "@tanstack/react-router";
 import { Maximize, Home as HomeIcon, Bed, Car, MapPin } from "lucide-react";
-import { getListingReference, type Listing } from "@/lib/listings";
+import { type Listing } from "@/lib/listings";
 
 type ListingCardProps = {
   listing: Listing;
-  onDetailClick?: (listing: Listing) => void;
 };
 
-function StatusBadges({ statuses }: { statuses: Listing["status"] }) {
-  const map: Record<string, { label: string; cls: string }> = {
-    vente: { label: "À vendre", cls: "bg-navy text-white" },
-    location: { label: "À louer", cls: "bg-emerald-600 text-white" },
-    exclusivite: { label: "Exclusivité", cls: "bg-gold text-navy" },
-  };
+function StatusBadges({ listing }: { listing: Listing }) {
+  const badges = listing.isRental
+    ? [
+        {
+          label: listing.furnished ? "🛋️ À louer · Meublé" : "À louer",
+          className: "bg-rental text-white",
+        },
+      ]
+    : listing.status.map((status) => ({
+        label:
+          status === "exclusivite"
+            ? "Exclusivité"
+            : status === "vente"
+              ? "À vendre"
+              : "À louer",
+        className:
+          status === "exclusivite"
+            ? "bg-gold text-navy"
+            : status === "vente"
+              ? "bg-navy text-white"
+              : "bg-rental text-white",
+      }));
+
   return (
     <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-      {statuses.map((s) => (
+      {badges.map((badge) => (
         <span
-          key={s}
-          className={`${map[s].cls} text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-soft`}
+          key={badge.label}
+          className={`${badge.className} text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-soft`}
         >
-          {map[s].label}
+          {badge.label}
         </span>
       ))}
     </div>
   );
 }
 
-export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
-  const reference = getListingReference(listing.id);
+export function ListingCard({ listing }: ListingCardProps) {
   return (
     <article className="group bg-white rounded-xl overflow-hidden shadow-soft hover:shadow-card transition-all hover:-translate-y-1 flex flex-col">
       <Link to="/annonces/$id" params={{ id: listing.id }} className="relative overflow-hidden aspect-[4/3] block cursor-pointer">
@@ -38,13 +53,11 @@ export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
-        <StatusBadges statuses={listing.status} />
+        <StatusBadges listing={listing} />
       </Link>
       <div className="p-6 flex flex-col flex-1">
-        <div className="flex items-baseline justify-between gap-3 mb-2">
-          <div className="font-display text-2xl text-navy">{listing.priceLabel}</div>
-          <span className="text-[11px] uppercase tracking-wider text-foreground/50">Réf. {reference}</span>
-        </div>
+        <div className="font-display text-2xl text-navy mb-1">{listing.priceLabel}</div>
+        {listing.priceNote && <div className="text-xs text-foreground/50 mb-2">{listing.priceNote}</div>}
         <Link to="/annonces/$id" params={{ id: listing.id }} className="font-display text-lg text-navy leading-snug mb-3 line-clamp-2 min-h-[3.5rem] hover:text-gold transition-colors">
           {listing.title}
         </Link>
@@ -71,23 +84,16 @@ export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
             {listing.parking ? "Parking" : "Sans parking"}
           </span>
         </div>
-        {onDetailClick ? (
-          <button
-            type="button"
-            onClick={() => onDetailClick(listing)}
-            className="mt-auto inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors cursor-pointer"
-          >
-            Voir le détail
-          </button>
-        ) : (
+        <div className="mt-auto flex items-end justify-between gap-4">
           <Link
             to="/annonces/$id"
             params={{ id: listing.id }}
-            className="mt-auto inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors"
+            className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors"
           >
             Voir le détail
           </Link>
-        )}
+          <span className="text-[10px] uppercase tracking-wider text-foreground/45 whitespace-nowrap">Réf. {listing.reference}</span>
+        </div>
       </div>
     </article>
   );
