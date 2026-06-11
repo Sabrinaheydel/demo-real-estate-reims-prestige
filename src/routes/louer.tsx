@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { submitBrevoForm } from "@/lib/brevo.functions";
 import {
   Search,
   FileText,
@@ -373,16 +375,56 @@ const BIEN_TYPES = [
 ];
 
 function QuoteForm() {
+  const submit = useServerFn(submitBrevoForm);
   const [f, setF] = useState<FormState>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setF((prev) => ({ ...prev, [k]: v }));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!f.rgpd) return;
-    setSubmitted(true);
+    if (!f.rgpd || loading) return;
+    setLoading(true);
+    setError(null);
+
+    const bienTypeLabel = BIEN_TYPES.find((b) => b.value === f.bienType)?.label || f.bienType;
+    const messageParts = [
+      f.surface ? `Surface : ${f.surface}` : null,
+      f.pieces ? `Pièces : ${f.pieces}` : null,
+      f.etat ? `État : ${f.etat}` : null,
+      f.occupation ? `Occupation : ${f.occupation}` : null,
+      f.meuble ? `Meublé : ${f.meuble}` : null,
+      f.profil ? `Profil : ${f.profil}` : null,
+      f.candidat ? `Candidat : ${f.candidat}` : null,
+      f.delai ? `Délai : ${f.delai}` : null,
+      f.contactPref ? `Contact préféré : ${f.contactPref}` : null,
+      f.message ? `\nMessage : ${f.message}` : null,
+    ].filter(Boolean) as string[];
+
+    try {
+      await submit({
+        data: {
+          formType: "mise-en-gestion-locative",
+          prenom: f.prenom,
+          nom: f.nom,
+          email: f.email,
+          telephone: f.telephone,
+          typeBien: bienTypeLabel || undefined,
+          surface: f.surface || undefined,
+          quartier: f.adresse || undefined,
+          message: messageParts.join(" · "),
+        },
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.error("[mise-en-gestion-locative] submit failed", err);
+      setError("Une erreur est survenue. Merci de réessayer ou de nous contacter directement.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -392,7 +434,7 @@ function QuoteForm() {
           <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center mx-auto mb-6">
             <Check className="text-gold" size={32} strokeWidth={3} />
           </div>
-          <h2 className="text-2xl mb-4">Demande reçue !</h2>
+          <h2 className="text-2xl mb-4">Votre demande a bien été envoyée.</h2>
           <p className="text-foreground/80">
             Julien Dupuis vous contacte sous 24h pour votre bien situé à{" "}
             <strong>{f.adresse || "Reims"}</strong>.
@@ -593,11 +635,15 @@ function QuoteForm() {
             </label>
           </fieldset>
 
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
+          )}
           <button
             type="submit"
-            className="w-full px-8 py-4 rounded-lg bg-gold text-navy font-semibold text-lg hover:bg-gold/90 transition-all shadow-card inline-flex items-center justify-center gap-2"
+            disabled={loading}
+            className="w-full px-8 py-4 rounded-lg bg-gold text-navy font-semibold text-lg hover:bg-gold/90 transition-all shadow-card inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Recevoir mon devis gratuit <ArrowRight size={20} />
+            {loading ? "Envoi en cours…" : (<>Recevoir mon devis gratuit <ArrowRight size={20} /></>)}
           </button>
         </form>
       </div>
