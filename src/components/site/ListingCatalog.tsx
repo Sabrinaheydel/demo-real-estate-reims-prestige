@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import { Search, List, Map as MapIcon } from "lucide-react";
 import { LISTINGS, type Listing } from "@/lib/listings";
 import { ListingCard } from "@/components/site/ListingCard";
-import { MapView } from "@/components/site/MapView";
+
+const MapView = lazy(() => import("@/components/site/MapView").then((m) => ({ default: m.MapView })));
 
 type TypeFilter = "vente" | "location" | "all";
 type SortMode = "newest" | "price-asc" | "price-desc";
