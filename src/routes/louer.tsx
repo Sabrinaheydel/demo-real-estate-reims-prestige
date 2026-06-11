@@ -148,6 +148,7 @@ function LouerPage() {
         <Hero />
         <Benefits />
         <Included />
+        <RentSimulator />
         <Pricing />
         <Process />
         <QuoteForm />
