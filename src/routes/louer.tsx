@@ -22,18 +22,12 @@ import portraitJulien from "@/assets/photo-profil-1.jpg.asset.json";
 export const Route = createFileRoute("/louer")({
   head: () => ({
     meta: [
-      { title: "Gestion locative à Reims · Confiez votre bien · Dupuis Immobilier" },
-      {
-        name: "description",
-        content:
-          "Propriétaires bailleurs à Reims : confiez la gestion locative de votre bien à Julien Dupuis. Sélection des locataires, loyers garantis, gestion complète.",
-      },
-      { property: "og:title", content: "Gestion locative à Reims · Dupuis Immobilier" },
-      {
-        property: "og:description",
-        content:
-          "Sélection des locataires, loyers garantis, zéro stress. Devis gratuit sous 24h.",
-      },
+      { title: "Gestion locative Reims · Dupuis Immobilier" },
+      { name: "description", content: "Confiez votre bien en gestion locative. Sélection locataires, loyers garantis, zéro stress." },
+      { property: "og:title", content: "Gestion locative Reims · Dupuis Immobilier" },
+      { property: "og:description", content: "Confiez votre bien en gestion locative. Sélection locataires, loyers garantis, zéro stress." },
+      { name: "twitter:title", content: "Gestion locative Reims · Dupuis Immobilier" },
+      { name: "twitter:description", content: "Confiez votre bien en gestion locative. Sélection locataires, loyers garantis, zéro stress." },
     ],
   }),
   component: LouerPage,
@@ -427,7 +421,8 @@ function QuoteForm() {
         >
           {/* Bloc 1 — Votre bien */}
           <fieldset className="space-y-6">
-            <legend className="font-display text-xl text-navy mb-2">Votre bien</legend>
+            <div className="h-px bg-gold/60 mb-4" />
+            <span className="inline-block bg-navy text-white text-[13px] font-medium rounded-[20px] px-3 py-1">① Votre bien</span>
 
             <div>
               <label className="block text-sm font-medium text-navy mb-3">Type de bien</label>
@@ -498,8 +493,9 @@ function QuoteForm() {
           </fieldset>
 
           {/* Bloc 2 — Votre situation */}
-          <fieldset className="space-y-6 border-t border-border pt-8">
-            <legend className="font-display text-xl text-navy mb-2">Votre situation</legend>
+          <fieldset className="space-y-6 pt-8">
+            <div className="h-px bg-gold/60 mb-4" />
+            <span className="inline-block bg-navy text-white text-[13px] font-medium rounded-[20px] px-3 py-1">② Votre situation</span>
 
             <RadioGroup
               label="Êtes-vous"
@@ -541,8 +537,9 @@ function QuoteForm() {
           </fieldset>
 
           {/* Bloc 3 — Coordonnées */}
-          <fieldset className="space-y-6 border-t border-border pt-8">
-            <legend className="font-display text-xl text-navy mb-2">Vos coordonnées</legend>
+          <fieldset className="space-y-6 pt-8">
+            <div className="h-px bg-gold/60 mb-4" />
+            <span className="inline-block bg-navy text-white text-[13px] font-medium rounded-[20px] px-3 py-1">③ Vos coordonnées</span>
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Prénom *">
                 <input required value={f.prenom} onChange={(e) => set("prenom", e.target.value)}

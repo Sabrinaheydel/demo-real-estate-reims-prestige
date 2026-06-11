@@ -100,10 +100,10 @@ export function RentSimulator() {
 
   const marketTip = (() => {
     if (!calc.valNum) return null;
-    if (calc.rdtNet < 3) return { emoji: "🟡", text: "Rendement modéré — Ce bien offre une bonne valorisation patrimoniale à long terme." };
-    if (calc.rdtNet < 5) return { emoji: "🟢", text: "Bon rendement — Dans la moyenne haute du marché rémois 2026." };
-    if (calc.rdtNet <= 7) return { emoji: "🟢", text: "Excellent rendement — Ce bien est un très bon investissement locatif." };
-    return { emoji: "⭐", text: "Rendement exceptionnel — Vérifiez les caractéristiques du bien pour confirmer cette estimation." };
+    if (calc.rdtNet < 3) return { emoji: "🟡", text: "Rendement modéré — Ce bien offre une bonne valorisation patrimoniale à long terme.", bg: "#FEF9C3", border: "#FACC15" };
+    if (calc.rdtNet < 5) return { emoji: "🟢", text: "Bon rendement — Dans la moyenne haute du marché rémois 2026.", bg: "#F0FDF4", border: "#86EFAC" };
+    if (calc.rdtNet <= 7) return { emoji: "🟢", text: "Excellent rendement — Ce bien est un très bon investissement locatif.", bg: "#DCFCE7", border: "#4ADE80" };
+    return { emoji: "⭐", text: "Rendement exceptionnel — Vérifiez les caractéristiques du bien pour confirmer cette estimation.", bg: "#FEF3C7", border: "#C9A96E" };
   })();
 
   const sliderPct = ((surface - 15) / (200 - 15)) * 100;
@@ -372,7 +372,8 @@ export function RentSimulator() {
               {marketTip ? (
                 <div
                   key={marketTip.text}
-                  className="bg-white rounded-lg p-4 border border-border animate-fade-in"
+                  className="rounded-lg p-4 border animate-fade-in transition-all duration-300"
+                  style={{ backgroundColor: marketTip.bg, borderColor: marketTip.border }}
                 >
                   <p className="text-sm text-navy">
                     <span className="mr-2">{marketTip.emoji}</span>

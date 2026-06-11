@@ -18,13 +18,12 @@ export const Route = createFileRoute("/annonces")({
       {
         name: "description",
         content:
-          "Découvrez l'ensemble des biens à vendre et à louer à Reims sélectionnés par Dupuis Immobilier.",
+          "16 biens à vendre et à louer à Reims. Appartements, maisons, studios — Dupuis Immobilier.",
       },
-      { property: "og:title", content: "Nos annonces immobilières à Reims" },
-      {
-        property: "og:description",
-        content: "16 biens à vendre et à louer à Reims et ses alentours.",
-      },
+      { property: "og:title", content: "Nos biens disponibles · Dupuis Immobilier Reims" },
+      { property: "og:description", content: "16 biens à vendre et à louer à Reims. Appartements, maisons, studios — Dupuis Immobilier." },
+      { name: "twitter:title", content: "Nos biens disponibles · Dupuis Immobilier Reims" },
+      { name: "twitter:description", content: "16 biens à vendre et à louer à Reims. Appartements, maisons, studios — Dupuis Immobilier." },
     ],
   }),
   errorComponent: ({ error, reset }) => {

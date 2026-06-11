@@ -10,9 +10,7 @@ import {
   Phone,
   Mail,
   MessageCircle,
-  User,
 } from "lucide-react";
-import { useProfile } from "@/hooks/useProfile";
 
 const NAV_LINKS: { label: string; to: string }[] = [
   { label: "Accueil", to: "/" },
@@ -104,7 +102,6 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
           )}
         </nav>
         <div className="hidden lg:flex items-center gap-3">
-          <ProfileNavIndicator isSolid={isSolid} />
           <Link
             to="/vendre"
             className="inline-flex items-center px-5 py-2.5 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90 transition-colors shadow-soft"
@@ -153,26 +150,6 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
   );
 }
 
-function ProfileNavIndicator({ isSolid }: { isSolid: boolean }) {
-  const profile = useProfile();
-  const filled = !!profile && !!profile.revenus_mensuels;
-  return (
-    <Link
-      to={profile?.type_recherche === "achat" ? "/acheter" : "/louer"}
-      hash="profil"
-      className={`relative inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-gold ${
-        isSolid ? "text-navy" : "text-white/90"
-      }`}
-      title={filled ? "Profil renseigné" : "Renseigner mon profil"}
-    >
-      <User size={16} />
-      <span>Mon profil</span>
-      {filled && (
-        <span className="absolute -top-0.5 -right-1.5 w-2 h-2 rounded-full bg-rental ring-2 ring-white" />
-      )}
-    </Link>
-  );
-}
 
 export function Footer() {
   return (
@@ -234,12 +211,12 @@ export function Footer() {
         <div>
           Site réalisé par{" "}
           <a
-            href="https://www.agence360digital.fr/"
+            href="https://www.agence360digital.fr"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gold hover:underline"
           >
-            Sabrina Heydel Agence 360 Digital
+            Sabrina Heydel — Agence 360 Digital
           </a>
         </div>
       </div>

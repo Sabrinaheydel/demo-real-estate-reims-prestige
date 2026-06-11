@@ -9,9 +9,11 @@ export const Route = createFileRoute("/vendre")({
   head: () => ({
     meta: [
       { title: "Vendre votre bien à Reims · Dupuis Immobilier" },
-      { name: "description", content: "Vendez votre appartement ou votre maison à Reims au meilleur prix avec Dupuis Immobilier. Estimation gratuite en 48h." },
-      { property: "og:title", content: "Vendre avec Dupuis Immobilier" },
-      { property: "og:description", content: "Estimation gratuite, mise en valeur professionnelle, diffusion sur 15+ portails." },
+      { name: "description", content: "Estimation gratuite sous 48h. Vente rapide au meilleur prix avec Julien Dupuis." },
+      { property: "og:title", content: "Vendre votre bien à Reims · Dupuis Immobilier" },
+      { property: "og:description", content: "Estimation gratuite sous 48h. Vente rapide au meilleur prix avec Julien Dupuis." },
+      { name: "twitter:title", content: "Vendre votre bien à Reims · Dupuis Immobilier" },
+      { name: "twitter:description", content: "Estimation gratuite sous 48h. Vente rapide au meilleur prix avec Julien Dupuis." },
     ],
   }),
   component: SellPage,

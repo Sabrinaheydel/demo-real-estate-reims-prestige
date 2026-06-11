@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { Link } from "@tanstack/react-router";
 import { Search, List, Map as MapIcon } from "lucide-react";
 import { LISTINGS, type Listing } from "@/lib/listings";
 import { ListingCard } from "@/components/site/ListingCard";
@@ -23,7 +24,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
   const [query, setQuery] = useState("");
   const [type, setType] = useState<TypeFilter>(initialType);
   const [sort, setSort] = useState<SortMode>("newest");
-  const [visible, setVisible] = useState(9);
+  const [visible, setVisible] = useState(LISTINGS.length);
   const [rentalBudget, setRentalBudget] = useState(1500);
   const [furnishedFilter, setFurnishedFilter] = useState<FurnishedFilter>("all");
   const [availability, setAvailability] = useState<AvailabilityFilter>("all");
@@ -97,7 +98,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
               value={type}
               onChange={(e) => {
                 setType(e.target.value as TypeFilter);
-                setVisible(9);
+                setVisible(LISTINGS.length);
               }}
             >
               <option value="vente">À vendre ({saleCount})</option>
@@ -221,6 +222,18 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
             >
               Charger plus de biens
             </button>
+          </div>
+        )}
+
+        {view === "list" && type === "location" && shown.length > 0 && (
+          <div className="text-center mt-10">
+            <Link
+              to="/louer"
+              hash="profil"
+              className="inline-flex items-center gap-1.5 text-sm text-foreground/60 hover:text-gold transition-colors"
+            >
+              💡 Vérifiez votre compatibilité avant de candidater →
+            </Link>
           </div>
         )}
       </section>

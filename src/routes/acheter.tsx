@@ -9,9 +9,11 @@ export const Route = createFileRoute("/acheter")({
   head: () => ({
     meta: [
       { title: "Acheter à Reims · Dupuis Immobilier" },
-      { name: "description", content: "Trouvez le bien de vos rêves à Reims. Recherche personnalisée et accompagnement sur-mesure avec Dupuis Immobilier." },
-      { property: "og:title", content: "Acheter avec Dupuis Immobilier" },
-      { property: "og:description", content: "Recherche personnalisée de biens à Reims." },
+      { name: "description", content: "Trouvez votre bien idéal à Reims. Accompagnement personnalisé de la recherche à la signature." },
+      { property: "og:title", content: "Acheter à Reims · Dupuis Immobilier" },
+      { property: "og:description", content: "Trouvez votre bien idéal à Reims. Accompagnement personnalisé de la recherche à la signature." },
+      { name: "twitter:title", content: "Acheter à Reims · Dupuis Immobilier" },
+      { name: "twitter:description", content: "Trouvez votre bien idéal à Reims. Accompagnement personnalisé de la recherche à la signature." },
     ],
   }),
   component: BuyPage,
