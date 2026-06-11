@@ -14,7 +14,8 @@ export type FormSubmission = {
   email: string | null;
   telephone: string | null;
   reference_annonce: string | null;
-  donnees_completes: Record<string, unknown>;
+  // JSON payload — typed loosely so TanStack's serializer accepts it
+  donnees_completes: Record<string, string | number | boolean | null | undefined> & Record<string, unknown>;
   statut: string;
   traite: boolean;
 };

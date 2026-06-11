@@ -169,7 +169,7 @@ export const submitBrevoForm = createServerFn({ method: "POST" })
       email: p.email,
       telephone: phone || p.telephone || null,
       reference_annonce: p.referenceAnnonce || null,
-      donnees_completes: donneesCompletes,
+      donnees_completes: donneesCompletes as never,
     });
     if (insertErr) console.error("[submissions] insert failed", insertErr.message);
 
