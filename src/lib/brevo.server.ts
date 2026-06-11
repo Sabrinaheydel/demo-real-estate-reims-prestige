@@ -22,26 +22,38 @@ export async function createOrUpdateBrevoContact(input: {
   listIds: number[];
 }): Promise<void> {
   const endpoint = `${BREVO_API_URL}/v3/contacts`;
+  const postContact = async (attributes: BrevoAttributes) => {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: brevoHeaders(),
+      body: JSON.stringify({
+        email: input.email,
+        attributes,
+        listIds: input.listIds,
+        updateEnabled: true,
+      }),
+    });
+    const text = !res.ok ? await res.text().catch(() => "") : "";
+    return { res, text };
+  };
+
   console.log("[brevo:diag] POST contacts", {
     endpoint,
     listIds: input.listIds,
-    listIdsTypes: input.listIds.map((v) => typeof v),
     attributeKeys: Object.keys(input.attributes),
-    hasLovableKey: !!process.env.LOVABLE_API_KEY,
     hasBrevoKey: !!process.env.BREVO_API_KEY,
   });
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: brevoHeaders(),
-    body: JSON.stringify({
-      email: input.email,
-      attributes: input.attributes,
-      listIds: input.listIds,
-      updateEnabled: true,
-    }),
-  });
-  const text = !res.ok ? await res.text().catch(() => "") : "";
+  let { res, text } = await postContact(input.attributes);
   console.log("[brevo:diag] contacts response", { status: res.status, ok: res.ok, body: text.slice(0, 500) });
+
+  // Brevo refuse si le SMS est déjà associé à un autre contact. On retente sans SMS.
+  if (!res.ok && res.status === 400 && text.includes("duplicate_parameter") && "SMS" in input.attributes) {
+    const { SMS: _ignored, ...rest } = input.attributes;
+    console.log("[brevo:diag] retry contacts without SMS attribute");
+    ({ res, text } = await postContact(rest));
+    console.log("[brevo:diag] contacts retry response", { status: res.status, ok: res.ok, body: text.slice(0, 500) });
+  }
+
   if (!res.ok && res.status !== 204) {
     throw new Error(`Brevo contact upsert failed (${res.status}): ${text}`);
   }
