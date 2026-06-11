@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { Listing } from "@/lib/listings";
 import { LISTING_COORDS } from "@/lib/listings-extra";
 
@@ -132,7 +133,9 @@ export function MapView({ listings }: Props) {
           center: [49.2583, 4.0317],
           zoom: 13,
           scrollWheelZoom: true,
+          zoomControl: false,
         });
+        L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: "© OpenStreetMap",
           maxZoom: 19,
@@ -234,8 +237,13 @@ export function MapView({ listings }: Props) {
 
   function applyIso(next: IsoState | null) {
     setIso(next);
-    if (next) localStorage.setItem(LS_KEY, JSON.stringify(next));
-    else localStorage.removeItem(LS_KEY);
+    if (next) {
+      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      toast.success(`Zone appliquée : ${next.minutes} min ${next.mode === "foot" ? "à pied" : "en voiture"} de ${POI[next.poi].label}`);
+    } else {
+      localStorage.removeItem(LS_KEY);
+      toast("Zone de trajet effacée");
+    }
   }
 
   return (
@@ -247,11 +255,14 @@ export function MapView({ listings }: Props) {
       />
 
       {/* Counter badge */}
-      <div className="pointer-events-none absolute top-3 right-3 z-[400] bg-white rounded-lg shadow-card px-3 py-2 text-xs text-navy font-semibold">
+      <div className="pointer-events-none absolute top-3 right-3 z-[400] max-w-[60%] md:max-w-none bg-white rounded-lg shadow-card px-3 py-2 text-xs text-navy font-semibold leading-tight">
         {counter.filteredLabel ? (
-          <span>📍 {counter.filteredLabel}</span>
+          <>
+            <span className="hidden md:inline">📍 {counter.filteredLabel}</span>
+            <span className="md:hidden">📍 {counter.filteredLabel.split(" à ")[0]} dans la zone</span>
+          </>
         ) : (
-          <span>{counter.total} bien{counter.total > 1 ? "s" : ""} affiché{counter.total > 1 ? "s" : ""}</span>
+          <span>{counter.total} bien{counter.total > 1 ? "s" : ""}</span>
         )}
       </div>
 
