@@ -740,3 +740,213 @@ function Field({
   );
 }
 
+function statusBadge(s: FormSubmission) {
+  if (s.traite) return { dot: "🟢", label: "Traité", cls: "bg-emerald-100 text-emerald-700" };
+  if (s.statut === "en_cours") return { dot: "🟡", label: "En cours", cls: "bg-amber-100 text-amber-700" };
+  return { dot: "🔴", label: "Nouveau", cls: "bg-red-100 text-red-700" };
+}
+
+function formTypeLabel(t: string): string {
+  switch (t) {
+    case "estimation-vendre": return "Estimation";
+    case "contact-annonce-vente": return "Contact annonce";
+    case "candidature-location": return "Candidature";
+    case "mise-en-gestion-locative": return "Gestion locative";
+    case "recherche-achat": return "Recherche achat";
+    case "rappel-rapide-homepage": return "Rappel rapide";
+    case "contact-general": return "Contact général";
+    default: return t;
+  }
+}
+
+function SubmissionsList({
+  submissions,
+  openId,
+  onClearOpen,
+  onToggle,
+}: {
+  submissions: FormSubmission[];
+  openId: string | null;
+  onClearOpen: () => void;
+  onToggle: (id: string, traite: boolean) => void;
+}) {
+  const detail = openId ? submissions.find((s) => s.id === openId) : null;
+  return (
+    <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-cream/60 text-xs uppercase tracking-wider text-foreground/60">
+            <tr>
+              <th className="text-left px-4 py-3">Date</th>
+              <th className="text-left px-4 py-3">Statut</th>
+              <th className="text-left px-4 py-3">Type</th>
+              <th className="text-left px-4 py-3">Prénom</th>
+              <th className="text-left px-4 py-3">Contact</th>
+              <th className="text-left px-4 py-3">Réf.</th>
+              <th className="text-left px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {submissions.map((s) => {
+              const sb = statusBadge(s);
+              return (
+                <tr key={s.id} className={`border-t border-border ${s.traite ? "opacity-60" : ""}`}>
+                  <td className="px-4 py-3 text-foreground/70 whitespace-nowrap">
+                    {new Date(s.created_at).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                  </td>
+                  <td className="px-4 py-3"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${sb.cls}`}>{sb.dot} {sb.label}</span></td>
+                  <td className="px-4 py-3"><span className="inline-block px-2 py-0.5 rounded-full bg-cream text-navy text-xs font-medium">{formTypeLabel(s.form_type)}</span></td>
+                  <td className="px-4 py-3 font-medium text-navy">{s.prenom || "—"} {s.nom || ""}</td>
+                  <td className="px-4 py-3 text-foreground/70">
+                    {s.email && <div className="truncate max-w-[200px]">{s.email}</div>}
+                    {s.telephone && <a href={`tel:${s.telephone}`} className="text-navy hover:text-gold">{s.telephone}</a>}
+                  </td>
+                  <td className="px-4 py-3 text-foreground/70 whitespace-nowrap">{s.reference_annonce || "—"}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => onToggle(s.id, !s.traite)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                        s.traite ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-navy text-white hover:bg-navy/90"
+                      }`}
+                    >
+                      {s.traite ? <><Check size={13} /> Traité</> : "Marquer traité"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {submissions.length === 0 && <p className="p-8 text-center text-foreground/60">Aucune soumission pour le moment.</p>}
+      </div>
+
+      {detail && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-6" onClick={onClearOpen}>
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl text-navy">{formTypeLabel(detail.form_type)}</h3>
+              <button onClick={onClearOpen} className="w-8 h-8 rounded-full hover:bg-cream flex items-center justify-center"><X size={16} /></button>
+            </div>
+            <dl className="space-y-2 text-sm">
+              <div><dt className="text-foreground/60 inline">Reçu : </dt><dd className="inline text-navy">{new Date(detail.created_at).toLocaleString("fr-FR")}</dd></div>
+              <div><dt className="text-foreground/60 inline">Prénom : </dt><dd className="inline text-navy">{detail.prenom} {detail.nom}</dd></div>
+              <div><dt className="text-foreground/60 inline">Email : </dt><dd className="inline text-navy">{detail.email}</dd></div>
+              {detail.telephone && <div><dt className="text-foreground/60 inline">Téléphone : </dt><dd className="inline text-navy">{detail.telephone}</dd></div>}
+              {detail.reference_annonce && <div><dt className="text-foreground/60 inline">Référence : </dt><dd className="inline text-navy">{detail.reference_annonce}</dd></div>}
+            </dl>
+            <details className="mt-4">
+              <summary className="text-xs uppercase tracking-wider text-foreground/60 cursor-pointer">Données complètes</summary>
+              <pre className="mt-2 p-3 bg-cream rounded-lg text-xs whitespace-pre-wrap break-all">{JSON.stringify(detail.donnees_completes, null, 2)}</pre>
+            </details>
+            <div className="mt-6 flex gap-2">
+              <button
+                onClick={() => { onToggle(detail.id, !detail.traite); onClearOpen(); }}
+                className={`flex-1 px-4 py-2 rounded-lg text-sm font-semibold ${detail.traite ? "bg-emerald-100 text-emerald-700" : "bg-navy text-white"}`}
+              >
+                {detail.traite ? "Marqué traité" : "Marquer traité"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotificationBanner() {
+  const [hidden, setHidden] = useState(true);
+  const [done, setDone] = useState<null | "granted" | "denied">(null);
+
+  useEffect(() => {
+    if (!notifIsSupported()) return;
+    const perm = Notification.permission;
+    const declined = localStorage.getItem("notifications_declined") === "true";
+    const enabled = localStorage.getItem("notifications_enabled") === "true";
+    if (perm === "default" && !declined && !enabled) setHidden(false);
+  }, []);
+
+  useEffect(() => {
+    if (done === "granted") {
+      const t = setTimeout(() => setDone(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [done]);
+
+  if (done === "granted") return <div className="mb-6 px-4 py-3 rounded-lg bg-emerald-600 text-white text-sm">✅ Notifications activées</div>;
+  if (done === "denied") return (
+    <div className="mb-6 px-4 py-3 rounded-lg bg-cream border border-border text-sm text-foreground/70">
+      Vous pouvez les activer plus tard dans les paramètres de votre navigateur.
+    </div>
+  );
+  if (hidden) return null;
+
+  return (
+    <div className="mb-6 rounded-xl bg-navy text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className="flex items-start gap-3 flex-1">
+        <Bell size={20} className="text-gold shrink-0 mt-0.5" />
+        <p className="text-sm text-white/90">
+          Activez les notifications pour être alerté(e) en temps réel de chaque nouvelle demande.
+        </p>
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={async () => {
+            const res = await Notification.requestPermission();
+            if (res === "granted") {
+              localStorage.setItem("notifications_enabled", "true");
+              localStorage.removeItem("notifications_declined");
+              setHidden(true);
+              setDone("granted");
+            } else {
+              localStorage.setItem("notifications_declined", "true");
+              setHidden(true);
+              setDone("denied");
+            }
+          }}
+          className="px-4 py-2 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90"
+        >
+          Activer les notifications
+        </button>
+        <button
+          onClick={() => { localStorage.setItem("notifications_declined", "true"); setHidden(true); }}
+          className="px-3 py-2 rounded-lg text-sm text-white/70 hover:text-white"
+        >
+          Plus tard
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function NotificationStatus() {
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    const tick = () => setEnabled(notifIsEnabled());
+    tick();
+    const i = setInterval(tick, 2000);
+    return () => clearInterval(i);
+  }, []);
+  if (!notifIsSupported()) return null;
+  return (
+    <button
+      type="button"
+      title={enabled ? "Notifications activées" : "Cliquer pour activer les notifications"}
+      onClick={async () => {
+        if (enabled) return;
+        const res = await Notification.requestPermission();
+        if (res === "granted") {
+          localStorage.setItem("notifications_enabled", "true");
+          localStorage.removeItem("notifications_declined");
+          setEnabled(true);
+        }
+      }}
+      className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-white/80"
+    >
+      {enabled ? <Bell size={16} className="text-gold" /> : <BellOff size={16} />}
+    </button>
+  );
+}
+
+void formatNotification;
+
+
