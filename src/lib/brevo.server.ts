@@ -65,13 +65,23 @@ export async function sendBrevoTemplateEmail(input: {
   if (input.sender) body.sender = input.sender;
   if (input.replyTo) body.replyTo = input.replyTo;
 
-  const res = await fetch(`${GATEWAY_URL}/v3/smtp/email`, {
+  const endpoint = `${GATEWAY_URL}/v3/smtp/email`;
+  console.log("[brevo:diag] POST smtp/email", {
+    endpoint,
+    templateId: input.templateId,
+    templateIdType: typeof input.templateId,
+    toCount: input.to.length,
+    sender: input.sender?.email,
+    hasParams: !!input.params,
+  });
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: brevoHeaders(),
     body: JSON.stringify(body),
   });
+  const text = !res.ok ? await res.text().catch(() => "") : "";
+  console.log("[brevo:diag] smtp/email response", { status: res.status, ok: res.ok, templateId: input.templateId, body: text.slice(0, 500) });
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
     throw new Error(`Brevo template send failed (${res.status}): ${text}`);
   }
   return (await res.json().catch(() => ({}))) as { messageId?: string };
