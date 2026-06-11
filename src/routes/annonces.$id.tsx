@@ -10,6 +10,12 @@ import { FURNISHED_ITEMS } from "@/lib/listings-extra";
 import { computeCompat, REVENU_OPTIONS } from "@/lib/profile";
 import { useProfile } from "@/hooks/useProfile";
 import {
+  openAgentMailto,
+  rentalScoreEmoji,
+  saleIntentEmoji,
+  type SaleIntent as MailSaleIntent,
+} from "@/lib/email-helpers";
+import {
   ArrowLeft,
   MapPin,
   Maximize,
