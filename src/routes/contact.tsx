@@ -4,6 +4,7 @@ import { z } from "zod";
 import { PageShell } from "@/components/site/SiteChrome";
 import { TextField, SelectField } from "./vendre";
 import { Check, MapPin, Phone, Mail, Clock, Facebook, Instagram, Linkedin } from "lucide-react";
+import { openAgentMailto } from "@/lib/email-helpers";
 import portraitInterior from "@/assets/photo-profil-3.jpg.asset.json";
 
 const contactSearchSchema = z.object({
