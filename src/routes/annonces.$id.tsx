@@ -234,95 +234,81 @@ function ListingDetailPage() {
     }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!emailValid || !form.rgpd) return;
-
-    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    if (!emailValid || !form.rgpd || loading) return;
     const pageUrl = typeof window !== "undefined" ? window.location.href : "";
-    const quick = {
-      firstName: form.firstName,
-      prospectEmail: form.email,
-      prospectPhone: form.phone,
-      reference,
-      listingTitle: listing.title,
-      listingId: listing.id,
-    };
 
-    if (listing.isRental) {
-      const ratio = form.revenusValue ? (listing.price / form.revenusValue) * 100 : 0;
-      const tauxStr = ratio ? `${ratio.toFixed(1).replace(".", ",")}%` : "—";
-      const score = ratio ? rentalScoreEmoji(ratio) : { emoji: "⚪", label: "INCOMPLET" };
-      const conform = ratio && ratio <= 33 ? "✅ Conforme" : ratio && ratio <= 40 ? "⚠️ Limite" : "❌ À renforcer";
-      const subject = `${score.emoji} 🔑 Pré-dossier — Réf. ${reference} — ${fullName} — Taux : ${tauxStr} — ${score.label}`;
-      const lines = [
-        "═══════════════════════════",
-        `CANDIDATURE — Réf. ${reference}`,
-        `${listing.title} — ${listing.priceLabel}`,
-        "═══════════════════════════",
-        "",
-        "👤 PROFIL CANDIDAT",
-        `Nom : ${fullName}`,
-        `Email : ${form.email}`,
-        `Téléphone : ${form.phone}`,
-        `Situation : ${form.profession || "—"}${form.contractDetail ? ` (${form.contractDetail})` : ""}`,
-        `Revenus nets : ${form.revenusValue ? form.revenusValue + "€/mois" : "—"} (${form.revenusLabel || "—"})`,
-        `Revenus foyer : ${form.revenusFoyerValue ? form.revenusFoyerValue + "€/mois" : "—"}`,
-        "",
-        "📊 ANALYSE FINANCIÈRE",
-        `Loyer demandé : ${listing.price}€/mois`,
-        `Taux d'effort : ${tauxStr} des revenus`,
-        `Statut : ${conform} ${score.emoji} ${score.label}`,
-        "",
-        "🛡️ GARANTIES",
-        `Garant : ${form.garantType ? `Oui · ${form.garantType}` : "Non précisé"}`,
-        `Documents disponibles :`,
-        ...(form.documents.length ? form.documents.map((d) => `  • ${d}`) : ["  • Aucun document coché"]),
-        "",
-        "📅 PROJET",
-        `Date d'entrée souhaitée : ${form.entryDate || "—"}`,
-        `Demande : ${form.intent === "visite" ? "Visite" : form.intent === "infos" ? "Infos" : "Candidature"}`,
-        ...(form.intent === "visite" && (form.day || form.slot) ? [`Disponibilités : ${form.day || "—"} / ${form.slot || "—"}`] : []),
-        "",
-        "💬 MESSAGE",
-        form.message.trim() || "—",
-        "",
-        ...(pageUrl ? [`Lien de l'annonce : ${pageUrl}`, ""] : []),
-      ];
-      openAgentMailto(subject, lines, quick);
+    setLoading(true);
+    setSubmitError(null);
+
+    try {
+      if (listing.isRental) {
+        const disponibilites =
+          form.intent === "visite" && (form.day || form.slot)
+            ? `${form.day || "—"} / ${form.slot || "—"}`
+            : form.entryDate
+              ? `Date d'entrée : ${form.entryDate}`
+              : undefined;
+
+        await submitForm({
+          data: {
+            formType: "candidature-location",
+            prenom: form.firstName,
+            nom: form.lastName,
+            email: form.email,
+            telephone: form.phone,
+            referenceAnnonce: reference,
+            titreAnnonce: listing.title,
+            urlAnnonce: pageUrl || undefined,
+            loyer: listing.price,
+            situationPro:
+              form.profession
+                ? `${form.profession}${form.contractDetail ? ` (${form.contractDetail})` : ""}`
+                : undefined,
+            typeContrat: form.contractDetail || undefined,
+            revenus: form.revenusValue || undefined,
+            revenusFoyer: form.revenusFoyerValue || undefined,
+            garant: form.garantType ? `Oui · ${form.garantType}` : "Non précisé",
+            documents: form.documents.length ? form.documents : undefined,
+            disponibilites,
+            message: form.message.trim() || undefined,
+            typeDemande:
+              form.intent === "visite" ? "Visite" : form.intent === "infos" ? "Infos" : "Candidature",
+          },
+        });
+        setSent(true);
+        return;
+      }
+
+      const intentLabel = SALE_INTENT_LABEL[form.intent];
+      const disponibilites =
+        form.intent === "visite" && (form.day || form.slot)
+          ? `${form.day || "—"} / ${form.slot || "—"}`
+          : undefined;
+
+      await submitForm({
+        data: {
+          formType: "contact-annonce-vente",
+          prenom: form.firstName,
+          nom: form.lastName,
+          email: form.email,
+          telephone: form.phone,
+          referenceAnnonce: reference,
+          titreAnnonce: listing.title,
+          urlAnnonce: pageUrl || undefined,
+          typeDemande: intentLabel,
+          disponibilites,
+          message: form.message.trim() || undefined,
+        },
+      });
       setSent(true);
-      return;
+    } catch (err) {
+      console.error("[annonce] submit failed", err);
+      setSubmitError("Une erreur est survenue. Merci de réessayer ou de nous contacter directement.");
+    } finally {
+      setLoading(false);
     }
-
-    const intentLabel = SALE_INTENT_LABEL[form.intent];
-    const emoji = saleIntentEmoji(form.intent as MailSaleIntent);
-    const shortAction =
-      form.intent === "offre" ? "Offre" :
-      form.intent === "visite" ? "Visite demandée" :
-      form.intent === "infos" ? "Infos" : "Rappel demandé";
-    const subject = `${emoji} 🏠 ${shortAction} — Réf. ${reference} — ${fullName} — ${listing.title}`;
-    const lines = [
-      `Référence : ${reference}`,
-      `Bien : ${listing.title}`,
-      `Prix : ${listing.priceLabel}`,
-      "",
-      `Nom complet : ${fullName}`,
-      `Email : ${form.email}`,
-      `Téléphone : ${form.phone}`,
-      "",
-      `Type de demande : ${intentLabel}`,
-    ];
-    if (form.intent === "visite" && (form.day || form.slot)) {
-      lines.push(`Disponibilités : ${form.day || "—"} / ${form.slot || "—"}`);
-    }
-    if (form.message.trim()) {
-      lines.push("", "Message :", form.message.trim());
-    }
-    if (pageUrl) {
-      lines.push("", `Lien de l'annonce : ${pageUrl}`);
-    }
-    openAgentMailto(subject, lines, quick);
-    setSent(true);
   }
 
   const inputCls =
