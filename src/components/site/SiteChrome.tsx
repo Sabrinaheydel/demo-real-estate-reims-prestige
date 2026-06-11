@@ -104,7 +104,6 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
           )}
         </nav>
         <div className="hidden lg:flex items-center gap-3">
-          <ProfileNavIndicator isSolid={isSolid} />
           <Link
             to="/vendre"
             className="inline-flex items-center px-5 py-2.5 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90 transition-colors shadow-soft"
