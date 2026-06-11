@@ -38,13 +38,13 @@ export function ProfileForm({ defaultType = "location" }: Props) {
   }
 
   return (
-    <div id="profil" tabIndex={-1} className="bg-white rounded-xl border border-border shadow-soft p-6 lg:p-8 scroll-mt-28 outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-xl">
+    <div id="profil" tabIndex={-1} aria-labelledby="profil-heading" className="bg-white rounded-xl border border-border shadow-soft p-6 lg:p-8 scroll-mt-28 outline-none focus-visible:ring-2 focus-visible:ring-gold/50">
       <div className="flex items-start gap-3 mb-5">
         <div className="w-10 h-10 rounded-full bg-rental-soft text-rental flex items-center justify-center">
           <User size={20} />
         </div>
         <div>
-          <h3 className="font-display text-2xl text-navy">Mon profil candidat</h3>
+          <h3 id="profil-heading" className="font-display text-2xl text-navy">Mon profil candidat</h3>
           <p className="text-sm text-foreground/70">
             Renseignez votre profil pour voir les biens compatibles avec vos revenus.
           </p>
