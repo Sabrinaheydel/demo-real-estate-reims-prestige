@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Maximize, Home as HomeIcon, Bed, Car, MapPin } from "lucide-react";
-import type { Listing } from "@/lib/listings";
+import { getListingReference, type Listing } from "@/lib/listings";
 
 type ListingCardProps = {
   listing: Listing;
@@ -28,6 +28,7 @@ function StatusBadges({ statuses }: { statuses: Listing["status"] }) {
 }
 
 export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
+  const reference = getListingReference(listing.id);
   return (
     <article className="group bg-white rounded-xl overflow-hidden shadow-soft hover:shadow-card transition-all hover:-translate-y-1 flex flex-col">
       <Link to="/annonces/$id" params={{ id: listing.id }} className="relative overflow-hidden aspect-[4/3] block cursor-pointer">
@@ -40,8 +41,9 @@ export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
         <StatusBadges statuses={listing.status} />
       </Link>
       <div className="p-6 flex flex-col flex-1">
-        <div className="font-display text-2xl text-navy mb-2">
-          {listing.priceLabel}
+        <div className="flex items-baseline justify-between gap-3 mb-2">
+          <div className="font-display text-2xl text-navy">{listing.priceLabel}</div>
+          <span className="text-[11px] uppercase tracking-wider text-foreground/50">Réf. {reference}</span>
         </div>
         <Link to="/annonces/$id" params={{ id: listing.id }} className="font-display text-lg text-navy leading-snug mb-3 line-clamp-2 min-h-[3.5rem] hover:text-gold transition-colors">
           {listing.title}
@@ -75,7 +77,7 @@ export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
             onClick={() => onDetailClick(listing)}
             className="mt-auto inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors cursor-pointer"
           >
-            Détail
+            Voir le détail
           </button>
         ) : (
           <Link
