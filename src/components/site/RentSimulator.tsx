@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Building2, Home as HomeIcon, Sofa, Square, Sparkles, ThumbsUp, Wrench, Phone } from "lucide-react";
+import { Building2, Home as HomeIcon, Sofa, Square, Sparkles, ThumbsUp, Wrench, Phone, Download } from "lucide-react";
+import { jsPDF } from "jspdf";
 
 type BienType = "appartement" | "maison" | "meuble" | "studio";
 type Etat = "renove" | "bon" | "rafraichir";
@@ -106,6 +107,80 @@ export function RentSimulator() {
   })();
 
   const sliderPct = ((surface - 15) / (200 - 15)) * 100;
+
+  const exportPDF = () => {
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const quartierLabel = QUARTIERS.find((q) => q.value === quartier)?.label ?? "";
+    const bienLabel = BIEN_OPTS.find((b) => b.value === bien)?.label ?? "";
+    const etatLabel = ETAT_OPTS.find((e) => e.value === etat)?.label ?? "";
+    const fmt = (n: number) => n.toLocaleString("fr-FR");
+    let y = 60;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Simulation de revenus locatifs", 40, y);
+    y += 8;
+    doc.setDrawColor(201, 169, 110);
+    doc.line(40, y, 200, y);
+    y += 24;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Dupuis Immobilier - Reims", 40, y);
+    y += 16;
+    doc.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, 40, y);
+    y += 28;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Caractéristiques du bien", 40, y);
+    y += 18;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    [
+      `Type de bien : ${bienLabel}`,
+      `Surface : ${surface} m²`,
+      `Secteur : ${quartierLabel}`,
+      `État : ${etatLabel}`,
+      ...(calc.valNum > 0 ? [`Valeur estimée : ${fmt(calc.valNum)} €`] : []),
+    ].forEach((line) => {
+      doc.text(line, 40, y);
+      y += 16;
+    });
+    y += 12;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Résultats de l'estimation", 40, y);
+    y += 20;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    const lines = [
+      `Loyer mensuel estimé : entre ${fmt(calc.bas)} € et ${fmt(calc.haut)} €`,
+      `Valeur centrale : ${fmt(calc.brut)} € / mois`,
+      `Honoraires de gestion (7%) : ${fmt(calc.honoraires)} € / mois`,
+      `Revenu net mensuel : ${fmt(calc.net)} € / mois`,
+      `Revenu net annuel : ${fmt(calc.annuel)} € / an`,
+    ];
+    if (calc.valNum > 0) {
+      lines.push(`Rendement brut : ${calc.rdtBrut.toFixed(2)} %`);
+      lines.push(`Rendement net après honoraires : ${calc.rdtNet.toFixed(2)} %`);
+    }
+    lines.forEach((line) => {
+      doc.text(line, 40, y);
+      y += 16;
+    });
+    y += 20;
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.setTextColor(110);
+    const legal = doc.splitTextToSize(
+      "Mention légale : ces estimations sont fournies à titre purement indicatif et sont basées sur les données du marché locatif rémois observées en 2026. Elles ne constituent pas une offre contractuelle ni un engagement de location. Une visite du bien et une étude personnalisée sont nécessaires pour établir une estimation précise. Dupuis Immobilier - Carte professionnelle T - RCP en vigueur.",
+      515,
+    );
+    doc.text(legal, 40, y);
+
+    doc.save(`simulation-loyer-${surface}m2-${quartier}.pdf`);
+  };
 
   return (
     <section className="py-24 px-6 bg-white">
@@ -334,6 +409,13 @@ export function RentSimulator() {
                     <Phone size={16} /> Appeler Julien
                   </a>
                 </div>
+                <button
+                  type="button"
+                  onClick={exportPDF}
+                  className="mt-3 w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white font-medium hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
+                >
+                  <Download size={16} /> Télécharger la simulation en PDF
+                </button>
                 <p className="text-xs text-white/70 mt-3 text-center">
                   ⚡ Réponse sous 24h · Estimation gratuite et sans engagement
                 </p>
