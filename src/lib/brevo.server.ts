@@ -24,7 +24,16 @@ export async function createOrUpdateBrevoContact(input: {
   attributes: BrevoAttributes;
   listIds: number[];
 }): Promise<void> {
-  const res = await fetch(`${GATEWAY_URL}/v3/contacts`, {
+  const endpoint = `${GATEWAY_URL}/v3/contacts`;
+  console.log("[brevo:diag] POST contacts", {
+    endpoint,
+    listIds: input.listIds,
+    listIdsTypes: input.listIds.map((v) => typeof v),
+    attributeKeys: Object.keys(input.attributes),
+    hasLovableKey: !!process.env.LOVABLE_API_KEY,
+    hasBrevoKey: !!process.env.BREVO_API_KEY,
+  });
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: brevoHeaders(),
     body: JSON.stringify({
@@ -34,9 +43,9 @@ export async function createOrUpdateBrevoContact(input: {
       updateEnabled: true,
     }),
   });
-  // Brevo returns 201 (created) or 204 (updated). Both are success.
+  const text = !res.ok ? await res.text().catch(() => "") : "";
+  console.log("[brevo:diag] contacts response", { status: res.status, ok: res.ok, body: text.slice(0, 500) });
   if (!res.ok && res.status !== 204) {
-    const text = await res.text().catch(() => "");
     throw new Error(`Brevo contact upsert failed (${res.status}): ${text}`);
   }
 }
