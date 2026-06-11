@@ -48,6 +48,7 @@ import heroAsset from "@/assets/hero-julien-reims.jpg.asset.json";
 import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
 import haussmannienSalon from "@/assets/appartement-haussmannien-salon.png.asset.json";
 import maisonCaractere from "@/assets/maison-caractere-jardin.png.asset.json";
+import villaPiscine from "@/assets/villa-contemporaine-piscine.png.asset.json";
 const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
@@ -89,7 +90,7 @@ const HOME_LISTINGS = [
     beds: 5,
     baths: 3,
     surface: 220,
-    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900",
+    img: villaPiscine.url,
   },
 ];
 
