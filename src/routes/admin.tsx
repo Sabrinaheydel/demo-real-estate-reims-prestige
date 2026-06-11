@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { LISTINGS as SEED_LISTINGS, type Listing } from "@/lib/listings";
+import { useListings, useUpdateListing } from "@/lib/admin-storage";
+
 import {
   Lock,
   LogOut,
@@ -131,9 +133,6 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
           >
             Se connecter
           </button>
-          <p className="text-xs text-center text-foreground/50 pt-2 border-t border-border">
-            Démo : <span className="font-mono">admin@dupuis.fr</span> / <span className="font-mono">demo2026</span>
-          </p>
         </form>
       </div>
     </div>
@@ -143,26 +142,48 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
 type Tab = "annonces" | "ajouter" | "messages";
 
 function AdminDashboard({ onLogout }: { onLogout: () => void }) {
-  const [listings, setListings] = useLocalState<Listing[]>("admin-listings", SEED_LISTINGS);
+  const supabaseListings = useListings();
+  const [localListings, setLocalListings] = useLocalState<Listing[]>("admin-listings", SEED_LISTINGS);
+  // Prefer Supabase data once it arrives; fall back to local state for newly-added items.
+  const listings = useMemo(() => {
+    const supaIds = new Set(supabaseListings.map((l) => l.id));
+    const extras = localListings.filter((l) => !supaIds.has(l.id));
+    return supabaseListings.length > 0 ? [...supabaseListings, ...extras] : localListings;
+  }, [supabaseListings, localListings]);
+  const updateListing = useUpdateListing();
   const [messages, setMessages] = useLocalState<Message[]>("admin-messages", SEED_MESSAGES);
   const [tab, setTab] = useState<Tab>("annonces");
   const [editing, setEditing] = useState<Listing | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const newMessagesThisWeek = messages.filter((m) => !m.handled).length;
 
-  function saveListing(l: Listing) {
-    setListings((prev) => {
-      const exists = prev.some((x) => x.id === l.id);
-      return exists ? prev.map((x) => (x.id === l.id ? l : x)) : [l, ...prev];
-    });
+  async function saveListing(l: Listing) {
+    setSaveError(null);
+    const existsInSupabase = supabaseListings.some((x) => x.id === l.id);
+    if (existsInSupabase) {
+      try {
+        await updateListing(l);
+      } catch (err) {
+        setSaveError(err instanceof Error ? err.message : "Erreur enregistrement");
+        return;
+      }
+    } else {
+      // New listing or seed-only: keep in local state for now.
+      setLocalListings((prev) => {
+        const exists = prev.some((x) => x.id === l.id);
+        return exists ? prev.map((x) => (x.id === l.id ? l : x)) : [l, ...prev];
+      });
+    }
     setEditing(null);
     setTab("annonces");
   }
 
   function deleteListing(id: string) {
     if (!confirm("Supprimer définitivement cette annonce ?")) return;
-    setListings((prev) => prev.filter((l) => l.id !== id));
+    setLocalListings((prev) => prev.filter((l) => l.id !== id));
   }
+
 
   return (
     <div className="min-h-screen bg-cream">
@@ -219,6 +240,13 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             )}
           </TabButton>
         </nav>
+
+        {saveError && (
+          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+            ❌ {saveError}
+          </div>
+        )}
+
 
         {tab === "annonces" && !editing && (
           <ListingsList
