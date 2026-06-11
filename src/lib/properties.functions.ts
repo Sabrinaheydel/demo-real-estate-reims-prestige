@@ -137,7 +137,8 @@ export const updatePropertyFn = createServerFn({ method: "POST" })
     }
     const { data: updated, error } = await supabaseAdmin
       .from("properties")
-      .update(data.patch as Record<string, unknown>)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update(data.patch as any)
       .eq("id", uuid)
       .select("*")
       .single();
