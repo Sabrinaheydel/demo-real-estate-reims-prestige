@@ -55,8 +55,11 @@ export async function createOrUpdateBrevoContact(input: {
   }
 
   if (!res.ok && res.status !== 204) {
-    throw new Error(`Brevo contact upsert failed (${res.status}): ${text}`);
+    // On n'échoue jamais ici : un doublon (email/SMS déjà connu) ne doit pas
+    // empêcher l'envoi de la notification à l'agent. On log et on continue.
+    console.warn(`[brevo] contact upsert non-bloquant (${res.status}): ${text.slice(0, 300)}`);
   }
+
 }
 
 export async function sendBrevoTemplateEmail(input: {
