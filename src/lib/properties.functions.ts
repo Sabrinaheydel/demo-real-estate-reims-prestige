@@ -137,7 +137,7 @@ export const updatePropertyFn = createServerFn({ method: "POST" })
     }
     const { data: updated, error } = await supabaseAdmin
       .from("properties")
-      .update(data.patch)
+      .update(data.patch as Record<string, unknown>)
       .eq("id", uuid)
       .select("*")
       .single();
