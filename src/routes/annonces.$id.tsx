@@ -11,7 +11,6 @@ import { FURNISHED_ITEMS } from "@/lib/listings-extra";
 import { computeCompat, REVENU_OPTIONS } from "@/lib/profile";
 import { useProfile } from "@/hooks/useProfile";
 import { submitBrevoForm } from "@/lib/brevo.functions";
-import type { SaleIntent } from "@/lib/email-helpers";
 import {
   ArrowLeft,
   MapPin,
@@ -191,6 +190,9 @@ function ListingDetailPage() {
   const [activePhoto, setActivePhoto] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submitForm = useServerFn(submitBrevoForm);
   const similar = getSimilar(listing);
   const reference = getListingReference(listing.id);
   const dpe = getDpe(listing.id);
