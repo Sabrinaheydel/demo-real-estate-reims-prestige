@@ -10,9 +10,7 @@ import {
   Phone,
   Mail,
   MessageCircle,
-  User,
 } from "lucide-react";
-import { useProfile } from "@/hooks/useProfile";
 
 const NAV_LINKS: { label: string; to: string }[] = [
   { label: "Accueil", to: "/" },
