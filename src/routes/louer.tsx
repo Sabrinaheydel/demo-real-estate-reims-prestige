@@ -543,8 +543,9 @@ function QuoteForm() {
           </fieldset>
 
           {/* Bloc 3 — Coordonnées */}
-          <fieldset className="space-y-6 border-t border-border pt-8">
-            <legend className="font-display text-xl text-navy mb-2">Vos coordonnées</legend>
+          <fieldset className="space-y-6 pt-8">
+            <div className="h-px bg-gold/60 mb-4" />
+            <span className="inline-block bg-navy text-white text-[13px] font-medium rounded-[20px] px-3 py-1">③ Vos coordonnées</span>
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Prénom *">
                 <input required value={f.prenom} onChange={(e) => set("prenom", e.target.value)}
