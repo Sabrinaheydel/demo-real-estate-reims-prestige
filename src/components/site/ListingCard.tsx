@@ -2,6 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { Maximize, Home as HomeIcon, Bed, Car, MapPin } from "lucide-react";
 import type { Listing } from "@/lib/listings";
 
+type ListingCardProps = {
+  listing: Listing;
+  onDetailClick?: (listing: Listing) => void;
+};
+
 function StatusBadges({ statuses }: { statuses: Listing["status"] }) {
   const map: Record<string, { label: string; cls: string }> = {
     vente: { label: "À vendre", cls: "bg-navy text-white" },
@@ -22,10 +27,10 @@ function StatusBadges({ statuses }: { statuses: Listing["status"] }) {
   );
 }
 
-export function ListingCard({ listing }: { listing: Listing }) {
+export function ListingCard({ listing, onDetailClick }: ListingCardProps) {
   return (
     <article className="group bg-white rounded-xl overflow-hidden shadow-soft hover:shadow-card transition-all hover:-translate-y-1 flex flex-col">
-      <div className="relative overflow-hidden aspect-[4/3]">
+      <Link to="/annonces/$id" params={{ id: listing.id }} className="relative overflow-hidden aspect-[4/3] block cursor-pointer">
         <img
           src={listing.photos[0]}
           alt={listing.title}
@@ -33,14 +38,14 @@ export function ListingCard({ listing }: { listing: Listing }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
         <StatusBadges statuses={listing.status} />
-      </div>
+      </Link>
       <div className="p-6 flex flex-col flex-1">
         <div className="font-display text-2xl text-navy mb-2">
           {listing.priceLabel}
         </div>
-        <h3 className="font-display text-lg text-navy leading-snug mb-3 line-clamp-2 min-h-[3.5rem]">
+        <Link to="/annonces/$id" params={{ id: listing.id }} className="font-display text-lg text-navy leading-snug mb-3 line-clamp-2 min-h-[3.5rem] hover:text-gold transition-colors">
           {listing.title}
-        </h3>
+        </Link>
         <div className="flex items-center gap-1.5 text-sm text-foreground/70 mb-4">
           <MapPin size={14} className="text-gold shrink-0" />
           <span className="truncate">{listing.neighborhood}</span>
@@ -64,13 +69,23 @@ export function ListingCard({ listing }: { listing: Listing }) {
             {listing.parking ? "Parking" : "Sans parking"}
           </span>
         </div>
-        <Link
-          to="/annonces/$id"
-          params={{ id: listing.id }}
-          className="mt-auto inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors"
-        >
-          Voir le détail
-        </Link>
+        {onDetailClick ? (
+          <button
+            type="button"
+            onClick={() => onDetailClick(listing)}
+            className="mt-auto inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors cursor-pointer"
+          >
+            Détail
+          </button>
+        ) : (
+          <Link
+            to="/annonces/$id"
+            params={{ id: listing.id }}
+            className="mt-auto inline-flex items-center justify-center px-5 py-3 rounded-lg bg-navy text-white font-semibold text-sm hover:bg-gold hover:text-navy transition-colors"
+          >
+            Voir le détail
+          </Link>
+        )}
       </div>
     </article>
   );

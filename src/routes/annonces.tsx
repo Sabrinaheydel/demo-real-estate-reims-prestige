@@ -1,10 +1,10 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCard } from "@/components/site/ListingCard";
-import { LISTINGS } from "@/lib/listings";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { LISTINGS, getListingReference, type Listing } from "@/lib/listings";
+import { Search, SlidersHorizontal, X, MapPin, Maximize, Bed, Car, Home as HomeIcon } from "lucide-react";
 
 export const Route = createFileRoute("/annonces")({
   head: () => ({
@@ -86,6 +86,81 @@ function priceInBucket(price: number, b: PriceBucket) {
   }
 }
 
+function DetailMiniCard({ listing, onClose }: { listing: Listing; onClose: () => void }) {
+  const reference = getListingReference(listing.id);
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center px-4" style={{ backgroundColor: "rgba(15, 23, 42, 0.72)" }} onClick={onClose}>
+      <div
+        className="w-full max-w-2xl rounded-xl bg-white shadow-card overflow-hidden animate-fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative aspect-[16/9] bg-cream">
+          <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 text-navy flex items-center justify-center hover:bg-white"
+            aria-label="Fermer"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <span className="inline-flex px-3 py-1 rounded-full bg-cream text-navy text-xs font-semibold tracking-wider uppercase">
+              {listing.isRental ? "Location" : "Vente"}
+            </span>
+            <span className="text-sm text-gold font-semibold">Réf. {reference}</span>
+          </div>
+
+          <h2 className="font-display text-2xl text-navy mb-2">{listing.title}</h2>
+          <div className="flex items-center gap-2 text-sm text-foreground/70 mb-5">
+            <MapPin size={15} className="text-gold" />
+            <span>{listing.neighborhood}, Reims</span>
+          </div>
+
+          <div className="font-display text-3xl text-gold mb-5">{listing.priceLabel}</div>
+
+          <div className="flex flex-wrap gap-4 text-sm text-foreground/80 mb-5 pb-5 border-b border-border">
+            <span className="flex items-center gap-1.5"><Maximize size={14} className="text-gold" /> {listing.surface} m²</span>
+            {listing.rooms !== null && <span className="flex items-center gap-1.5"><HomeIcon size={14} className="text-gold" /> {listing.rooms} pièces</span>}
+            {listing.bedrooms !== null && <span className="flex items-center gap-1.5"><Bed size={14} className="text-gold" /> {listing.bedrooms} ch.</span>}
+            <span className="flex items-center gap-1.5"><Car size={14} className="text-gold" /> {listing.parking ? "Parking" : "Sans parking"}</span>
+          </div>
+
+          <p className="text-foreground/80 leading-relaxed mb-6 line-clamp-4">{listing.description}</p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/contact"
+              search={{ reference, listing: listing.title, intent: "infos" }}
+              className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-colors"
+            >
+              Demander plus d'infos
+            </Link>
+            <Link
+              to="/contact"
+              search={{ reference, listing: listing.title, intent: "visite" }}
+              className="inline-flex items-center justify-center px-5 py-3 rounded-lg border border-navy text-navy font-semibold hover:bg-navy hover:text-white transition-colors"
+            >
+              Demander une visite
+            </Link>
+            <Link
+              to="/annonces/$id"
+              params={{ id: listing.id }}
+              className="inline-flex items-center justify-center px-5 py-3 rounded-lg border border-border text-navy font-medium hover:border-gold hover:text-gold transition-colors"
+            >
+              Voir la page complète
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AnnoncesPage() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<TypeFilter>("vente");
@@ -99,6 +174,7 @@ function AnnoncesPage() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [sort, setSort] = useState<SortMode>("newest");
   const [visible, setVisible] = useState(9);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -241,7 +317,7 @@ function AnnoncesPage() {
                       type="checkbox"
                       checked={exclusiveOnly}
                       onChange={(e) => setExclusiveOnly(e.target.checked)}
-                      className="w-4 h-4 accent-[#C9A96E]"
+                      className="w-4 h-4 accent-[var(--color-gold)]"
                     />
                     Exclusivité uniquement
                   </label>
@@ -286,7 +362,7 @@ function AnnoncesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {shown.map((l) => (
-                <ListingCard key={l.id} listing={l} />
+                <ListingCard key={l.id} listing={l} onDetailClick={setSelectedListing} />
               ))}
             </div>
           )}
@@ -304,6 +380,7 @@ function AnnoncesPage() {
         </section>
       </main>
       <Footer />
+      {selectedListing && <DetailMiniCard listing={selectedListing} onClose={() => setSelectedListing(null)} />}
     </div>
   );
 }
