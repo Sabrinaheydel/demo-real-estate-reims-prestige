@@ -4,7 +4,14 @@ import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCatalog } from "@/components/site/ListingCatalog";
 import { LISTINGS } from "@/lib/listings";
 
+type TypeSearch = "vente" | "location" | "all";
+
 export const Route = createFileRoute("/annonces")({
+  validateSearch: (search: Record<string, unknown>): { type?: TypeSearch } => {
+    const t = search.type;
+    if (t === "vente" || t === "location" || t === "all") return { type: t };
+    return {};
+  },
   head: () => ({
     meta: [
       { title: "Nos biens disponibles · Dupuis Immobilier Reims" },
@@ -42,13 +49,14 @@ export const Route = createFileRoute("/annonces")({
 });
 
 function AnnoncesPage() {
+  const { type } = Route.useSearch();
   return (
     <div className="min-h-screen bg-background">
       <Navbar solid />
       <Breadcrumbs items={[{ label: "Annonces" }]} />
       <main className="pt-6">
         <ListingCatalog
-          initialType="all"
+          initialType={type ?? "all"}
           title="Nos biens disponibles"
           subtitle={`${LISTINGS.length} biens à Reims et alentours, à vendre comme à louer.`}
         />
