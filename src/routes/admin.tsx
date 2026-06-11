@@ -1,7 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { LISTINGS as SEED_LISTINGS, type Listing } from "@/lib/listings";
 import { useListings, useUpdateListing } from "@/lib/admin-storage";
+import { useServerFn } from "@tanstack/react-start";
+import { listSubmissionsFn, setSubmissionTraiteFn, type FormSubmission } from "@/lib/submissions.functions";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  isSupported as notifIsSupported,
+  isEnabled as notifIsEnabled,
+  showSubmissionNotification,
+  playDing,
+  registerAdminServiceWorker,
+  formatNotification,
+} from "@/lib/admin-notifications";
 
 import {
   Lock,
@@ -17,6 +28,8 @@ import {
   Check,
   Upload,
   ArrowLeft,
+  Bell,
+  BellOff,
 } from "lucide-react";
 import portraitAvatar from "@/assets/photo-profil-1.jpg.asset.json";
 
@@ -33,22 +46,7 @@ export const Route = createFileRoute("/admin")({
 const ADMIN_EMAIL = "admin@dupuis.fr";
 const ADMIN_PASSWORD = "demo2026";
 
-type Message = {
-  id: string;
-  date: string;
-  firstname: string;
-  email: string;
-  phone: string;
-  object: string;
-  message: string;
-  handled: boolean;
-};
 
-const SEED_MESSAGES: Message[] = [
-  { id: "m1", date: "2026-06-08", firstname: "Marie", email: "marie.dubois@example.com", phone: "06 12 34 56 78", object: "Estimation", message: "Bonjour, je souhaite faire estimer mon T3 rue Cérès.", handled: false },
-  { id: "m2", date: "2026-06-09", firstname: "Thomas", email: "t.lefevre@example.com", phone: "06 98 76 54 32", object: "Acheter", message: "Recherche maison 4 chambres avec jardin, secteur Clairmarais.", handled: false },
-  { id: "m3", date: "2026-06-10", firstname: "Sophie", email: "sophie.m@example.com", phone: "07 11 22 33 44", object: "Louer", message: "Studio meublé proche CHU pour septembre.", handled: false },
-];
 
 function useLocalState<T>(key: string, initial: T) {
   const [value, setValue] = useState<T>(() => {
