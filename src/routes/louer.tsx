@@ -499,8 +499,9 @@ function QuoteForm() {
           </fieldset>
 
           {/* Bloc 2 — Votre situation */}
-          <fieldset className="space-y-6 border-t border-border pt-8">
-            <legend className="font-display text-xl text-navy mb-2">Votre situation</legend>
+          <fieldset className="space-y-6 pt-8">
+            <div className="h-px bg-gold/60 mb-4" />
+            <span className="inline-block bg-navy text-white text-[13px] font-medium rounded-[20px] px-3 py-1">② Votre situation</span>
 
             <RadioGroup
               label="Êtes-vous"
