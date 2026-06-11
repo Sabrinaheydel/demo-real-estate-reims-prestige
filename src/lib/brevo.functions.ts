@@ -113,69 +113,86 @@ export const submitBrevoForm = createServerFn({ method: "POST" })
     if (p.garant) attrs.IMMO_GARANT = p.garant;
     if (p.documents && p.documents.length) attrs.IMMO_DOCUMENTS = p.documents.join(", ");
 
-    // Form-specific rules
+    let tauxEffort: number | undefined;
     if (p.formType === "recherche-achat" && p.alerteBien) {
       attrs.IMMO_ALERTE_BIEN = true;
       attrs.IMMO_STATUT = "alerte-active";
       if (!listIds.includes(ALERT_LIST_ID)) listIds.push(ALERT_LIST_ID);
     }
-    if (p.formType === "contact-annonce-vente") {
-      if (typeDemande.toLowerCase().includes("offre")) {
-        attrs.IMMO_STATUT = "offre-en-cours";
-      }
+    if (p.formType === "contact-annonce-vente" && typeDemande.toLowerCase().includes("offre")) {
+      attrs.IMMO_STATUT = "offre-en-cours";
     }
     if (p.formType === "candidature-location") {
-      const loyerNum =
-        typeof p.loyer === "number" ? p.loyer : Number(p.loyer ?? 0);
+      const loyerNum = typeof p.loyer === "number" ? p.loyer : Number(p.loyer ?? 0);
       const rev = p.revenus ?? 0;
       if (loyerNum > 0 && rev > 0) {
-        const taux = Math.round((loyerNum / rev) * 100);
-        attrs.IMMO_TAUX_EFFORT = String(taux);
+        tauxEffort = Math.round((loyerNum / rev) * 100);
+        attrs.IMMO_TAUX_EFFORT = String(tauxEffort);
         attrs.IMMO_VERDICT =
-          taux <= 33 ? "🟢 Dossier solide"
-          : taux <= 40 ? "🟡 À vérifier"
-          : taux <= 50 ? "🟠 Dossier fragile"
+          tauxEffort <= 33 ? "🟢 Dossier solide"
+          : tauxEffort <= 40 ? "🟡 À vérifier"
+          : tauxEffort <= 50 ? "🟠 Dossier fragile"
           : "🔴 Dossier risqué";
         attrs.IMMO_STATUT =
-          taux <= 33 ? "dossier-solide"
-          : taux <= 40 ? "dossier-a-verifier"
+          tauxEffort <= 33 ? "dossier-solide"
+          : tauxEffort <= 40 ? "dossier-a-verifier"
           : "dossier-fragile";
       }
     }
 
-    // 1) Upsert contact + lists
-    await createOrUpdateBrevoContact({
+    // 1) Persist submission to Supabase (source of truth for admin inbox + realtime push)
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const donneesCompletes: Record<string, unknown> = {
+      typeDemande,
+      typeBien: p.typeBien,
+      surface: p.surface,
+      quartier: p.quartier,
+      budget: p.budget,
+      loyer: p.loyer,
+      titreAnnonce: p.titreAnnonce,
+      urlAnnonce: p.urlAnnonce,
+      disponibilites: p.disponibilites,
+      message: p.message,
+      situationPro: p.situationPro,
+      typeContrat: p.typeContrat,
+      revenus: p.revenus,
+      revenusFoyer: p.revenusFoyer,
+      garant: p.garant,
+      documents: p.documents,
+      alerteBien: p.alerteBien,
+      tauxEffort,
+    };
+    const { error: insertErr } = await supabaseAdmin.from("form_submissions").insert({
+      form_type: p.formType,
+      prenom: p.prenom,
+      nom: p.nom || null,
       email: p.email,
-      attributes: attrs,
-      listIds,
+      telephone: phone || p.telephone || null,
+      reference_annonce: p.referenceAnnonce || null,
+      donnees_completes: donneesCompletes,
     });
+    if (insertErr) console.error("[submissions] insert failed", insertErr.message);
 
-    const prospectName = `${p.prenom} ${p.nom}`.trim();
-
-    // 2) Agent notification (uses params.* in template)
-    await sendBrevoTemplateEmail({
-      templateId: cfg.agentTemplate,
-      to: [{ email: AGENT_EMAIL, name: "Julien Dupuis" }],
-      sender: SENDER,
-      replyTo: { email: p.email, name: prospectName || undefined },
-      params: attrs as Record<string, unknown>,
-    });
-
-    // 3) Prospect confirmation (uses contact.* in template — Brevo pulls attrs)
-    await sendBrevoTemplateEmail({
-      templateId: cfg.prospectTemplate,
-      to: [{ email: p.email, name: prospectName || undefined }],
-      sender: SENDER,
-      replyTo: { email: AGENT_EMAIL, name: "Julien Dupuis" },
-    });
-
-    // Server-side log only (no sensitive data)
-    console.log("[brevo] form submitted", {
-      formType: p.formType,
-      listIds,
-      agentTemplateId: cfg.agentTemplate,
-      prospectTemplateId: cfg.prospectTemplate,
-    });
+    // 2) Brevo (best-effort — never block the user if Brevo is misconfigured)
+    try {
+      await createOrUpdateBrevoContact({ email: p.email, attributes: attrs, listIds });
+      const prospectName = `${p.prenom} ${p.nom}`.trim();
+      await sendBrevoTemplateEmail({
+        templateId: cfg.agentTemplate,
+        to: [{ email: AGENT_EMAIL, name: "Julien Dupuis" }],
+        sender: SENDER,
+        replyTo: { email: p.email, name: prospectName || undefined },
+        params: attrs as Record<string, unknown>,
+      });
+      await sendBrevoTemplateEmail({
+        templateId: cfg.prospectTemplate,
+        to: [{ email: p.email, name: prospectName || undefined }],
+        sender: SENDER,
+        replyTo: { email: AGENT_EMAIL, name: "Julien Dupuis" },
+      });
+    } catch (e) {
+      console.warn("[brevo] send failed (submission still saved)", e instanceof Error ? e.message : e);
+    }
 
     return { ok: true as const };
   });
