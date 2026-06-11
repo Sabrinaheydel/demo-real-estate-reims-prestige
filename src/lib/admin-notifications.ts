@@ -3,14 +3,66 @@ import portraitAvatar from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const ICON_URL = portraitAvatar.url;
 
+// --- Preference helpers (localStorage) ---------------------------------------
+export const PREF_KEYS = {
+  enabled: "notifications_enabled",
+  permission: "notifications_permission",
+  sound: "admin_sound_enabled",
+  night: "admin_night_mode",
+} as const;
+
+function lsGet(key: string, fallback = "") {
+  if (typeof window === "undefined") return fallback;
+  try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
+}
+function lsBool(key: string, defaultVal: boolean): boolean {
+  const v = lsGet(key);
+  if (v === "") return defaultVal;
+  return v === "true";
+}
+
 export function isSupported() {
   return typeof window !== "undefined" && "Notification" in window;
 }
+export function permissionStatus(): NotificationPermission | "unsupported" {
+  if (!isSupported()) return "unsupported";
+  return Notification.permission;
+}
 export function isEnabled() {
   if (!isSupported()) return false;
-  return Notification.permission === "granted" && localStorage.getItem("notifications_enabled") === "true";
+  return Notification.permission === "granted" && lsBool(PREF_KEYS.enabled, false);
+}
+export function isSoundEnabled() {
+  return lsBool(PREF_KEYS.sound, true);
+}
+export function isNightMode(): boolean {
+  if (!lsBool(PREF_KEYS.night, false)) return false;
+  const hour = new Date().getHours();
+  return hour >= 20 || hour < 8;
 }
 
+export function setEnabled(v: boolean) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PREF_KEYS.enabled, v ? "true" : "false");
+}
+export function setSoundEnabled(v: boolean) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PREF_KEYS.sound, v ? "true" : "false");
+}
+export function setNightMode(v: boolean) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PREF_KEYS.night, v ? "true" : "false");
+}
+
+export async function requestPermissionAndEnable(): Promise<NotificationPermission> {
+  if (!isSupported()) return "denied";
+  const res = await Notification.requestPermission();
+  localStorage.setItem(PREF_KEYS.permission, res);
+  if (res === "granted") setEnabled(true);
+  return res;
+}
+
+// --- Formatting --------------------------------------------------------------
 export function formatNotification(s: FormSubmission): { title: string; body: string } {
   const prenom = s.prenom || "—";
   const d = s.donnees_completes ?? {};
@@ -36,27 +88,34 @@ export function formatNotification(s: FormSubmission): { title: string; body: st
   }
 }
 
-export function showSubmissionNotification(s: FormSubmission) {
-  if (!isEnabled()) return;
-  const { title, body } = formatNotification(s);
+// --- Push notification -------------------------------------------------------
+export function showRawNotification(opts: { title: string; body: string; tag?: string; url?: string }) {
+  if (!isEnabled() || isNightMode()) return;
   try {
-    const n = new Notification(title, {
-      body,
+    const n = new Notification(opts.title, {
+      body: opts.body,
       icon: ICON_URL,
       badge: "/favicon.ico",
-      tag: `submission-${s.id}`,
+      tag: opts.tag,
     });
     n.onclick = () => {
       window.focus();
-      window.location.href = `/admin?open=${s.id}`;
+      if (opts.url) window.location.href = opts.url;
     };
-  } catch (e) {
-    console.warn("[notifications] failed", e);
-  }
+  } catch (e) { console.warn("[notifications] failed", e); }
 }
 
+export function showSubmissionNotification(s: FormSubmission) {
+  const { title, body } = formatNotification(s);
+  showRawNotification({ title, body, tag: `submission-${s.id}`, url: `/admin?open=${s.id}` });
+}
+
+// --- Web Audio "ding" --------------------------------------------------------
 let audioCtx: AudioContext | null = null;
-export function playDing() {
+export function playDing(opts: { respectNight?: boolean; respectSound?: boolean } = {}) {
+  const { respectNight = true, respectSound = true } = opts;
+  if (respectSound && !isSoundEnabled()) return;
+  if (respectNight && isNightMode()) return;
   try {
     if (typeof window === "undefined") return;
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -67,11 +126,13 @@ export function playDing() {
     const gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
+    osc.type = "sine";
     osc.frequency.value = 880;
-    gain.gain.value = 0.3;
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    osc.stop(ctx.currentTime + 0.5);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.8);
   } catch { /* ignore */ }
 }
 
