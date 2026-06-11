@@ -237,8 +237,13 @@ export function MapView({ listings }: Props) {
 
   function applyIso(next: IsoState | null) {
     setIso(next);
-    if (next) localStorage.setItem(LS_KEY, JSON.stringify(next));
-    else localStorage.removeItem(LS_KEY);
+    if (next) {
+      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      toast.success(`Zone appliquée : ${next.minutes} min ${next.mode === "foot" ? "à pied" : "en voiture"} de ${POI[next.poi].label}`);
+    } else {
+      localStorage.removeItem(LS_KEY);
+      toast("Zone de trajet effacée");
+    }
   }
 
   return (
