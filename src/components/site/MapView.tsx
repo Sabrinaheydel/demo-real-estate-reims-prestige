@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { Listing } from "@/lib/listings";
 import { LISTING_COORDS } from "@/lib/listings-extra";
 
