@@ -22,6 +22,7 @@ type Props = {
 };
 
 export function ListingCatalog({ initialType = "all", title, subtitle }: Props) {
+  const LISTINGS = useListings();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<TypeFilter>(initialType);
   const [sort, setSort] = useState<SortMode>("newest");
