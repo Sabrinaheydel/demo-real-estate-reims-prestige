@@ -427,7 +427,8 @@ function QuoteForm() {
         >
           {/* Bloc 1 — Votre bien */}
           <fieldset className="space-y-6">
-            <legend className="font-display text-xl text-navy mb-2">Votre bien</legend>
+            <div className="h-px bg-gold/60 mb-4" />
+            <span className="inline-block bg-navy text-white text-[13px] font-medium rounded-[20px] px-3 py-1">① Votre bien</span>
 
             <div>
               <label className="block text-sm font-medium text-navy mb-3">Type de bien</label>
