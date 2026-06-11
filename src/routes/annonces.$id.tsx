@@ -5,7 +5,7 @@ import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Lightbox } from "@/components/site/Lightbox";
 import { ListingCard } from "@/components/site/ListingCard";
-import { getListing, getSimilar } from "@/lib/listings";
+import { getListing, getSimilar, getListingReference, getDpe } from "@/lib/listings";
 import {
   ArrowLeft,
   MapPin,
@@ -14,6 +14,8 @@ import {
   Bed,
   Car,
   Check,
+  Package,
+  Building2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/annonces/$id")({
@@ -70,19 +72,89 @@ export const Route = createFileRoute("/annonces/$id")({
   component: ListingDetailPage,
 });
 
+const DPE_STYLES: Record<"A" | "B" | "C" | "D", string> = {
+  A: "bg-green-600 text-white",
+  B: "bg-lime-500 text-white",
+  C: "bg-yellow-400 text-navy",
+  D: "bg-orange-500 text-white",
+};
+
+type Intent = "visite" | "infos" | "offre" | "rappel";
+
+const INTENT_LABEL: Record<Intent, string> = {
+  visite: "Organiser une visite",
+  infos: "Obtenir plus d'informations",
+  offre: "Faire une offre",
+  rappel: "Être rappelé(e)",
+};
+
 function ListingDetailPage() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
   const [activePhoto, setActivePhoto] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sent, setSent] = useState(false);
-  const [intent, setIntent] = useState<"visite" | "infos" | "offre">("visite");
   const similar = getSimilar(listing);
+  const reference = getListingReference(listing.id);
+  const dpe = getDpe(listing.id);
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    intent: "visite" as Intent,
+    day: "",
+    slot: "",
+    message: "",
+    rgpd: false,
+  });
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
 
   const statusLabel: Record<string, string> = {
     vente: "À vendre",
     location: "À louer",
     exclusivite: "Exclusivité",
   };
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!emailValid || !form.rgpd) return;
+
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    const intentLabel = INTENT_LABEL[form.intent];
+    const subject = `🏠 Nouvelle demande — Réf. ${reference} — ${fullName} — ${intentLabel}`;
+    const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+
+    const lines = [
+      `Référence : ${reference}`,
+      `Bien : ${listing.title}`,
+      `Prix : ${listing.priceLabel}`,
+      "",
+      `Nom complet : ${fullName}`,
+      `Email : ${form.email}`,
+      `Téléphone : ${form.phone}`,
+      "",
+      `Type de demande : ${intentLabel}`,
+    ];
+    if (form.intent === "visite" && (form.day || form.slot)) {
+      lines.push(`Disponibilités : ${form.day || "—"} / ${form.slot || "—"}`);
+    }
+    if (form.message.trim()) {
+      lines.push("", "Message :", form.message.trim());
+    }
+    if (pageUrl) {
+      lines.push("", `Lien de l'annonce : ${pageUrl}`);
+    }
+    const body = lines.join("\n");
+
+    window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+    setSent(true);
+  }
+
+  const inputCls =
+    "w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-gold text-sm";
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,29 +185,31 @@ function ListingDetailPage() {
                 src={listing.photos[activePhoto]}
                 alt={listing.title}
                 className="w-full object-cover transition-transform group-hover:scale-[1.01]"
-                style={{ height: "400px" }}
+                style={{ height: "420px" }}
               />
             </button>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 mb-10 -mx-6 px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-5 lg:gap-4 snap-x">
-            {listing.photos.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setActivePhoto(i);
-                  setLightboxOpen(true);
-                }}
-                className={`shrink-0 w-[22vw] min-w-[110px] lg:w-auto rounded-lg overflow-hidden bg-cream aspect-[4/3] snap-start transition-all ${
-                  activePhoto === i
-                    ? "border-2 border-gold"
-                    : "border-2 border-transparent hover:border-gold/40 opacity-90"
-                }`}
-                aria-label={`Voir photo ${i + 1}`}
-              >
-                <img src={p} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
+          {listing.photos.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-2 mb-10 -mx-6 px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-3 lg:gap-4 snap-x">
+              {listing.photos.slice(0, 3).map((p, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setActivePhoto(i);
+                    setLightboxOpen(true);
+                  }}
+                  className={`shrink-0 w-[28vw] min-w-[120px] lg:w-auto rounded-lg overflow-hidden bg-cream aspect-[4/3] snap-start transition-all ${
+                    activePhoto === i
+                      ? "border-2 border-gold"
+                      : "border-2 border-transparent hover:border-gold/40 opacity-90"
+                  }`}
+                  aria-label={`Voir photo ${i + 1}`}
+                >
+                  <img src={p} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
 
           <Lightbox
             photos={listing.photos}
@@ -169,49 +243,33 @@ function ListingDetailPage() {
                 <MapPin size={16} className="text-gold" />
                 <span>{listing.neighborhood}, Reims</span>
               </div>
-              <div className="font-display text-4xl text-gold mb-8">{listing.priceLabel}</div>
+              <div className="font-display text-4xl sm:text-5xl text-navy mb-8">{listing.priceLabel}</div>
 
-              <div className="bg-white border border-border rounded-xl overflow-hidden mb-10">
-                <h2 className="font-display text-xl text-navy px-6 py-4 border-b border-border bg-cream/50">
-                  Caractéristiques
-                </h2>
-                <table className="w-full text-sm">
-                  <tbody>
-                    {[
-                      { label: "Surface", value: `${listing.surface} m²`, icon: Maximize },
-                      listing.rooms !== null && {
-                        label: "Pièces",
-                        value: `${listing.rooms}`,
-                        icon: HomeIcon,
-                      },
-                      listing.bedrooms !== null && {
-                        label: "Chambres",
-                        value: `${listing.bedrooms}`,
-                        icon: Bed,
-                      },
-                      {
-                        label: "Parking",
-                        value: listing.parking ? "Oui" : "Non",
-                        icon: Car,
-                      },
-                      { label: "Quartier", value: listing.neighborhood, icon: MapPin },
-                    ]
-                      .filter(Boolean)
-                      .map((row) => {
-                        const r = row as { label: string; value: string; icon: typeof Maximize };
-                        const Icon = r.icon;
-                        return (
-                          <tr key={r.label} className="border-b border-border last:border-0">
-                            <td className="px-6 py-3.5 text-foreground/60 w-1/2 flex items-center gap-2">
-                              <Icon size={14} className="text-gold" /> {r.label}
-                            </td>
-                            <td className="px-6 py-3.5 text-navy font-medium">{r.value}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
+                {[
+                  { icon: Maximize, label: "Surface", value: `${listing.surface} m²` },
+                  listing.rooms !== null && { icon: HomeIcon, label: "Pièces", value: `${listing.rooms}` },
+                  listing.bedrooms !== null && { icon: Bed, label: "Chambres", value: `${listing.bedrooms}` },
+                  { icon: Car, label: "Parking", value: listing.parking ? "Oui" : "Non" },
+                  { icon: Building2, label: "Étage", value: "—" },
+                  { icon: Package, label: "Cave", value: listing.features.some((f) => f.toLowerCase().includes("cave")) ? "Oui" : "—" },
+                ]
+                  .filter(Boolean)
+                  .map((row) => {
+                    const r = row as { icon: typeof Maximize; label: string; value: string };
+                    const Icon = r.icon;
+                    return (
+                      <div key={r.label} className="rounded-lg border border-border bg-white px-4 py-3">
+                        <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-foreground/60 mb-1">
+                          <Icon size={14} className="text-gold" /> {r.label}
+                        </div>
+                        <div className="text-navy font-semibold">{r.value}</div>
+                      </div>
+                    );
+                  })}
               </div>
+
+              <hr className="border-0 h-px bg-gold/40 mb-10" />
 
               <div className="mb-10">
                 <h2 className="font-display text-2xl text-navy mb-4">Description</h2>
@@ -233,108 +291,121 @@ function ListingDetailPage() {
                 </div>
               )}
 
-              <div className="mb-10">
-                <h2 className="font-display text-2xl text-navy mb-4">Localisation</h2>
-                <div className="rounded-xl overflow-hidden border border-border bg-cream aspect-[16/8] relative">
-                  <iframe
-                    title="Localisation du bien"
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(listing.neighborhood + ", Reims, France")}&output=embed`}
-                    className="w-full h-full"
-                    loading="lazy"
-                  />
-                </div>
-                <p className="text-xs text-foreground/60 mt-2">
-                  Adresse précise communiquée sur demande.
-                </p>
+              <div className="mb-8 flex items-center gap-4">
+                <span className="text-xs uppercase tracking-wider text-foreground/60">DPE</span>
+                <span className={`inline-flex items-center justify-center w-10 h-10 rounded-md font-display text-lg font-bold ${DPE_STYLES[dpe]}`}>
+                  {dpe}
+                </span>
               </div>
+
+              <p className="text-xs text-foreground/50">Réf. {reference}</p>
             </div>
 
             <aside className="lg:sticky lg:top-28 self-start">
               <div className="bg-navy text-white rounded-xl p-7 shadow-card">
-                <h3 className="font-display text-2xl text-white mb-2">
-                  Je suis intéressé(e) par ce bien
+                <h3 className="font-display text-2xl text-white mb-1">
+                  Vous êtes intéressé(e) ?
                 </h3>
-                <p className="text-white/70 text-sm mb-6">
-                  Réponse personnalisée sous 24h ouvrées.
+                <p className="text-gold text-xs font-semibold tracking-wider mb-6">
+                  Réf. {reference}
                 </p>
                 {sent ? (
                   <div className="bg-gold/15 border border-gold/40 rounded-lg p-5 text-center">
-                    <Check size={28} className="mx-auto text-gold mb-2" />
-                    <p className="text-white font-semibold mb-1">Demande envoyée</p>
-                    <p className="text-white/70 text-sm">Je reviens vers vous très vite.</p>
+                    <Check size={28} className="mx-auto text-gold mb-3" />
+                    <p className="text-white font-semibold mb-2">
+                      ✅ Votre demande a été envoyée !
+                    </p>
+                    <p className="text-white/80 text-sm">
+                      Julien Dupuis vous recontacte sous 24h pour la Réf. {reference}.
+                      Un email de confirmation vous a été envoyé.
+                    </p>
                   </div>
                 ) : (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      setSent(true);
-                    }}
-                    className="space-y-3"
-                  >
+                  <form onSubmit={handleSubmit} className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
-                      <input
-                        required
-                        placeholder="Prénom"
-                        maxLength={60}
-                        className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-gold text-sm"
-                      />
-                      <input
-                        required
-                        placeholder="Nom"
-                        maxLength={60}
-                        className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-gold text-sm"
-                      />
+                      <input required placeholder="Prénom" maxLength={60} value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} className={inputCls} />
+                      <input required placeholder="Nom" maxLength={60} value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} className={inputCls} />
                     </div>
-                    <input
-                      required
-                      type="email"
-                      placeholder="Email"
-                      maxLength={120}
-                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-gold text-sm"
-                    />
-                    <input
-                      required
-                      type="tel"
-                      placeholder="Téléphone"
-                      maxLength={20}
-                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-gold text-sm"
-                    />
+                    <div>
+                      <input
+                        required
+                        type="email"
+                        placeholder="Email"
+                        maxLength={120}
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        className={`${inputCls} ${form.email && !emailValid ? "border-red-400" : ""}`}
+                      />
+                      {form.email && !emailValid && (
+                        <p className="text-xs text-red-300 mt-1">Email invalide</p>
+                      )}
+                    </div>
+                    <input required type="tel" placeholder="Téléphone" maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} />
+
                     <div className="pt-1">
                       <p className="text-xs uppercase tracking-wider text-white/60 mb-2">Je souhaite</p>
                       <div className="space-y-2">
-                        {([
-                          ["visite", "Visiter le bien"],
-                          ["infos", "Obtenir plus d'infos"],
-                          ["offre", "Faire une offre"],
-                        ] as const).map(([val, label]) => (
+                        {(Object.keys(INTENT_LABEL) as Intent[]).map((val) => (
                           <label key={val} className="flex items-center gap-2.5 text-sm cursor-pointer">
                             <input
                               type="radio"
                               name="intent"
-                              checked={intent === val}
-                              onChange={() => setIntent(val)}
+                              checked={form.intent === val}
+                              onChange={() => setForm({ ...form, intent: val })}
                               className="accent-[var(--color-gold)]"
                             />
-                            <span className="text-white/90">{label}</span>
+                            <span className="text-white/90">{INTENT_LABEL[val]}</span>
                           </label>
                         ))}
                       </div>
                     </div>
+
+                    {form.intent === "visite" && (
+                      <div className="grid grid-cols-2 gap-3 pt-1">
+                        <select value={form.day} onChange={(e) => setForm({ ...form, day: e.target.value })} className={inputCls}>
+                          <option value="">Jour préféré</option>
+                          {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map((d) => (
+                            <option key={d} value={d} className="text-navy">{d}</option>
+                          ))}
+                        </select>
+                        <select value={form.slot} onChange={(e) => setForm({ ...form, slot: e.target.value })} className={inputCls}>
+                          <option value="">Créneau</option>
+                          {["9h-11h", "11h-13h", "14h-16h", "16h-18h"].map((s) => (
+                            <option key={s} value={s} className="text-navy">{s}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
                     <textarea
-                      placeholder="Votre message (optionnel)"
+                      placeholder="Questions particulières sur ce bien ?"
                       rows={3}
                       maxLength={1000}
-                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-gold text-sm resize-none"
+                      value={form.message}
+                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      className={`${inputCls} resize-none`}
                     />
+
+                    <label className="flex items-start gap-2 text-xs text-white/70 cursor-pointer pt-1">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={form.rgpd}
+                        onChange={(e) => setForm({ ...form, rgpd: e.target.checked })}
+                        className="mt-0.5 accent-[var(--color-gold)]"
+                      />
+                      <span>
+                        J'accepte que mes informations soient utilisées pour me recontacter au sujet de cette annonce (RGPD).
+                      </span>
+                    </label>
+
                     <button
                       type="submit"
-                      className="w-full px-5 py-3.5 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90 transition-colors"
+                      disabled={!form.rgpd || !emailValid}
+                      className="w-full px-5 py-3.5 rounded-lg bg-gold text-navy font-semibold text-sm hover:bg-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Envoyer ma demande
                     </button>
-                    <p className="text-[11px] text-white/50 text-center">
-                      En envoyant ce formulaire, vous acceptez d'être recontacté.
-                    </p>
                   </form>
                 )}
               </div>
@@ -343,8 +414,8 @@ function ListingDetailPage() {
 
           {similar.length > 0 && (
             <section className="mt-24">
-              <h2 className="font-display text-3xl text-navy mb-2">Vous aimerez aussi</h2>
-              <p className="text-foreground/70 mb-8">Des biens similaires à découvrir</p>
+              <h2 className="font-display text-3xl text-navy mb-2">Biens similaires</h2>
+              <p className="text-foreground/70 mb-8">Vous aimerez aussi</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 {similar.map((l) => (
                   <ListingCard key={l.id} listing={l} />
@@ -352,6 +423,15 @@ function ListingDetailPage() {
               </div>
             </section>
           )}
+
+          <div className="mt-16 text-center">
+            <Link
+              to="/annonces"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-navy text-navy font-semibold hover:bg-navy hover:text-white transition-colors"
+            >
+              <ArrowLeft size={16} /> Retour aux annonces
+            </Link>
+          </div>
         </section>
       </main>
       <Footer />
