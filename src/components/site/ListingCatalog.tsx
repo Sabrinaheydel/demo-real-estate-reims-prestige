@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import { Search, List, Map as MapIcon } from "lucide-react";
 import { LISTINGS, type Listing } from "@/lib/listings";
 import { ListingCard } from "@/components/site/ListingCard";
-import { MapView } from "@/components/site/MapView";
+
+const MapView = lazy(() => import("@/components/site/MapView").then((m) => ({ default: m.MapView })));
 
 type TypeFilter = "vente" | "location" | "all";
 type SortMode = "newest" | "price-asc" | "price-desc";
@@ -196,7 +197,9 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
 
       <section className="max-w-7xl mx-auto px-6 lg:px-10 mt-10 pb-24">
         {view === "map" ? (
-          <MapView listings={filtered} />
+          <Suspense fallback={<div className="w-full rounded-xl border border-border bg-cream" style={{ height: "70vh", minHeight: 520 }} />}>
+            <MapView listings={filtered} />
+          </Suspense>
         ) : shown.length === 0 ? (
           <div className="bg-cream rounded-xl p-12 text-center">
             <p className="text-navy font-display text-xl mb-2">Aucun bien ne correspond</p>

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ListingCatalog } from "@/components/site/ListingCatalog";
@@ -16,7 +17,26 @@ export const Route = createFileRoute("/louer")({
   component: RentPage,
 });
 
+function useHashScroll() {
+  useEffect(() => {
+    const scrollToHash = () => {
+      const hash = typeof window !== "undefined" ? window.location.hash : "";
+      if (hash === "#profil") {
+        const el = document.getElementById("profil");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          el.focus({ preventScroll: true });
+        }
+      }
+    };
+    scrollToHash();
+    window.addEventListener("hashchange", scrollToHash);
+    return () => window.removeEventListener("hashchange", scrollToHash);
+  }, []);
+}
+
 function RentPage() {
+  useHashScroll();
   return (
     <div className="min-h-screen bg-background">
       <Navbar solid />
