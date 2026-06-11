@@ -823,11 +823,15 @@ function SubmissionsList({
   openId,
   onClearOpen,
   onToggle,
+  testRow,
+  testFading,
 }: {
   submissions: FormSubmission[];
   openId: string | null;
   onClearOpen: () => void;
   onToggle: (id: string, traite: boolean) => void;
+  testRow?: FormSubmission | null;
+  testFading?: boolean;
 }) {
   const detail = openId ? submissions.find((s) => s.id === openId) : null;
   return (
@@ -846,6 +850,25 @@ function SubmissionsList({
             </tr>
           </thead>
           <tbody>
+            {testRow && (
+              <tr
+                key={testRow.id}
+                style={{ transition: "opacity 500ms ease-out", opacity: testFading ? 0 : 1 }}
+                className="border-t border-border bg-amber-50/60"
+              >
+                <td className="px-4 py-3 text-foreground/70 whitespace-nowrap">À l'instant</td>
+                <td className="px-4 py-3">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                    🧪 TEST
+                  </span>
+                </td>
+                <td className="px-4 py-3"><span className="inline-block px-2 py-0.5 rounded-full bg-cream text-navy text-xs font-medium">Estimation</span></td>
+                <td className="px-4 py-3 font-medium text-navy">Marie Dupont</td>
+                <td className="px-4 py-3 text-foreground/70">Clairmarais</td>
+                <td className="px-4 py-3 text-foreground/70">—</td>
+                <td className="px-4 py-3 text-xs italic text-foreground/50">Démo</td>
+              </tr>
+            )}
             {submissions.map((s) => {
               const sb = statusBadge(s);
               return (
@@ -876,8 +899,9 @@ function SubmissionsList({
             })}
           </tbody>
         </table>
-        {submissions.length === 0 && <p className="p-8 text-center text-foreground/60">Aucune soumission pour le moment.</p>}
+        {submissions.length === 0 && !testRow && <p className="p-8 text-center text-foreground/60">Aucune soumission pour le moment.</p>}
       </div>
+
 
       {detail && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-6" onClick={onClearOpen}>
