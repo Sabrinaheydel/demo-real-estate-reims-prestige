@@ -22,18 +22,12 @@ import portraitJulien from "@/assets/photo-profil-1.jpg.asset.json";
 export const Route = createFileRoute("/louer")({
   head: () => ({
     meta: [
-      { title: "Gestion locative à Reims · Confiez votre bien · Dupuis Immobilier" },
-      {
-        name: "description",
-        content:
-          "Propriétaires bailleurs à Reims : confiez la gestion locative de votre bien à Julien Dupuis. Sélection des locataires, loyers garantis, gestion complète.",
-      },
-      { property: "og:title", content: "Gestion locative à Reims · Dupuis Immobilier" },
-      {
-        property: "og:description",
-        content:
-          "Sélection des locataires, loyers garantis, zéro stress. Devis gratuit sous 24h.",
-      },
+      { title: "Gestion locative Reims · Dupuis Immobilier" },
+      { name: "description", content: "Confiez votre bien en gestion locative. Sélection locataires, loyers garantis, zéro stress." },
+      { property: "og:title", content: "Gestion locative Reims · Dupuis Immobilier" },
+      { property: "og:description", content: "Confiez votre bien en gestion locative. Sélection locataires, loyers garantis, zéro stress." },
+      { name: "twitter:title", content: "Gestion locative Reims · Dupuis Immobilier" },
+      { name: "twitter:description", content: "Confiez votre bien en gestion locative. Sélection locataires, loyers garantis, zéro stress." },
     ],
   }),
   component: LouerPage,
