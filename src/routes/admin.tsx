@@ -330,13 +330,40 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
         )}
         {tab === "messages" && (
-          <MessagesList
-            messages={messages}
-            onToggle={(id) =>
-              setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, handled: !m.handled } : m)))
-            }
+          <SubmissionsList
+            submissions={submissions}
+            openId={openSubmissionId}
+            onClearOpen={() => setOpenSubmissionId(null)}
+            onToggle={toggleSubmission}
           />
         )}
+
+        <div className="mt-12 pt-6 border-t border-border/40 flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              const fake: FormSubmission = {
+                id: `test-${Date.now()}`,
+                created_at: new Date().toISOString(),
+                form_type: "estimation-vendre",
+                prenom: "Marie",
+                nom: "Dupont",
+                email: "marie@example.com",
+                telephone: "06 12 34 56 78",
+                reference_annonce: null,
+                donnees_completes: { typeBien: "T3 Clairmarais · Simulation démo", quartier: "Clairmarais" },
+                statut: "nouveau",
+                traite: false,
+              };
+              showSubmissionNotification(fake);
+              playDing();
+            }}
+            className="text-xs text-foreground/50 hover:text-navy underline"
+          >
+            🧪 Tester la notification
+          </button>
+        </div>
+
       </div>
     </div>
   );
