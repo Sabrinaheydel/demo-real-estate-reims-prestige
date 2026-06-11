@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/site/SiteChrome";
+import maison5Asset from "@/assets/maison-5-pieces-clairmarais.png.asset.json";
 import { Clock } from "lucide-react";
 
 export const Route = createFileRoute("/dernieres-ventes")({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/dernieres-ventes")({
 
 const SOLD = [
   { title: "Appartement T3", area: "Centre-ville", days: 18, price: "215 000 €", img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&q=80" },
-  { title: "Maison 5 pièces", area: "Clairmarais", days: 31, price: "389 000 €", img: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=900&q=80" },
+  { title: "Maison 5 pièces", area: "Clairmarais", days: 31, price: "389 000 €", img: maison5Asset.url },
   { title: "Studio", area: "Hypercentre", days: 8, price: "87 000 €", img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80" },
   { title: "T4 familial", area: "Laon", days: 24, price: "267 000 €", img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&q=80" },
   { title: "Villa avec jardin", area: "Bétheny", days: 42, price: "445 000 €", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=80" },
