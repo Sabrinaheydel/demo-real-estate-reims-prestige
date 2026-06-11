@@ -46,6 +46,7 @@ export const Route = createFileRoute("/")({
 
 import heroAsset from "@/assets/hero-julien-reims.jpg.asset.json";
 import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
+import haussmannienSalon from "@/assets/appartement-haussmannien-salon.png.asset.json";
 const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
@@ -67,7 +68,7 @@ const HOME_LISTINGS = [
     beds: 3,
     baths: 2,
     surface: 98,
-    img: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=900",
+    img: haussmannienSalon.url,
   },
   {
     id: "2",
