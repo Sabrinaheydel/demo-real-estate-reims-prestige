@@ -21,7 +21,7 @@ export async function createOrUpdateBrevoContact(input: {
   attributes: BrevoAttributes;
   listIds: number[];
 }): Promise<void> {
-  const endpoint = `${GATEWAY_URL}/v3/contacts`;
+  const endpoint = `${BREVO_API_URL}/v3/contacts`;
   console.log("[brevo:diag] POST contacts", {
     endpoint,
     listIds: input.listIds,
@@ -62,7 +62,7 @@ export async function sendBrevoTemplateEmail(input: {
   if (input.sender) body.sender = input.sender;
   if (input.replyTo) body.replyTo = input.replyTo;
 
-  const endpoint = `${GATEWAY_URL}/v3/smtp/email`;
+  const endpoint = `${BREVO_API_URL}/v3/smtp/email`;
   console.log("[brevo:diag] POST smtp/email", {
     endpoint,
     templateId: input.templateId,
