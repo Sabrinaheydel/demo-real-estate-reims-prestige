@@ -186,7 +186,9 @@ function FurnishedExpander() {
 }
 
 function ListingDetailPage() {
-  const { listing } = Route.useLoaderData() as { listing: Listing };
+  const { listing: loaderListing } = Route.useLoaderData() as { listing: Listing };
+  const stored = useListing(loaderListing.id);
+  const listing = stored ?? loaderListing;
   const [activePhoto, setActivePhoto] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sent, setSent] = useState(false);
