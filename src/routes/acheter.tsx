@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { PageShell } from "@/components/site/SiteChrome";
 import { ProfileForm } from "@/components/site/ProfileForm";
 import { TextField, RadioGroup, CheckboxGroup } from "./vendre";
 import { Check, Search } from "lucide-react";
+import { submitBrevoForm } from "@/lib/brevo.functions";
 
 export const Route = createFileRoute("/acheter")({
   head: () => ({
@@ -20,16 +22,19 @@ export const Route = createFileRoute("/acheter")({
 });
 
 function BuyForm() {
+  const submit = useServerFn(submitBrevoForm);
   const [budget, setBudget] = useState(300000);
   const [surface, setSurface] = useState(50);
   const [rooms, setRooms] = useState(3);
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (sent) {
     return (
       <div className="bg-cream rounded-xl p-10 text-center">
         <Check size={36} className="mx-auto text-gold mb-3" />
-        <h3 className="font-display text-2xl text-navy mb-2">Recherche enregistrée</h3>
+        <h3 className="font-display text-2xl text-navy mb-2">Votre demande a bien été envoyée.</h3>
         <p className="text-foreground/70">Vous recevrez les biens correspondants en avant-première.</p>
       </div>
     );
@@ -37,9 +42,50 @@ function BuyForm() {
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        setSent(true);
+        if (loading) return;
+        const data = new FormData(e.currentTarget);
+        const get = (k: string) => String(data.get(k) ?? "").trim();
+        const getAll = (k: string) => data.getAll(k).map((v) => String(v).trim()).filter(Boolean);
+        const firstName = get("firstname");
+        const lastName = get("lastname");
+        const email = get("email");
+        const phone = get("phone");
+        const type = get("type");
+        const quartiers = getAll("quartiers");
+        const criteres = getAll("criteres");
+        const alerte = Boolean(data.get("alerte"));
+        const messageParts = [
+          `Pièces min : ${rooms}`,
+          criteres.length ? `Critères : ${criteres.join(", ")}` : null,
+        ].filter(Boolean) as string[];
+
+        setLoading(true);
+        setError(null);
+        try {
+          await submit({
+            data: {
+              formType: "recherche-achat",
+              prenom: firstName,
+              nom: lastName,
+              email,
+              telephone: phone,
+              typeBien: type || undefined,
+              budget: `${budget} €`,
+              surface: `${surface} m² min`,
+              quartier: quartiers.join(", ") || undefined,
+              message: messageParts.join(" · "),
+              alerteBien: alerte,
+            },
+          });
+          setSent(true);
+        } catch (err) {
+          console.error("[recherche-achat] submit failed", err);
+          setError("Une erreur est survenue. Merci de réessayer ou de nous contacter directement.");
+        } finally {
+          setLoading(false);
+        }
       }}
       className="bg-white rounded-xl shadow-soft border border-border p-6 lg:p-10 space-y-6"
     >
@@ -105,17 +151,28 @@ function BuyForm() {
         options={["Parking", "Jardin", "Balcon", "Cave", "Proche écoles", "Investissement locatif"]}
       />
 
+      <TextField name="firstname" label="Prénom" required />
       <div className="grid sm:grid-cols-3 gap-4">
-        <TextField name="firstname" label="Prénom" required />
+        <TextField name="lastname" label="Nom" />
         <TextField name="email" type="email" label="Email" required />
         <TextField name="phone" type="tel" label="Téléphone" required />
       </div>
 
+      <label className="flex items-start gap-3 text-sm text-foreground/80 cursor-pointer">
+        <input type="checkbox" name="alerte" className="mt-1 accent-[var(--color-gold)]" />
+        <span>Recevoir une alerte dès qu'un bien correspondant à mes critères est mis en ligne.</span>
+      </label>
+
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
+      )}
+
       <button
         type="submit"
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-colors shadow-card"
+        disabled={loading}
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-colors shadow-card disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        <Search size={18} /> Trouver mon bien
+        <Search size={18} /> {loading ? "Envoi en cours…" : "Trouver mon bien"}
       </button>
     </form>
   );
