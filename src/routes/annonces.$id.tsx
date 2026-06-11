@@ -10,6 +10,12 @@ import { FURNISHED_ITEMS } from "@/lib/listings-extra";
 import { computeCompat, REVENU_OPTIONS } from "@/lib/profile";
 import { useProfile } from "@/hooks/useProfile";
 import {
+  openAgentMailto,
+  rentalScoreEmoji,
+  saleIntentEmoji,
+  type SaleIntent as MailSaleIntent,
+} from "@/lib/email-helpers";
+import {
   ArrowLeft,
   MapPin,
   Maximize,
@@ -235,12 +241,21 @@ function ListingDetailPage() {
 
     const fullName = `${form.firstName} ${form.lastName}`.trim();
     const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+    const quick = {
+      firstName: form.firstName,
+      prospectEmail: form.email,
+      prospectPhone: form.phone,
+      reference,
+      listingTitle: listing.title,
+      listingId: listing.id,
+    };
 
     if (listing.isRental) {
       const ratio = form.revenusValue ? (listing.price / form.revenusValue) * 100 : 0;
       const tauxStr = ratio ? `${ratio.toFixed(1).replace(".", ",")}%` : "—";
+      const score = ratio ? rentalScoreEmoji(ratio) : { emoji: "⚪", label: "INCOMPLET" };
       const conform = ratio && ratio <= 33 ? "✅ Conforme" : ratio && ratio <= 40 ? "⚠️ Limite" : "❌ À renforcer";
-      const subject = `🔑 Pré-dossier complet — Réf. ${reference} — ${fullName} — Revenus : ${form.revenusValue}€ — Taux effort : ${tauxStr}`;
+      const subject = `${score.emoji} 🔑 Pré-dossier — Réf. ${reference} — ${fullName} — Taux : ${tauxStr} — ${score.label}`;
       const lines = [
         "═══════════════════════════",
         `CANDIDATURE — Réf. ${reference}`,
@@ -258,7 +273,7 @@ function ListingDetailPage() {
         "📊 ANALYSE FINANCIÈRE",
         `Loyer demandé : ${listing.price}€/mois`,
         `Taux d'effort : ${tauxStr} des revenus`,
-        `Statut : ${conform}`,
+        `Statut : ${conform} ${score.emoji} ${score.label}`,
         "",
         "🛡️ GARANTIES",
         `Garant : ${form.garantType ? `Oui · ${form.garantType}` : "Non précisé"}`,
@@ -274,21 +289,19 @@ function ListingDetailPage() {
         form.message.trim() || "—",
         "",
         ...(pageUrl ? [`Lien de l'annonce : ${pageUrl}`, ""] : []),
-        "═══════════════════════════",
-        "Dossier généré automatiquement",
-        "par Dupuis Immobilier · Système digital",
-        "═══════════════════════════",
       ];
-      const body = lines.join("\n");
-      window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(
-        subject
-      )}&body=${encodeURIComponent(body)}`;
+      openAgentMailto(subject, lines, quick);
       setSent(true);
       return;
     }
 
     const intentLabel = SALE_INTENT_LABEL[form.intent];
-    const subject = `🏠 Nouvelle demande — Réf. ${reference} — ${fullName} — ${intentLabel}`;
+    const emoji = saleIntentEmoji(form.intent as MailSaleIntent);
+    const shortAction =
+      form.intent === "offre" ? "Offre" :
+      form.intent === "visite" ? "Visite demandée" :
+      form.intent === "infos" ? "Infos" : "Rappel demandé";
+    const subject = `${emoji} 🏠 ${shortAction} — Réf. ${reference} — ${fullName} — ${listing.title}`;
     const lines = [
       `Référence : ${reference}`,
       `Bien : ${listing.title}`,
@@ -309,10 +322,7 @@ function ListingDetailPage() {
     if (pageUrl) {
       lines.push("", `Lien de l'annonce : ${pageUrl}`);
     }
-    const body = lines.join("\n");
-    window.location.href = `mailto:contact@dupuis-immobilier.fr?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
+    openAgentMailto(subject, lines, quick);
     setSent(true);
   }
 

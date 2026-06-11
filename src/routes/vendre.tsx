@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
 import { Check, Target, Camera, Megaphone, ClipboardCheck, Users, Handshake, Phone } from "lucide-react";
+import { openAgentMailto } from "@/lib/email-helpers";
 import portraitOutdoor from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/vendre")({
@@ -45,6 +46,37 @@ export function EstimationForm() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        const get = (k: string) => String(data.get(k) ?? "").trim();
+        const firstName = get("firstname");
+        const email = get("email");
+        const phone = get("phone");
+        const type = get("type");
+        const surface = get("surface");
+        const rooms = get("rooms");
+        const state = get("state");
+        const address = get("address");
+        const callback = get("callback");
+        const subject = `💰 Estimation — ${type || "Bien"} ${surface || ""} — ${address || "Reims"} — ${firstName}`.trim();
+        const lines = [
+          "Demande d'estimation gratuite",
+          "",
+          `Prénom : ${firstName}`,
+          `Email : ${email}`,
+          `Téléphone : ${phone}`,
+          "",
+          `Type de bien : ${type || "—"}`,
+          `Surface : ${surface || "—"}`,
+          `Pièces : ${rooms || "—"}`,
+          `État : ${state || "—"}`,
+          `Adresse / quartier : ${address || "—"}`,
+          `Rappel : ${callback || "—"}`,
+        ];
+        openAgentMailto(subject, lines, {
+          firstName,
+          prospectEmail: email,
+          prospectPhone: phone,
+        });
         setSent(true);
       }}
       className="bg-white rounded-xl shadow-soft border border-border p-6 lg:p-10 space-y-6"
