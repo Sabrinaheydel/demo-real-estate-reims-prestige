@@ -118,7 +118,6 @@ export const LISTINGS: Listing[] = [
       "Studio entièrement rénové, idéal pour un premier achat ou un investissement patrimonial. Coin nuit séparé, cuisine équipée, salle d'eau moderne et très belle luminosité. Immeuble sécurisé avec digicode. Situation recherchée à proximité du CHU et des transports.",
     photos: [annonce3NewAsset.url, annonce3NewAsset.url, annonce3NewAsset.url],
   },
-...
   {
     id: "6",
     reference: "DI-2024-006",
@@ -141,7 +140,6 @@ export const LISTINGS: Listing[] = [
       "Bel appartement familial refait à neuf dans un immeuble récent. Double séjour lumineux, cuisine ouverte équipée, 2 belles chambres, salle de bain et WC séparés. Balcon orienté sud, parking privatif. Proche commerces, écoles et transports.",
     photos: [annonce6NewAsset.url, annonce6NewAsset.url, annonce6NewAsset.url],
   },
-...
   {
     id: "9",
     reference: "DI-2024-009",
