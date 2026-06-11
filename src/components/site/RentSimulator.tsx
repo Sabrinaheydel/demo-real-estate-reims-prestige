@@ -409,6 +409,13 @@ export function RentSimulator() {
                     <Phone size={16} /> Appeler Julien
                   </a>
                 </div>
+                <button
+                  type="button"
+                  onClick={exportPDF}
+                  className="mt-3 w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white font-medium hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2"
+                >
+                  <Download size={16} /> Télécharger la simulation en PDF
+                </button>
                 <p className="text-xs text-white/70 mt-3 text-center">
                   ⚡ Réponse sous 24h · Estimation gratuite et sans engagement
                 </p>
