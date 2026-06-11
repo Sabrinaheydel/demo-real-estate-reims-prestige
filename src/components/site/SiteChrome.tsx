@@ -211,12 +211,12 @@ export function Footer() {
         <div>
           Site réalisé par{" "}
           <a
-            href="https://www.agence360digital.fr/"
+            href="https://www.agence360digital.fr"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gold hover:underline"
           >
-            Sabrina Heydel Agence 360 Digital
+            Sabrina Heydel — Agence 360 Digital
           </a>
         </div>
       </div>
