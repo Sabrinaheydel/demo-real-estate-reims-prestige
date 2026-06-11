@@ -6,6 +6,7 @@ import { ProfileForm } from "@/components/site/ProfileForm";
 import { TextField, RadioGroup, CheckboxGroup } from "./vendre";
 import { Check, Search } from "lucide-react";
 import { submitBrevoForm } from "@/lib/brevo.functions";
+import { LoanSimulator } from "@/components/site/LoanSimulator";
 
 export const Route = createFileRoute("/acheter")({
   head: () => ({
@@ -199,7 +200,13 @@ function BuyPage() {
         </div>
       </section>
 
-      <section className="pb-12 px-6">
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <LoanSimulator />
+        </div>
+      </section>
+
+      <section id="recherche" className="pb-12 px-6">
         <div className="max-w-3xl mx-auto space-y-8">
           <ProfileForm defaultType="achat" />
           <BuyForm />
