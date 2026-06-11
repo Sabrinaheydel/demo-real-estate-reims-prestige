@@ -12,7 +12,7 @@ import loc1Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_05_3.png.asset.
 import loc2Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_06_6.png.asset.json";
 import loc3Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_05_4.png.asset.json";
 import loc4Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_04_1.png.asset.json";
-import loc5Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_04_1.png.asset.json";
+import loc5Asset from "@/assets/loc-t2-meuble-centre-historique.png.asset.json";
 import loc6Asset from "@/assets/ChatGPT_Image_11_juin_2026_10_01_04_2.png.asset.json";
 
 export type ListingStatus = "vente" | "location" | "exclusivite";
