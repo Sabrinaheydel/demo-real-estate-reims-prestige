@@ -140,8 +140,9 @@ function BuyPage() {
         </div>
       </section>
 
-      <section className="pb-24 px-6">
-        <div className="max-w-3xl mx-auto">
+      <section className="pb-12 px-6">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <ProfileForm defaultType="achat" />
           <BuyForm />
         </div>
       </section>
