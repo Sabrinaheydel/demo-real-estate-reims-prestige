@@ -1004,35 +1004,138 @@ function NotificationBanner() {
   );
 }
 
-function NotificationStatus() {
-  const [enabled, setEnabled] = useState(false);
-  useEffect(() => {
-    const tick = () => setEnabled(notifIsEnabled());
-    tick();
-    const i = setInterval(tick, 2000);
-    return () => clearInterval(i);
+type NotifState = "off" | "on" | "muted";
+
+function NotificationStatus({ onTest }: { onTest: () => void }) {
+  const [state, setState] = useState<NotifState>("off");
+  const [open, setOpen] = useState(false);
+  const [sound, setSound] = useState(true);
+  const [night, setNight] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const refresh = useCallback(() => {
+    if (!notifIsSupported()) return;
+    const perm = Notification.permission;
+    const enabled = localStorage.getItem(PREF_KEYS.enabled) === "true";
+    setSound(isSoundEnabled());
+    setNight(localStorage.getItem(PREF_KEYS.night) === "true");
+    if (perm !== "granted") setState("off");
+    else if (!enabled) setState("muted");
+    else setState("on");
   }, []);
+
+  useEffect(() => {
+    refresh();
+    const i = setInterval(refresh, 2000);
+    return () => clearInterval(i);
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
   if (!notifIsSupported()) return null;
+
+  const handleClick = async () => {
+    if (state === "off") {
+      const res = await requestPermissionAndEnable();
+      if (res === "granted") toast.success("Notifications activées");
+      else toast.error("Permission refusée");
+      refresh();
+    } else if (state === "muted") {
+      setNotifEnabled(true);
+      refresh();
+      toast.success("Notifications réactivées");
+    } else {
+      setOpen((o) => !o);
+    }
+  };
+
+  const icon = state === "on"
+    ? <Bell size={16} className="text-gold" />
+    : state === "muted"
+    ? <BellOff size={16} className="text-white/60" />
+    : <Bell size={16} className="text-white/60" />;
+  const title = state === "on"
+    ? "Notifications activées — gérer"
+    : state === "muted"
+    ? "Notifications désactivées — cliquer pour réactiver"
+    : "Activer les notifications";
+
   return (
-    <button
-      type="button"
-      title={enabled ? "Notifications activées" : "Cliquer pour activer les notifications"}
-      onClick={async () => {
-        if (enabled) return;
-        const res = await Notification.requestPermission();
-        if (res === "granted") {
-          localStorage.setItem("notifications_enabled", "true");
-          localStorage.removeItem("notifications_declined");
-          setEnabled(true);
-        }
-      }}
-      className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-white/80"
-    >
-      {enabled ? <Bell size={16} className="text-gold" /> : <BellOff size={16} />}
-    </button>
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        title={title}
+        onClick={handleClick}
+        className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10"
+      >
+        {icon}
+      </button>
+      {open && state === "on" && (
+        <div
+          className="absolute right-0 mt-2 z-50 bg-white text-foreground shadow-xl border border-border"
+          style={{ width: 240, borderRadius: 8 }}
+        >
+          <div className="p-3 border-b border-border">
+            <div className="text-xs uppercase tracking-wider text-foreground/50 font-semibold">Notifications</div>
+          </div>
+          <div className="p-3 space-y-3 text-sm">
+            <label className="flex items-center justify-between gap-3 cursor-pointer">
+              <span className="flex items-center gap-2">🔊 Son {sound ? "activé" : "coupé"}</span>
+              <input
+                type="checkbox"
+                checked={sound}
+                onChange={(e) => { setSoundEnabled(e.target.checked); setSound(e.target.checked); }}
+                className="accent-navy"
+              />
+            </label>
+            <div>
+              <label className="flex items-center justify-between gap-3 cursor-pointer">
+                <span className="flex items-center gap-2">🌙 Mode nuit (20h–8h)</span>
+                <input
+                  type="checkbox"
+                  checked={night}
+                  onChange={(e) => { setNightMode(e.target.checked); setNight(e.target.checked); }}
+                  className="accent-navy"
+                />
+              </label>
+              {night && (
+                <p className="mt-1 text-[11px] text-foreground/50">
+                  Notifications suspendues entre 20h et 8h
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => { setNotifEnabled(false); setOpen(false); refresh(); toast.info("Notifications désactivées"); }}
+              className="w-full text-left flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 px-2 py-1.5 rounded"
+            >
+              🔕 Désactiver les notifications
+            </button>
+            <button
+              type="button"
+              onClick={() => { setOpen(false); onTest(); }}
+              className="w-full text-left flex items-center gap-2 text-sm text-navy hover:bg-cream px-2 py-1.5 rounded"
+            >
+              <TestTube2 size={14} /> Envoyer une notification test
+            </button>
+          </div>
+          <div className="border-t border-border p-3">
+            <p className="text-[11px] italic text-foreground/50">
+              Les notifications s'affichent même si cet onglet est en arrière-plan.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-void formatNotification;
 
 
