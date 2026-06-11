@@ -241,6 +241,13 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </TabButton>
         </nav>
 
+        {saveError && (
+          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+            ❌ {saveError}
+          </div>
+        )}
+
+
         {tab === "annonces" && !editing && (
           <ListingsList
             listings={listings}
