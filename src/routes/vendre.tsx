@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageShell } from "@/components/site/SiteChrome";
 import { Check, Target, Camera, Megaphone, ClipboardCheck, Users, Handshake, Phone } from "lucide-react";
+import { openAgentMailto } from "@/lib/email-helpers";
 import portraitOutdoor from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/vendre")({
