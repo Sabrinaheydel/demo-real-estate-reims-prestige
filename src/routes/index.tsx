@@ -105,7 +105,7 @@ const SERVICES = [
   {
     icon: Key,
     title: "Louer mon bien",
-    desc: "Gestion locative complète et sérénisée. Sélection des locataires, état des lieux, suivi.",
+    desc: "Confiez votre bien à un professionnel. Sélection des locataires, gestion complète, loyers sécurisés.",
     href: "/louer",
   },
   {
