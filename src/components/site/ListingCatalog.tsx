@@ -63,7 +63,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
     if (sort === "price-asc") res = [...res].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") res = [...res].sort((a, b) => b.price - a.price);
     return res;
-  }, [availability, furnishedFilter, query, rentalBudget, sort, type]);
+  }, [LISTINGS, availability, furnishedFilter, query, rentalBudget, sort, type]);
 
   const shown = filtered.slice(0, visible);
   const saleCount = LISTINGS.filter((l) => !l.isRental).length;
