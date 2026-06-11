@@ -219,7 +219,16 @@ export function getListing(id: string): Listing | undefined {
 }
 
 export function getListingReference(id: string): string {
-  return `REF-${id.padStart(3, "0")}`;
+  return `DI-2024-${id.padStart(3, "0")}`;
+}
+
+const DPE_BY_ID: Record<string, "A" | "B" | "C" | "D"> = {
+  "1": "C", "2": "C", "3": "B", "4": "D", "5": "A",
+  "6": "B", "7": "D", "8": "C", "9": "C", "10": "B",
+};
+
+export function getDpe(id: string): "A" | "B" | "C" | "D" {
+  return DPE_BY_ID[id] ?? "C";
 }
 
 export function getSimilar(listing: Listing, count = 3): Listing[] {
