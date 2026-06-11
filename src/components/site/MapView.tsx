@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import type { Listing } from "@/lib/listings";
 import { LISTING_COORDS } from "@/lib/listings-extra";
 
 type Props = {
   listings: Listing[];
-  onSelect?: (id: string) => void;
 };
 
 function priceForPin(l: Listing): string {
@@ -19,17 +16,6 @@ function pinColor(l: Listing): string {
   if (l.status.includes("exclusivite")) return "#C9A96E";
   if (l.isRental) return "#16A34A";
   return "#1B2D4F";
-}
-
-function makePinIcon(l: Listing): L.DivIcon {
-  const color = pinColor(l);
-  const label = priceForPin(l);
-  return L.divIcon({
-    className: "di-pin",
-    html: `<div style="background:${color};color:#fff;border-radius:9999px;padding:6px 10px;font-weight:700;font-size:11px;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;border:2px solid #fff;">${label}</div>`,
-    iconSize: [60, 28],
-    iconAnchor: [30, 14],
-  });
 }
 
 function popupHtml(l: Listing): string {
@@ -49,42 +35,64 @@ function popupHtml(l: Listing): string {
 
 export function MapView({ listings }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const layerRef = useRef<L.LayerGroup | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const layerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const LRef = useRef<any>(null);
 
-  // Init map once
-  useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
-    const map = L.map(containerRef.current, {
-      center: [49.2583, 4.0317],
-      zoom: 13,
-      scrollWheelZoom: true,
-    });
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap",
-      maxZoom: 19,
-    }).addTo(map);
-    layerRef.current = L.layerGroup().addTo(map);
-    mapRef.current = map;
-    // ensure correct sizing after mount
-    setTimeout(() => map.invalidateSize(), 50);
-  }, []);
-
-  // signature for re-rendering pins when list changes
   const signature = useMemo(() => listings.map((l) => l.id).join(","), [listings]);
 
   useEffect(() => {
-    if (!mapRef.current || !layerRef.current) return;
-    layerRef.current.clearLayers();
-    listings.forEach((l) => {
-      const coords = LISTING_COORDS[l.id];
-      if (!coords) return;
-      const m = L.marker([coords.lat, coords.lng], { icon: makePinIcon(l) });
-      m.bindPopup(popupHtml(l), { maxWidth: 280 });
-      layerRef.current!.addLayer(m);
-    });
-    // refresh size in case container was hidden when init ran
-    mapRef.current.invalidateSize();
+    let cancelled = false;
+    async function init() {
+      if (typeof window === "undefined" || !containerRef.current) return;
+      const leaflet = await import("leaflet");
+      await import("leaflet/dist/leaflet.css");
+      if (cancelled || !containerRef.current) return;
+      const L = leaflet.default ?? leaflet;
+      LRef.current = L;
+      if (!mapRef.current) {
+        mapRef.current = L.map(containerRef.current, {
+          center: [49.2583, 4.0317],
+          zoom: 13,
+          scrollWheelZoom: true,
+        });
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap",
+          maxZoom: 19,
+        }).addTo(mapRef.current);
+        layerRef.current = L.layerGroup().addTo(mapRef.current);
+        setTimeout(() => mapRef.current?.invalidateSize(), 50);
+      }
+      renderPins();
+    }
+    function renderPins() {
+      const L = LRef.current;
+      if (!L || !layerRef.current) return;
+      layerRef.current.clearLayers();
+      listings.forEach((l) => {
+        const coords = LISTING_COORDS[l.id];
+        if (!coords) return;
+        const color = pinColor(l);
+        const label = priceForPin(l);
+        const icon = L.divIcon({
+          className: "di-pin",
+          html: `<div style="background:${color};color:#fff;border-radius:9999px;padding:6px 10px;font-weight:700;font-size:11px;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;border:2px solid #fff;">${label}</div>`,
+          iconSize: [60, 28],
+          iconAnchor: [30, 14],
+        });
+        const m = L.marker([coords.lat, coords.lng], { icon });
+        m.bindPopup(popupHtml(l), { maxWidth: 280 });
+        layerRef.current.addLayer(m);
+      });
+      mapRef.current?.invalidateSize();
+    }
+    init();
+    return () => {
+      cancelled = true;
+    };
   }, [signature, listings]);
 
   useEffect(() => {
