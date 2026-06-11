@@ -131,9 +131,6 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
           >
             Se connecter
           </button>
-          <p className="text-xs text-center text-foreground/50 pt-2 border-t border-border">
-            Démo : <span className="font-mono">admin@dupuis.fr</span> / <span className="font-mono">demo2026</span>
-          </p>
         </form>
       </div>
     </div>
