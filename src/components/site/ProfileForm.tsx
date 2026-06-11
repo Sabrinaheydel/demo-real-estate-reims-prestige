@@ -38,7 +38,7 @@ export function ProfileForm({ defaultType = "location" }: Props) {
   }
 
   return (
-    <div id="profil" className="bg-white rounded-xl border border-border shadow-soft p-6 lg:p-8 scroll-mt-28">
+    <div id="profil" tabIndex={-1} className="bg-white rounded-xl border border-border shadow-soft p-6 lg:p-8 scroll-mt-28 outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-xl">
       <div className="flex items-start gap-3 mb-5">
         <div className="w-10 h-10 rounded-full bg-rental-soft text-rental flex items-center justify-center">
           <User size={20} />
