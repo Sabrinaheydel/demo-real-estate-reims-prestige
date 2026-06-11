@@ -47,6 +47,7 @@ export const Route = createFileRoute("/")({
 import heroAsset from "@/assets/hero-julien-reims.jpg.asset.json";
 import portraitDesk from "@/assets/photo-profil-2.jpg.asset.json";
 import haussmannienSalon from "@/assets/appartement-haussmannien-salon.png.asset.json";
+import maisonCaractere from "@/assets/maison-caractere-jardin.png.asset.json";
 const HERO_IMG = heroAsset.url;
 
 const NAV_LINKS = [
@@ -78,7 +79,7 @@ const HOME_LISTINGS = [
     beds: 4,
     baths: 2,
     surface: 165,
-    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900",
+    img: maisonCaractere.url,
   },
   {
     id: "5",
