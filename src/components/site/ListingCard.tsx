@@ -11,7 +11,7 @@ function StatusBadges({ listing }: { listing: Listing }) {
     ? [
         {
           label: listing.furnished ? "🛋️ À louer · Meublé" : "À louer",
-          className: "bg-[var(--color-rental)] text-white",
+          className: "bg-rental text-white",
         },
       ]
     : listing.status.map((status) => ({
@@ -26,7 +26,7 @@ function StatusBadges({ listing }: { listing: Listing }) {
             ? "bg-gold text-navy"
             : status === "vente"
               ? "bg-navy text-white"
-              : "bg-[var(--color-rental)] text-white",
+              : "bg-rental text-white",
       }));
 
   return (
