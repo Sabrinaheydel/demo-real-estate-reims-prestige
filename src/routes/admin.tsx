@@ -41,6 +41,11 @@ import {
   Bell,
   BellOff,
   TestTube2,
+  LayoutDashboard,
+  Mail,
+  MailWarning,
+  MailCheck,
+  RefreshCw,
 } from "lucide-react";
 
 import portraitAvatar from "@/assets/photo-profil-1.jpg.asset.json";
