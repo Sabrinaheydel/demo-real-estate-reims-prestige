@@ -83,7 +83,141 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
       </section>
 
       <div className="sticky top-16 sm:top-20 z-30 bg-white border-y border-border shadow-[0_4px_18px_-12px_rgba(27,45,79,0.18)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-3 sm:py-4">
+        {/* ============= MOBILE COMPACT (< md) ============= */}
+        <div className="md:hidden max-w-7xl mx-auto px-4 py-2">
+          {/* Row 1: search + type, h=44px, gap=8 */}
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+            <div className="relative">
+              <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-foreground/50" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ville, quartier, réf..."
+                className="w-full h-11 pl-8 pr-2 py-2 rounded-lg border border-border bg-white text-navy text-sm focus:outline-none focus:border-gold"
+              />
+            </div>
+            <select
+              className="h-11 px-2 py-2 rounded-lg border border-border bg-white text-navy text-sm font-medium focus:outline-none focus:border-gold"
+              value={type}
+              onChange={(e) => {
+                setType(e.target.value as TypeFilter);
+                setVisible(LISTINGS.length);
+              }}
+            >
+              <option value="vente">Vente ({saleCount})</option>
+              <option value="location">Location ({rentalCount})</option>
+              <option value="all">Toutes ({LISTINGS.length})</option>
+            </select>
+          </div>
+
+          {/* Row 2: sort icon + count + view toggle */}
+          <div className="mt-2 flex items-center gap-2">
+            <div className="relative">
+              <ArrowUpDown size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-navy pointer-events-none" />
+              <select
+                aria-label="Trier"
+                className="h-9 pl-7 pr-2 rounded-lg border border-border bg-white text-navy text-sm font-medium focus:outline-none focus:border-gold appearance-none w-[44px]"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortMode)}
+              >
+                <option value="newest">Plus récents</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix décroissant</option>
+              </select>
+            </div>
+            <div className="flex-1 h-9 px-3 rounded-lg bg-cream text-xs text-navy flex items-center justify-center font-medium">
+              {filtered.length} bien{filtered.length > 1 ? "s" : ""}
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen((v) => !v)}
+              className="h-9 px-2.5 rounded-lg border border-border bg-white text-navy text-xs font-medium flex items-center gap-1"
+              aria-expanded={mobileFiltersOpen}
+            >
+              <SlidersHorizontal size={14} /> Filtres
+              <ChevronDown size={12} className={`transition-transform ${mobileFiltersOpen ? "rotate-180" : ""}`} />
+            </button>
+            <div className="inline-flex h-9 rounded-lg border border-border overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                aria-pressed={view === "list"}
+                className={`px-2 ${view === "list" ? "bg-navy text-white" : "bg-white text-navy"}`}
+                aria-label="Vue liste"
+              >
+                <List size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("map")}
+                aria-pressed={view === "map"}
+                className={`px-2 ${view === "map" ? "bg-navy text-white" : "bg-white text-navy"}`}
+                aria-label="Vue carte"
+              >
+                <MapIcon size={14} />
+              </button>
+            </div>
+          </div>
+
+          {/* Accordion: Filtres */}
+          {mobileFiltersOpen && (
+            <div className="mt-2 p-3 rounded-lg border border-border bg-cream/50 space-y-2">
+              <label className="flex items-center gap-2 text-sm text-navy">
+                <input
+                  type="checkbox"
+                  checked={furnishedFilter === "yes"}
+                  onChange={(e) => setFurnishedFilter(e.target.checked ? "yes" : "all")}
+                  className="h-4 w-4 accent-[#7C3AED]"
+                />
+                <span>🛋️ Meublé uniquement</span>
+              </label>
+              <select
+                className="w-full text-sm text-navy bg-white border border-border rounded-lg px-3 py-2 focus:outline-none focus:border-gold"
+                value={furnishedFilter}
+                onChange={(e) => setFurnishedFilter(e.target.value as FurnishedFilter)}
+              >
+                <option value="all">Meublé : indifférent</option>
+                <option value="yes">Meublé</option>
+                <option value="no">Non meublé</option>
+              </select>
+
+              {type === "location" && (
+                <>
+                  <label className="block">
+                    <span className="block text-xs uppercase tracking-wider text-foreground/60 mb-1">Budget loyer max</span>
+                    <input
+                      type="range"
+                      min={400}
+                      max={1500}
+                      step={50}
+                      value={rentalBudget}
+                      onChange={(e) => setRentalBudget(Number(e.target.value))}
+                      className="w-full accent-[var(--color-rental)]"
+                    />
+                    <span className="text-sm font-medium text-navy">Jusqu'à {rentalBudget} €/mois</span>
+                  </label>
+                  <label className="block">
+                    <span className="block text-xs uppercase tracking-wider text-foreground/60 mb-1">Disponibilité</span>
+                    <select
+                      className="w-full text-sm text-navy bg-white border border-border rounded-lg px-3 py-2 focus:outline-none"
+                      value={availability}
+                      onChange={(e) => setAvailability(e.target.value as AvailabilityFilter)}
+                    >
+                      <option value="all">Peu importe</option>
+                      <option value="immediate">Immédiatement</option>
+                      <option value="this-month">Ce mois</option>
+                      <option value="within-3-months">Dans 3 mois</option>
+                    </select>
+                  </label>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ============= DESKTOP (>= md) ============= */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-3 sm:py-4">
           <div className="grid grid-cols-1 md:grid-cols-[minmax(240px,2fr)_repeat(3,minmax(0,1fr))] gap-3">
             <div className="relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50" />
