@@ -439,6 +439,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             openId={openSubmissionId}
             onClearOpen={() => setOpenSubmissionId(null)}
             onToggle={toggleSubmission}
+            onResend={handleResendEmail}
             testRow={testRow}
             testFading={testFading}
           />
