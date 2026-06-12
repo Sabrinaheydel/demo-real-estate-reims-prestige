@@ -251,6 +251,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       },
       statut: "nouveau",
       traite: false,
+      email_status: "skipped",
     };
     showRawNotification({
       title: "🏠 Démo — Nouvelle estimation",
