@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
+import { ProfileForm } from "@/components/site/ProfileForm";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Lightbox } from "@/components/site/Lightbox";
 import { ListingCard } from "@/components/site/ListingCard";
