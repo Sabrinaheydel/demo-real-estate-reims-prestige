@@ -368,6 +368,9 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         </p>
 
         <nav className="flex flex-wrap gap-2 mb-8">
+          <TabButton active={tab === "dashboard"} onClick={() => setTab("dashboard")} icon={LayoutDashboard}>
+            Tableau de bord
+          </TabButton>
           <TabButton active={tab === "annonces"} onClick={() => { setEditing(null); setTab("annonces"); }} icon={Building2}>
             Mes annonces
           </TabButton>
@@ -375,7 +378,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             Ajouter une annonce
           </TabButton>
           <TabButton active={tab === "messages"} onClick={() => setTab("messages")} icon={Inbox}>
-            Formulaires reçus
+            Candidatures & formulaires
             {newMessagesThisWeek > 0 && (
               <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-[11px] rounded-full bg-gold text-navy font-bold">
                 {newMessagesThisWeek}
