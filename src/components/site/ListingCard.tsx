@@ -65,7 +65,8 @@ function CompatBadge({ listing }: { listing: Listing }) {
   if (compat.status === "missing") {
     return (
       <Link
-        to="/louer"
+        to="/annonces/$id"
+        params={{ id: listing.id }}
         hash="profil"
         className="block text-center text-[12px] py-2 rounded-b-xl bg-foreground/5 text-foreground/70 hover:bg-foreground/10 transition-colors"
       >

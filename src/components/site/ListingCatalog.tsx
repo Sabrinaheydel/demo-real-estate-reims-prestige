@@ -363,14 +363,8 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
         )}
 
         {view === "list" && type === "location" && shown.length > 0 && (
-          <div className="text-center mt-10">
-            <Link
-              to="/louer"
-              hash="profil"
-              className="inline-flex items-center gap-1.5 text-sm text-foreground/60 hover:text-gold transition-colors"
-            >
-              💡 Vérifiez votre compatibilité avant de candidater →
-            </Link>
+          <div className="text-center mt-10 text-sm text-foreground/60">
+            💡 Ouvrez une annonce pour vérifier votre compatibilité avant de candidater.
           </div>
         )}
       </section>

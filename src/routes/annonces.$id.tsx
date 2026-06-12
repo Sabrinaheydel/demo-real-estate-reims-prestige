@@ -156,13 +156,19 @@ function CompatBlock({ listing }: { listing: Listing }) {
         Loyer : {listing.price}€ = {pct}% de vos revenus
       </p>
       <p className="text-foreground/80 mb-3">{recommendation}</p>
-      <Link
-        to="/louer"
-        hash="profil"
-        className="inline-flex items-center text-xs font-semibold text-navy underline hover:text-gold"
-      >
-        Mettre à jour mon profil
-      </Link>
+      {!showForm ? (
+        <button
+          type="button"
+          onClick={() => setShowForm(true)}
+          className="inline-flex items-center text-xs font-semibold text-navy underline hover:text-gold"
+        >
+          Mettre à jour mon profil
+        </button>
+      ) : (
+        <div className="mt-4">
+          <ProfileForm defaultType="location" />
+        </div>
+      )}
     </div>
   );
 }
