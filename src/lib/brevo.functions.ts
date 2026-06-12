@@ -3,6 +3,8 @@ import { z } from "zod";
 import {
   createOrUpdateBrevoContact,
   sendBrevoTemplateEmail,
+  sendBrevoHtmlEmail,
+  buildRentalConfirmationHtml,
   normalizePhoneFR,
   type BrevoAttributes,
 } from "./brevo.server";
@@ -192,6 +194,27 @@ export const submitBrevoForm = createServerFn({ method: "POST" })
       });
     } catch (e) {
       console.warn("[brevo] send failed (submission still saved)", e instanceof Error ? e.message : e);
+    }
+
+    // 3) Branded HTML confirmation for rental candidatures (best-effort)
+    if (p.formType === "candidature-location") {
+      try {
+        await sendBrevoHtmlEmail({
+          to: [{ email: p.email, name: `${p.prenom} ${p.nom}`.trim() || undefined }],
+          subject: "Votre dossier a bien été reçu - Dupuis Immobilier",
+          htmlContent: buildRentalConfirmationHtml({
+            prenom: p.prenom,
+            titreAnnonce: p.titreAnnonce || "le bien sélectionné",
+            siteUrl: p.urlAnnonce?.startsWith("http")
+              ? new URL(p.urlAnnonce).origin
+              : undefined,
+          }),
+          sender: SENDER,
+          replyTo: { email: AGENT_EMAIL, name: "Julien Dupuis" },
+        });
+      } catch (e) {
+        console.warn("[brevo] rental confirmation HTML send failed", e instanceof Error ? e.message : e);
+      }
     }
 
     return { ok: true as const };

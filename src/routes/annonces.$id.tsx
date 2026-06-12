@@ -493,7 +493,9 @@ function ListingDetailPage() {
                       ✅ Votre {listing.isRental ? "pré-dossier" : "demande"} a été envoyé !
                     </p>
                     <p className="text-white/80 text-sm">
-                      Julien Dupuis vous recontacte sous 24h pour la Réf. {reference}.
+                      {listing.isRental
+                        ? `Votre dossier a été transmis. Un email de confirmation vous a été envoyé. Julien Dupuis vous recontacte sous 24h pour la Réf. ${reference}.`
+                        : `Julien Dupuis vous recontacte sous 24h pour la Réf. ${reference}.`}
                     </p>
                   </div>
                 ) : (
