@@ -166,7 +166,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     return supabaseListings.length > 0 ? [...supabaseListings, ...extras] : localListings;
   }, [supabaseListings, localListings]);
   const updateListing = useUpdateListing();
-  const [tab, setTab] = useState<Tab>("annonces");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const [editing, setEditing] = useState<Listing | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
