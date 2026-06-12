@@ -283,6 +283,21 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     catch (e) { console.warn("[submissions] toggle failed", e); refreshSubmissions(); }
   }
 
+  const resendEmail = useServerFn(resendConfirmationEmailFn);
+  async function handleResendEmail(id: string) {
+    setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, email_status: "pending" } : s)));
+    try {
+      const res = await resendEmail({ data: { id } });
+      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, email_status: res.email_status } : s)));
+      if (res.email_status === "sent") toast.success("✅ Email de confirmation renvoyé");
+      else toast.error("❌ Échec de l'envoi (voir logs)");
+    } catch (e) {
+      console.warn("[resend] failed", e);
+      toast.error("Erreur lors du renvoi");
+      refreshSubmissions();
+    }
+  }
+
 
 
   async function saveListing(l: Listing) {
