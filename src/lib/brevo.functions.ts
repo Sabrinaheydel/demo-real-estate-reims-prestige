@@ -164,16 +164,23 @@ export const submitBrevoForm = createServerFn({ method: "POST" })
       alerteBien: p.alerteBien,
       tauxEffort,
     };
-    const { error: insertErr } = await supabaseAdmin.from("form_submissions").insert({
-      form_type: p.formType,
-      prenom: p.prenom,
-      nom: p.nom || null,
-      email: p.email,
-      telephone: phone || p.telephone || null,
-      reference_annonce: p.referenceAnnonce || null,
-      donnees_completes: donneesCompletes as never,
-    });
+    const isRental = p.formType === "candidature-location";
+    const { data: inserted, error: insertErr } = await supabaseAdmin
+      .from("form_submissions")
+      .insert({
+        form_type: p.formType,
+        prenom: p.prenom,
+        nom: p.nom || null,
+        email: p.email,
+        telephone: phone || p.telephone || null,
+        reference_annonce: p.referenceAnnonce || null,
+        donnees_completes: donneesCompletes as never,
+        email_status: isRental ? "pending" : "skipped",
+      })
+      .select("id")
+      .single();
     if (insertErr) console.error("[submissions] insert failed", insertErr.message);
+    const submissionId = inserted?.id as string | undefined;
 
     // 2) Brevo (best-effort — never block the user if Brevo is misconfigured)
     try {
@@ -196,8 +203,9 @@ export const submitBrevoForm = createServerFn({ method: "POST" })
       console.warn("[brevo] send failed (submission still saved)", e instanceof Error ? e.message : e);
     }
 
-    // 3) Branded HTML confirmation for rental candidatures (best-effort)
-    if (p.formType === "candidature-location") {
+    // 3) Branded HTML confirmation for rental candidatures (best-effort) + email_status tracking
+    if (isRental) {
+      let emailStatus: "sent" | "failed" = "failed";
       try {
         await sendBrevoHtmlEmail({
           to: [{ email: p.email, name: `${p.prenom} ${p.nom}`.trim() || undefined }],
@@ -212,8 +220,16 @@ export const submitBrevoForm = createServerFn({ method: "POST" })
           sender: SENDER,
           replyTo: { email: AGENT_EMAIL, name: "Julien Dupuis" },
         });
+        emailStatus = "sent";
       } catch (e) {
         console.warn("[brevo] rental confirmation HTML send failed", e instanceof Error ? e.message : e);
+      }
+      if (submissionId) {
+        const { error: upErr } = await supabaseAdmin
+          .from("form_submissions")
+          .update({ email_status: emailStatus })
+          .eq("id", submissionId);
+        if (upErr) console.error("[submissions] email_status update failed", upErr.message);
       }
     }
 
