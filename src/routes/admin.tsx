@@ -895,6 +895,7 @@ function SubmissionsList({
               <th className="text-left px-4 py-3">Prénom</th>
               <th className="text-left px-4 py-3">Contact</th>
               <th className="text-left px-4 py-3">Réf.</th>
+              <th className="text-left px-4 py-3">Email</th>
               <th className="text-left px-4 py-3">Actions</th>
             </tr>
           </thead>
