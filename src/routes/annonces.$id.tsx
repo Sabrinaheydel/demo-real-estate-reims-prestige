@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { Listing } from "@/lib/listings";
 import { Navbar, Footer } from "@/components/site/SiteChrome";
+import { ProfileForm } from "@/components/site/ProfileForm";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Lightbox } from "@/components/site/Lightbox";
 import { ListingCard } from "@/components/site/ListingCard";
@@ -108,6 +109,7 @@ const DOCUMENT_OPTIONS = [
 function CompatBlock({ listing }: { listing: Listing }) {
   const profile = useProfile();
   const compat = computeCompat(listing.price, profile);
+  const [showForm, setShowForm] = useState(false);
   if (compat.status === "missing") {
     return (
       <div className="mb-8 rounded-xl border border-dashed border-border bg-cream/60 p-5 text-sm">
@@ -115,13 +117,19 @@ function CompatBlock({ listing }: { listing: Listing }) {
         <p className="text-foreground/70 mb-3">
           Renseignez votre profil pour vérifier si ce loyer est compatible avec vos revenus.
         </p>
-        <Link
-          to="/louer"
-          hash="profil"
-          className="inline-flex items-center px-4 py-2 rounded-lg bg-navy text-white text-sm font-semibold hover:bg-gold hover:text-navy transition-colors"
-        >
-          Renseigner mon profil
-        </Link>
+        {!showForm ? (
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center px-4 py-2 rounded-lg bg-navy text-white text-sm font-semibold hover:bg-gold hover:text-navy transition-colors"
+          >
+            Renseigner mon profil
+          </button>
+        ) : (
+          <div className="mt-4">
+            <ProfileForm defaultType="location" />
+          </div>
+        )}
       </div>
     );
   }
