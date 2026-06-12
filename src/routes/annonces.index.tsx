@@ -6,7 +6,7 @@ import { LISTINGS } from "@/lib/listings";
 
 type TypeSearch = "vente" | "location" | "all";
 
-export const Route = createFileRoute("/annonces")({
+export const Route = createFileRoute("/annonces/")({
   validateSearch: (search: Record<string, unknown>): { type?: TypeSearch } => {
     const t = search.type;
     if (t === "vente" || t === "location" || t === "all") return { type: t };
