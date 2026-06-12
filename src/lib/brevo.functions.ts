@@ -3,6 +3,8 @@ import { z } from "zod";
 import {
   createOrUpdateBrevoContact,
   sendBrevoTemplateEmail,
+  sendBrevoHtmlEmail,
+  buildRentalConfirmationHtml,
   normalizePhoneFR,
   type BrevoAttributes,
 } from "./brevo.server";
