@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           donnees_completes: Json
           email: string | null
+          email_status: string
           form_type: string
           id: string
           nom: string | null
@@ -32,6 +33,7 @@ export type Database = {
           created_at?: string
           donnees_completes?: Json
           email?: string | null
+          email_status?: string
           form_type: string
           id?: string
           nom?: string | null
@@ -45,6 +47,7 @@ export type Database = {
           created_at?: string
           donnees_completes?: Json
           email?: string | null
+          email_status?: string
           form_type?: string
           id?: string
           nom?: string | null
