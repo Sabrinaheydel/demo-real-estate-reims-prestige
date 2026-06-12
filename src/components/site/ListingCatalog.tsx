@@ -31,6 +31,7 @@ export function ListingCatalog({ initialType = "all", title, subtitle }: Props) 
   const [furnishedFilter, setFurnishedFilter] = useState<FurnishedFilter>("all");
   const [availability, setAvailability] = useState<AvailabilityFilter>("all");
   const [view, setView] = useState<ViewMode>("list");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
