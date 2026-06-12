@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { LISTINGS as SEED_LISTINGS, type Listing } from "@/lib/listings";
 import { useListings, useUpdateListing } from "@/lib/admin-storage";
 import { useServerFn } from "@tanstack/react-start";
-import { listSubmissionsFn, setSubmissionTraiteFn, type FormSubmission } from "@/lib/submissions.functions";
+import { listSubmissionsFn, setSubmissionTraiteFn, resendConfirmationEmailFn, type FormSubmission, type EmailStatus } from "@/lib/submissions.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   isSupported as notifIsSupported,
