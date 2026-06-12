@@ -398,6 +398,15 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
 
 
+        {tab === "dashboard" && (
+          <DashboardOverview
+            listings={listings}
+            submissions={submissions}
+            onGoMessages={() => setTab("messages")}
+            onGoAnnonces={() => setTab("annonces")}
+            onOpenSubmission={(id) => { setOpenSubmissionId(id); setTab("messages"); }}
+          />
+        )}
         {tab === "annonces" && !editing && (
           <ListingsList
             listings={listings}
