@@ -78,9 +78,9 @@ const AnnoncesIndexRoute = AnnoncesIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnnoncesIdRoute = AnnoncesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AnnoncesRoute,
+  id: '/annonces/$id',
+  path: '/annonces/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -182,6 +182,7 @@ export interface RootRouteChildren {
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   PolitiqueRgpdRoute: typeof PolitiqueRgpdRoute
   VendreRoute: typeof VendreRoute
+  AnnoncesIdRoute: typeof AnnoncesIdRoute
   AnnoncesIndexRoute: typeof AnnoncesIndexRoute
 }
 
@@ -266,10 +267,10 @@ declare module '@tanstack/react-router' {
     }
     '/annonces/$id': {
       id: '/annonces/$id'
-      path: '/$id'
+      path: '/annonces/$id'
       fullPath: '/annonces/$id'
       preLoaderRoute: typeof AnnoncesIdRouteImport
-      parentRoute: typeof AnnoncesRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -285,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   MentionsLegalesRoute: MentionsLegalesRoute,
   PolitiqueRgpdRoute: PolitiqueRgpdRoute,
   VendreRoute: VendreRoute,
+  AnnoncesIdRoute: AnnoncesIdRoute,
   AnnoncesIndexRoute: AnnoncesIndexRoute,
 }
 export const routeTree = rootRouteImport
