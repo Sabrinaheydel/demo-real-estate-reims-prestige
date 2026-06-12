@@ -158,8 +158,7 @@ export function buildRentalConfirmationHtml(input: {
   </table>
 </body></html>`;
 }
-  return (await res.json().catch(() => ({}))) as { messageId?: string };
-}
+
 
 // Normalize FR phone to E.164 (+33...). Returns undefined if too short.
 export function normalizePhoneFR(input?: string): string | undefined {
