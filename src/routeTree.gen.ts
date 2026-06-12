@@ -16,10 +16,10 @@ import { Route as LouerRouteImport } from './routes/louer'
 import { Route as HonorairesRouteImport } from './routes/honoraires'
 import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AnnoncesRouteImport } from './routes/annonces'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcheterRouteImport } from './routes/acheter'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnnoncesIndexRouteImport } from './routes/annonces.index'
 import { Route as AnnoncesIdRouteImport } from './routes/annonces.$id'
 
 const VendreRoute = VendreRouteImport.update({
@@ -57,11 +57,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AnnoncesRoute = AnnoncesRouteImport.update({
-  id: '/annonces',
-  path: '/annonces',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -77,6 +72,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnnoncesIndexRoute = AnnoncesIndexRouteImport.update({
+  id: '/annonces/',
+  path: '/annonces/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnnoncesIdRoute = AnnoncesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -87,7 +87,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/admin': typeof AdminRoute
-  '/annonces': typeof AnnoncesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
@@ -96,12 +95,12 @@ export interface FileRoutesByFullPath {
   '/politique-rgpd': typeof PolitiqueRgpdRoute
   '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
+  '/annonces/': typeof AnnoncesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/admin': typeof AdminRoute
-  '/annonces': typeof AnnoncesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
@@ -110,13 +109,13 @@ export interface FileRoutesByTo {
   '/politique-rgpd': typeof PolitiqueRgpdRoute
   '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
+  '/annonces': typeof AnnoncesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/admin': typeof AdminRoute
-  '/annonces': typeof AnnoncesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
@@ -125,6 +124,7 @@ export interface FileRoutesById {
   '/politique-rgpd': typeof PolitiqueRgpdRoute
   '/vendre': typeof VendreRoute
   '/annonces/$id': typeof AnnoncesIdRoute
+  '/annonces/': typeof AnnoncesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,7 +132,6 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/admin'
-    | '/annonces'
     | '/contact'
     | '/dernieres-ventes'
     | '/honoraires'
@@ -141,12 +140,12 @@ export interface FileRouteTypes {
     | '/politique-rgpd'
     | '/vendre'
     | '/annonces/$id'
+    | '/annonces/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/acheter'
     | '/admin'
-    | '/annonces'
     | '/contact'
     | '/dernieres-ventes'
     | '/honoraires'
@@ -155,12 +154,12 @@ export interface FileRouteTypes {
     | '/politique-rgpd'
     | '/vendre'
     | '/annonces/$id'
+    | '/annonces'
   id:
     | '__root__'
     | '/'
     | '/acheter'
     | '/admin'
-    | '/annonces'
     | '/contact'
     | '/dernieres-ventes'
     | '/honoraires'
@@ -169,13 +168,13 @@ export interface FileRouteTypes {
     | '/politique-rgpd'
     | '/vendre'
     | '/annonces/$id'
+    | '/annonces/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AcheterRoute: typeof AcheterRoute
   AdminRoute: typeof AdminRoute
-  AnnoncesRoute: typeof AnnoncesRouteWithChildren
   ContactRoute: typeof ContactRoute
   DernieresVentesRoute: typeof DernieresVentesRoute
   HonorairesRoute: typeof HonorairesRoute
@@ -183,6 +182,7 @@ export interface RootRouteChildren {
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   PolitiqueRgpdRoute: typeof PolitiqueRgpdRoute
   VendreRoute: typeof VendreRoute
+  AnnoncesIndexRoute: typeof AnnoncesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -236,13 +236,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/annonces': {
-      id: '/annonces'
-      path: '/annonces'
-      fullPath: '/annonces'
-      preLoaderRoute: typeof AnnoncesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -264,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/annonces/': {
+      id: '/annonces/'
+      path: '/annonces'
+      fullPath: '/annonces/'
+      preLoaderRoute: typeof AnnoncesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/annonces/$id': {
       id: '/annonces/$id'
       path: '/$id'
@@ -274,23 +274,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AnnoncesRouteChildren {
-  AnnoncesIdRoute: typeof AnnoncesIdRoute
-}
-
-const AnnoncesRouteChildren: AnnoncesRouteChildren = {
-  AnnoncesIdRoute: AnnoncesIdRoute,
-}
-
-const AnnoncesRouteWithChildren = AnnoncesRoute._addFileChildren(
-  AnnoncesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcheterRoute: AcheterRoute,
   AdminRoute: AdminRoute,
-  AnnoncesRoute: AnnoncesRouteWithChildren,
   ContactRoute: ContactRoute,
   DernieresVentesRoute: DernieresVentesRoute,
   HonorairesRoute: HonorairesRoute,
@@ -298,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   MentionsLegalesRoute: MentionsLegalesRoute,
   PolitiqueRgpdRoute: PolitiqueRgpdRoute,
   VendreRoute: VendreRoute,
+  AnnoncesIndexRoute: AnnoncesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
