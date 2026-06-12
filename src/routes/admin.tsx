@@ -855,11 +855,22 @@ function formTypeLabel(t: string): string {
   }
 }
 
+function emailStatusBadge(s: FormSubmission): { dot: string; label: string; cls: string } | null {
+  if (s.form_type !== "candidature-location") return null;
+  switch (s.email_status) {
+    case "sent": return { dot: "🟢", label: "Email envoyé", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+    case "pending": return { dot: "🟠", label: "Email en attente", cls: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "failed": return { dot: "🔴", label: "Email échoué", cls: "bg-red-50 text-red-700 border-red-200" };
+    default: return { dot: "⚪", label: "Email non envoyé", cls: "bg-gray-50 text-gray-600 border-gray-200" };
+  }
+}
+
 function SubmissionsList({
   submissions,
   openId,
   onClearOpen,
   onToggle,
+  onResend,
   testRow,
   testFading,
 }: {
@@ -867,6 +878,7 @@ function SubmissionsList({
   openId: string | null;
   onClearOpen: () => void;
   onToggle: (id: string, traite: boolean) => void;
+  onResend: (id: string) => void;
   testRow?: FormSubmission | null;
   testFading?: boolean;
 }) {
