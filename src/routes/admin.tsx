@@ -935,6 +935,29 @@ function SubmissionsList({
                     {s.telephone && <a href={`tel:${s.telephone}`} className="text-navy hover:text-gold">{s.telephone}</a>}
                   </td>
                   <td className="px-4 py-3 text-foreground/70 whitespace-nowrap">{s.reference_annonce || "—"}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {(() => {
+                      const eb = emailStatusBadge(s);
+                      if (!eb) return <span className="text-foreground/40 text-xs">—</span>;
+                      const canResend = s.form_type === "candidature-location" && (s.email_status === "failed" || s.email_status === "pending");
+                      return (
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-semibold ${eb.cls}`}>
+                            {eb.dot} {eb.label}
+                          </span>
+                          {canResend && (
+                            <button
+                              onClick={() => onResend(s.id)}
+                              title="Renvoyer l'email de confirmation"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-navy text-white hover:bg-navy/90"
+                            >
+                              <RefreshCw size={11} /> Renvoyer
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => onToggle(s.id, !s.traite)}
