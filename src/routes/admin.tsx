@@ -1208,5 +1208,143 @@ function NotificationStatus({ onTest }: { onTest: () => void }) {
   );
 }
 
+function DashboardOverview({
+  listings,
+  submissions,
+  onGoMessages,
+  onGoAnnonces,
+  onOpenSubmission,
+}: {
+  listings: Listing[];
+  submissions: FormSubmission[];
+  onGoMessages: () => void;
+  onGoAnnonces: () => void;
+  onOpenSubmission: (id: string) => void;
+}) {
+  const now = Date.now();
+  const d24 = now - 24 * 60 * 60 * 1000;
+  const d7 = now - 7 * 24 * 60 * 60 * 1000;
+
+  const rentals = submissions.filter((s) => s.form_type === "candidature-location");
+  const sent = rentals.filter((s) => s.email_status === "sent").length;
+  const failed = rentals.filter((s) => s.email_status === "failed").length;
+  const pending = rentals.filter((s) => s.email_status === "pending").length;
+  const deliveryRate = rentals.length === 0 ? 0 : Math.round((sent / rentals.length) * 100);
+
+  const last24 = submissions.filter((s) => new Date(s.created_at).getTime() >= d24).length;
+  const last7 = submissions.filter((s) => new Date(s.created_at).getTime() >= d7).length;
+  const aTraiter = submissions.filter((s) => !s.traite).length;
+  const recent = submissions.slice(0, 5);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard label="Annonces actives" value={listings.length} icon={Building2} onClick={onGoAnnonces} />
+        <KpiCard label="Demandes 24h" value={last24} hint={`${last7} sur 7 j`} icon={Inbox} onClick={onGoMessages} />
+        <KpiCard label="À traiter" value={aTraiter} icon={Mail} tone={aTraiter > 0 ? "warn" : "ok"} onClick={onGoMessages} />
+        <KpiCard
+          label="Emails livrés (location)"
+          value={`${deliveryRate}%`}
+          hint={`${sent}/${rentals.length} envoyés${failed ? ` · ${failed} échec` : ""}`}
+          icon={MailCheck}
+          tone={failed > 0 ? "warn" : "ok"}
+          onClick={onGoMessages}
+        />
+      </div>
+
+      {(failed > 0 || pending > 0) && (
+        <div className="bg-white rounded-xl border border-amber-200 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <MailWarning size={18} className="text-amber-600" />
+            <h3 className="font-semibold text-navy">Emails à renvoyer</h3>
+          </div>
+          <p className="text-sm text-foreground/70 mb-3">
+            {failed} échec{failed > 1 ? "s" : ""} · {pending} en attente. Ouvrez l'onglet "Candidatures" pour les relancer.
+          </p>
+          <button
+            onClick={onGoMessages}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-navy text-white text-sm font-semibold hover:bg-navy/90"
+          >
+            <RefreshCw size={14} /> Voir et renvoyer
+          </button>
+        </div>
+      )}
+
+      <div className="bg-white rounded-xl border border-border p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-navy">Dernières demandes</h3>
+          <button onClick={onGoMessages} className="text-xs text-navy/70 hover:text-navy underline">
+            Tout voir
+          </button>
+        </div>
+        {recent.length === 0 ? (
+          <p className="text-sm text-foreground/60">Aucune demande pour le moment.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {recent.map((s) => (
+              <li key={s.id}>
+                <button
+                  onClick={() => onOpenSubmission(s.id)}
+                  className="w-full flex items-center gap-3 py-3 text-left hover:bg-cream/50 px-2 -mx-2 rounded-lg"
+                >
+                  <span className={`inline-block w-2 h-2 rounded-full ${s.traite ? "bg-emerald-500" : "bg-red-500"}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-navy font-medium truncate">
+                      {s.prenom || "—"} {s.nom || ""} <span className="text-foreground/50 font-normal">· {formTypeLabel(s.form_type)}</span>
+                    </div>
+                    <div className="text-xs text-foreground/60 truncate">
+                      {s.email || s.telephone || "—"}{s.reference_annonce ? ` · Réf. ${s.reference_annonce}` : ""}
+                    </div>
+                  </div>
+                  <span className="text-xs text-foreground/50 whitespace-nowrap">
+                    {new Date(s.created_at).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KpiCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+  tone = "neutral",
+  onClick,
+}: {
+  label: string;
+  value: number | string;
+  hint?: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  tone?: "neutral" | "ok" | "warn";
+  onClick?: () => void;
+}) {
+  const toneCls =
+    tone === "warn" ? "text-amber-700 bg-amber-50" :
+    tone === "ok" ? "text-emerald-700 bg-emerald-50" :
+    "text-navy bg-cream";
+  return (
+    <button
+      onClick={onClick}
+      className="text-left bg-white rounded-xl border border-border p-4 hover:border-gold/50 transition-colors"
+    >
+      <div className="flex items-start justify-between mb-2">
+        <span className="text-xs uppercase tracking-wider text-foreground/60">{label}</span>
+        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${toneCls}`}>
+          <Icon size={16} />
+        </span>
+      </div>
+      <div className="font-display text-2xl text-navy leading-tight">{value}</div>
+      {hint && <div className="text-xs text-foreground/60 mt-1">{hint}</div>}
+    </button>
+  );
+}
+
+
 
 
