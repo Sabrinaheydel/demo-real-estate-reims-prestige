@@ -95,6 +95,8 @@ export async function sendBrevoTemplateEmail(input: {
   console.log("[brevo:diag] smtp/email response", { status: res.status, ok: res.ok, templateId: input.templateId, body: text.slice(0, 500) });
   if (!res.ok) {
     throw new Error(`Brevo template send failed (${res.status}): ${text}`);
+  }
+  return (await res.json().catch(() => ({}))) as { messageId?: string };
 }
 
 export async function sendBrevoHtmlEmail(input: {
