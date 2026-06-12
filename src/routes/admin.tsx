@@ -917,6 +917,7 @@ function SubmissionsList({
                 <td className="px-4 py-3 text-foreground/70">Clairmarais</td>
                 <td className="px-4 py-3 text-foreground/70">—</td>
                 <td className="px-4 py-3 text-xs italic text-foreground/50">Démo</td>
+                <td className="px-4 py-3 text-xs italic text-foreground/50">—</td>
               </tr>
             )}
             {submissions.map((s) => {
