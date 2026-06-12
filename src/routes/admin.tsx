@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { LISTINGS as SEED_LISTINGS, type Listing } from "@/lib/listings";
 import { useListings, useUpdateListing } from "@/lib/admin-storage";
 import { useServerFn } from "@tanstack/react-start";
-import { listSubmissionsFn, setSubmissionTraiteFn, type FormSubmission } from "@/lib/submissions.functions";
+import { listSubmissionsFn, setSubmissionTraiteFn, resendConfirmationEmailFn, type FormSubmission, type EmailStatus } from "@/lib/submissions.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   isSupported as notifIsSupported,
@@ -41,6 +41,11 @@ import {
   Bell,
   BellOff,
   TestTube2,
+  LayoutDashboard,
+  Mail,
+  MailWarning,
+  MailCheck,
+  RefreshCw,
 } from "lucide-react";
 
 import portraitAvatar from "@/assets/photo-profil-1.jpg.asset.json";
@@ -149,7 +154,7 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-type Tab = "annonces" | "ajouter" | "messages";
+type Tab = "dashboard" | "annonces" | "ajouter" | "messages";
 
 function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const supabaseListings = useListings();
@@ -161,7 +166,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     return supabaseListings.length > 0 ? [...supabaseListings, ...extras] : localListings;
   }, [supabaseListings, localListings]);
   const updateListing = useUpdateListing();
-  const [tab, setTab] = useState<Tab>("annonces");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const [editing, setEditing] = useState<Listing | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -251,6 +256,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       },
       statut: "nouveau",
       traite: false,
+      email_status: "skipped",
     };
     showRawNotification({
       title: "🏠 Démo — Nouvelle estimation",
@@ -275,6 +281,21 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, traite, statut: traite ? "traite" : "nouveau" } : s)));
     try { await markTraite({ data: { id, traite } }); }
     catch (e) { console.warn("[submissions] toggle failed", e); refreshSubmissions(); }
+  }
+
+  const resendEmail = useServerFn(resendConfirmationEmailFn);
+  async function handleResendEmail(id: string) {
+    setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, email_status: "pending" } : s)));
+    try {
+      const res = await resendEmail({ data: { id } });
+      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, email_status: res.email_status } : s)));
+      if (res.email_status === "sent") toast.success("✅ Email de confirmation renvoyé");
+      else toast.error("❌ Échec de l'envoi (voir logs)");
+    } catch (e) {
+      console.warn("[resend] failed", e);
+      toast.error("Erreur lors du renvoi");
+      refreshSubmissions();
+    }
   }
 
 
@@ -347,6 +368,9 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         </p>
 
         <nav className="flex flex-wrap gap-2 mb-8">
+          <TabButton active={tab === "dashboard"} onClick={() => setTab("dashboard")} icon={LayoutDashboard}>
+            Tableau de bord
+          </TabButton>
           <TabButton active={tab === "annonces"} onClick={() => { setEditing(null); setTab("annonces"); }} icon={Building2}>
             Mes annonces
           </TabButton>
@@ -354,7 +378,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             Ajouter une annonce
           </TabButton>
           <TabButton active={tab === "messages"} onClick={() => setTab("messages")} icon={Inbox}>
-            Formulaires reçus
+            Candidatures & formulaires
             {newMessagesThisWeek > 0 && (
               <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-[11px] rounded-full bg-gold text-navy font-bold">
                 {newMessagesThisWeek}
@@ -374,6 +398,15 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
 
 
+        {tab === "dashboard" && (
+          <DashboardOverview
+            listings={listings}
+            submissions={submissions}
+            onGoMessages={() => setTab("messages")}
+            onGoAnnonces={() => setTab("annonces")}
+            onOpenSubmission={(id) => { setOpenSubmissionId(id); setTab("messages"); }}
+          />
+        )}
         {tab === "annonces" && !editing && (
           <ListingsList
             listings={listings}
@@ -406,6 +439,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             openId={openSubmissionId}
             onClearOpen={() => setOpenSubmissionId(null)}
             onToggle={toggleSubmission}
+            onResend={handleResendEmail}
             testRow={testRow}
             testFading={testFading}
           />
@@ -821,11 +855,22 @@ function formTypeLabel(t: string): string {
   }
 }
 
+function emailStatusBadge(s: FormSubmission): { dot: string; label: string; cls: string } | null {
+  if (s.form_type !== "candidature-location") return null;
+  switch (s.email_status) {
+    case "sent": return { dot: "🟢", label: "Email envoyé", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+    case "pending": return { dot: "🟠", label: "Email en attente", cls: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "failed": return { dot: "🔴", label: "Email échoué", cls: "bg-red-50 text-red-700 border-red-200" };
+    default: return { dot: "⚪", label: "Email non envoyé", cls: "bg-gray-50 text-gray-600 border-gray-200" };
+  }
+}
+
 function SubmissionsList({
   submissions,
   openId,
   onClearOpen,
   onToggle,
+  onResend,
   testRow,
   testFading,
 }: {
@@ -833,6 +878,7 @@ function SubmissionsList({
   openId: string | null;
   onClearOpen: () => void;
   onToggle: (id: string, traite: boolean) => void;
+  onResend: (id: string) => void;
   testRow?: FormSubmission | null;
   testFading?: boolean;
 }) {
@@ -849,6 +895,7 @@ function SubmissionsList({
               <th className="text-left px-4 py-3">Prénom</th>
               <th className="text-left px-4 py-3">Contact</th>
               <th className="text-left px-4 py-3">Réf.</th>
+              <th className="text-left px-4 py-3">Email</th>
               <th className="text-left px-4 py-3">Actions</th>
             </tr>
           </thead>
@@ -870,6 +917,7 @@ function SubmissionsList({
                 <td className="px-4 py-3 text-foreground/70">Clairmarais</td>
                 <td className="px-4 py-3 text-foreground/70">—</td>
                 <td className="px-4 py-3 text-xs italic text-foreground/50">Démo</td>
+                <td className="px-4 py-3 text-xs italic text-foreground/50">—</td>
               </tr>
             )}
             {submissions.map((s) => {
@@ -887,6 +935,29 @@ function SubmissionsList({
                     {s.telephone && <a href={`tel:${s.telephone}`} className="text-navy hover:text-gold">{s.telephone}</a>}
                   </td>
                   <td className="px-4 py-3 text-foreground/70 whitespace-nowrap">{s.reference_annonce || "—"}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {(() => {
+                      const eb = emailStatusBadge(s);
+                      if (!eb) return <span className="text-foreground/40 text-xs">—</span>;
+                      const canResend = s.form_type === "candidature-location" && (s.email_status === "failed" || s.email_status === "pending");
+                      return (
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-semibold ${eb.cls}`}>
+                            {eb.dot} {eb.label}
+                          </span>
+                          {canResend && (
+                            <button
+                              onClick={() => onResend(s.id)}
+                              title="Renvoyer l'email de confirmation"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-navy text-white hover:bg-navy/90"
+                            >
+                              <RefreshCw size={11} /> Renvoyer
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => onToggle(s.id, !s.traite)}
@@ -1136,6 +1207,144 @@ function NotificationStatus({ onTest }: { onTest: () => void }) {
     </div>
   );
 }
+
+function DashboardOverview({
+  listings,
+  submissions,
+  onGoMessages,
+  onGoAnnonces,
+  onOpenSubmission,
+}: {
+  listings: Listing[];
+  submissions: FormSubmission[];
+  onGoMessages: () => void;
+  onGoAnnonces: () => void;
+  onOpenSubmission: (id: string) => void;
+}) {
+  const now = Date.now();
+  const d24 = now - 24 * 60 * 60 * 1000;
+  const d7 = now - 7 * 24 * 60 * 60 * 1000;
+
+  const rentals = submissions.filter((s) => s.form_type === "candidature-location");
+  const sent = rentals.filter((s) => s.email_status === "sent").length;
+  const failed = rentals.filter((s) => s.email_status === "failed").length;
+  const pending = rentals.filter((s) => s.email_status === "pending").length;
+  const deliveryRate = rentals.length === 0 ? 0 : Math.round((sent / rentals.length) * 100);
+
+  const last24 = submissions.filter((s) => new Date(s.created_at).getTime() >= d24).length;
+  const last7 = submissions.filter((s) => new Date(s.created_at).getTime() >= d7).length;
+  const aTraiter = submissions.filter((s) => !s.traite).length;
+  const recent = submissions.slice(0, 5);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard label="Annonces actives" value={listings.length} icon={Building2} onClick={onGoAnnonces} />
+        <KpiCard label="Demandes 24h" value={last24} hint={`${last7} sur 7 j`} icon={Inbox} onClick={onGoMessages} />
+        <KpiCard label="À traiter" value={aTraiter} icon={Mail} tone={aTraiter > 0 ? "warn" : "ok"} onClick={onGoMessages} />
+        <KpiCard
+          label="Emails livrés (location)"
+          value={`${deliveryRate}%`}
+          hint={`${sent}/${rentals.length} envoyés${failed ? ` · ${failed} échec` : ""}`}
+          icon={MailCheck}
+          tone={failed > 0 ? "warn" : "ok"}
+          onClick={onGoMessages}
+        />
+      </div>
+
+      {(failed > 0 || pending > 0) && (
+        <div className="bg-white rounded-xl border border-amber-200 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <MailWarning size={18} className="text-amber-600" />
+            <h3 className="font-semibold text-navy">Emails à renvoyer</h3>
+          </div>
+          <p className="text-sm text-foreground/70 mb-3">
+            {failed} échec{failed > 1 ? "s" : ""} · {pending} en attente. Ouvrez l'onglet "Candidatures" pour les relancer.
+          </p>
+          <button
+            onClick={onGoMessages}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-navy text-white text-sm font-semibold hover:bg-navy/90"
+          >
+            <RefreshCw size={14} /> Voir et renvoyer
+          </button>
+        </div>
+      )}
+
+      <div className="bg-white rounded-xl border border-border p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-navy">Dernières demandes</h3>
+          <button onClick={onGoMessages} className="text-xs text-navy/70 hover:text-navy underline">
+            Tout voir
+          </button>
+        </div>
+        {recent.length === 0 ? (
+          <p className="text-sm text-foreground/60">Aucune demande pour le moment.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {recent.map((s) => (
+              <li key={s.id}>
+                <button
+                  onClick={() => onOpenSubmission(s.id)}
+                  className="w-full flex items-center gap-3 py-3 text-left hover:bg-cream/50 px-2 -mx-2 rounded-lg"
+                >
+                  <span className={`inline-block w-2 h-2 rounded-full ${s.traite ? "bg-emerald-500" : "bg-red-500"}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-navy font-medium truncate">
+                      {s.prenom || "—"} {s.nom || ""} <span className="text-foreground/50 font-normal">· {formTypeLabel(s.form_type)}</span>
+                    </div>
+                    <div className="text-xs text-foreground/60 truncate">
+                      {s.email || s.telephone || "—"}{s.reference_annonce ? ` · Réf. ${s.reference_annonce}` : ""}
+                    </div>
+                  </div>
+                  <span className="text-xs text-foreground/50 whitespace-nowrap">
+                    {new Date(s.created_at).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KpiCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+  tone = "neutral",
+  onClick,
+}: {
+  label: string;
+  value: number | string;
+  hint?: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  tone?: "neutral" | "ok" | "warn";
+  onClick?: () => void;
+}) {
+  const toneCls =
+    tone === "warn" ? "text-amber-700 bg-amber-50" :
+    tone === "ok" ? "text-emerald-700 bg-emerald-50" :
+    "text-navy bg-cream";
+  return (
+    <button
+      onClick={onClick}
+      className="text-left bg-white rounded-xl border border-border p-4 hover:border-gold/50 transition-colors"
+    >
+      <div className="flex items-start justify-between mb-2">
+        <span className="text-xs uppercase tracking-wider text-foreground/60">{label}</span>
+        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${toneCls}`}>
+          <Icon size={16} />
+        </span>
+      </div>
+      <div className="font-display text-2xl text-navy leading-tight">{value}</div>
+      {hint && <div className="text-xs text-foreground/60 mt-1">{hint}</div>}
+    </button>
+  );
+}
+
 
 
 
