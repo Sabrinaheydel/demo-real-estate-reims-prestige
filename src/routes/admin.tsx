@@ -154,7 +154,7 @@ function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-type Tab = "annonces" | "ajouter" | "messages";
+type Tab = "dashboard" | "annonces" | "ajouter" | "messages";
 
 function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const supabaseListings = useListings();
