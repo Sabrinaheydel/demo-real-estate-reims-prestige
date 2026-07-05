@@ -101,6 +101,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap",
       },
     ],
+    scripts: [
+      { src: "https://www.googletagmanager.com/gtag/js?id=G-GE530MHKM6", async: true },
+      {
+        children:
+          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','G-GE530MHKM6',{send_page_view:false});",
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
