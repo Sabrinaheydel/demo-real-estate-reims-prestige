@@ -140,6 +140,54 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.searchStr });
+
+  // GA4 SPA page_view on route change
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+    const path = pathname + (search ? `?${search}` : "");
+    window.gtag("event", "page_view", {
+      page_path: path,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }, [pathname, search]);
+
+  // GA4 global click / submit tracking
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const send = (name: string, params: Record<string, unknown> = {}) => {
+      window.gtag?.("event", name, params);
+    };
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const anchor = target.closest("a") as HTMLAnchorElement | null;
+      if (!anchor) return;
+      const href = anchor.getAttribute("href") || "";
+      const text = (anchor.textContent || "").trim().slice(0, 80);
+      if (href.startsWith("mailto:")) send("click_email", { link_url: href, link_text: text });
+      else if (href.startsWith("tel:")) send("click_phone", { link_url: href, link_text: text });
+      else if (/wa\.me|whatsapp\.com/i.test(href)) send("click_whatsapp", { link_url: href, link_text: text });
+      else if (/\/contact/i.test(href)) send("click_contact", { link_url: href, link_text: text });
+      else if (/demo|démo/i.test(href) || /demo|démo/i.test(text)) send("click_demo", { link_url: href, link_text: text });
+    };
+    const onSubmit = (e: SubmitEvent) => {
+      const form = e.target as HTMLFormElement | null;
+      send("form_submit", {
+        form_id: form?.id || undefined,
+        form_name: form?.getAttribute("name") || undefined,
+        form_location: window.location.pathname,
+      });
+    };
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("submit", onSubmit, true);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      document.removeEventListener("submit", onSubmit, true);
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -149,4 +197,5 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
 
