@@ -113,8 +113,18 @@ export default function CrmBoard() {
     if (params.get("guide") === "1" || window.sessionStorage.getItem("crm_guide") === "1") {
       setGuideOpen(true);
       window.sessionStorage.removeItem("crm_guide");
+      window.sessionStorage.setItem("crm_guide_shown", "1");
     }
   }, []);
+
+  // Proposer la démo guidée automatiquement au rôle demo, une fois par session
+  useEffect(() => {
+    if (loading || guideOpen || snap.role !== "demo") return;
+    if (typeof window === "undefined") return;
+    if (window.sessionStorage.getItem("crm_guide_shown") === "1") return;
+    window.sessionStorage.setItem("crm_guide_shown", "1");
+    setGuideOpen(true);
+  }, [loading, guideOpen, snap.role]);
 
   const kpis = useMemo(() => {
     const l = snap.leads;

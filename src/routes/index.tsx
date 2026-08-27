@@ -27,6 +27,7 @@ import {
   Mail,
   ArrowRight,
   Check,
+  PlayCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -330,6 +331,16 @@ function Hero() {
               className="inline-flex items-center justify-center w-full px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-navy transition-all"
             >
               Voir les annonces
+            </Link>
+            <Link
+              to="/demo"
+              className="inline-flex items-center justify-center gap-2.5 w-full px-6 py-3 rounded-lg bg-gold text-navy font-semibold hover:bg-gold/90 transition-all shadow-card ring-2 ring-gold/40 ring-offset-2 ring-offset-navy"
+            >
+              <PlayCircle size={18} className="shrink-0" />
+              <span className="flex flex-col items-start leading-tight text-left">
+                <span>Tester le CRM en démonstration</span>
+                <span className="text-[11px] font-normal text-navy/70">Démo interactive · 5 min</span>
+              </span>
             </Link>
           </div>
           <div className="inline-flex items-center gap-2 text-sm text-white bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-3 py-2">
