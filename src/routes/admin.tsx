@@ -82,77 +82,75 @@ function useLocalState<T>(key: string, initial: T) {
   return [value, setValue] as const;
 }
 
-function AdminRoute() {
-  const [authed, setAuthed] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setAuthed(sessionStorage.getItem("admin-auth") === "1");
-  }, []);
-  if (!authed) return <LoginScreen onSuccess={() => setAuthed(true)} />;
-  return <AdminDashboard onLogout={() => { sessionStorage.removeItem("admin-auth"); setAuthed(false); }} />;
-}
+type StaffRole = "admin" | "demo";
+type GateState = { status: "loading" } | { status: "denied"; email: string } | { status: "ok"; role: StaffRole };
 
-function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("admin-auth", "1");
-      onSuccess();
-    } else {
-      setError("Identifiants incorrects.");
+function AdminRoute() {
+  const navigate = useNavigate();
+  const [gate, setGate] = useState<GateState>({ status: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function check() {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+      if (!user) {
+        navigate({ to: "/auth", replace: true });
+        return;
+      }
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      const staff = (roles ?? []).map((r) => r.role).find((r) => r === "admin" || r === "demo") as
+        | StaffRole
+        | undefined;
+      if (cancelled) return;
+      setGate(staff ? { status: "ok", role: staff } : { status: "denied", email: user.email ?? "" });
     }
+    check();
+    return () => { cancelled = true; };
+  }, [navigate]);
+
+  async function logout() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
   }
-  return (
-    <div className="min-h-screen bg-cream flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-card p-8">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-foreground/60 hover:text-navy mb-6">
-          <ArrowLeft size={14} /> Retour au site
-        </Link>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-full bg-navy text-gold flex items-center justify-center">
+
+  if (gate.status === "loading") {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center">
+        <p className="text-sm text-foreground/60">Vérification de votre accès…</p>
+      </div>
+    );
+  }
+
+  if (gate.status === "denied") {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-card p-8 text-center">
+          <div className="w-10 h-10 rounded-full bg-navy text-gold flex items-center justify-center mx-auto mb-4">
             <Lock size={18} />
           </div>
-          <h1 className="font-display text-2xl text-navy">Espace admin</h1>
+          <h1 className="font-display text-2xl text-navy mb-2">Accès refusé</h1>
+          <p className="text-sm text-foreground/70 mb-6">
+            Le compte <strong className="text-navy">{gate.email}</strong> n'a pas de rôle autorisé sur cet espace.
+            Contactez l'administrateur pour obtenir un accès.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Link to="/" className="px-5 py-2.5 rounded-lg bg-gray-100 text-sm font-semibold">Retour au site</Link>
+            <button onClick={logout} className="px-5 py-2.5 rounded-lg bg-navy text-white text-sm font-semibold">
+              Se déconnecter
+            </button>
+          </div>
         </div>
-        <p className="text-sm text-foreground/60 mb-6">Connectez-vous pour gérer vos annonces.</p>
-        <form onSubmit={submit} className="space-y-4">
-          <label className="block">
-            <span className="block text-sm font-medium text-navy mb-1.5">Email</span>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-border text-sm focus:outline-none focus:border-gold"
-              placeholder="admin@dupuis.fr"
-            />
-          </label>
-          <label className="block">
-            <span className="block text-sm font-medium text-navy mb-1.5">Mot de passe</span>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-border text-sm focus:outline-none focus:border-gold"
-              placeholder="••••••••"
-            />
-          </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            className="w-full px-5 py-3 rounded-lg bg-navy text-white font-semibold hover:bg-navy/90 transition-colors"
-          >
-            Se connecter
-          </button>
-        </form>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return <AdminDashboard onLogout={logout} role={gate.role} />;
 }
+
 
 type Tab = "dashboard" | "annonces" | "ajouter" | "messages";
 
