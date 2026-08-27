@@ -152,7 +152,8 @@ function AdminRoute() {
 
 type Tab = "dashboard" | "annonces" | "ajouter" | "messages";
 
-function AdminDashboard({ onLogout }: { onLogout: () => void }) {
+function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffRole }) {
+  void role;
   const supabaseListings = useListings();
   const [localListings, setLocalListings] = useLocalState<Listing[]>("admin-listings", SEED_LISTINGS);
   // Prefer Supabase data once it arrives; fall back to local state for newly-added items.
