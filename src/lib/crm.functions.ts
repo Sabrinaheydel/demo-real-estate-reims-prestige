@@ -22,7 +22,7 @@ export type CrmLead = {
   email: string | null;
   telephone: string | null;
   reference_annonce: string | null;
-  donnees_completes: Record<string, unknown>;
+  donnees_completes: Record<string, string | number | boolean | null | string[]>;
   statut: string;
   traite: boolean;
   is_demo: boolean;
@@ -139,7 +139,8 @@ export const updateLeadCrmFn = createServerFn({ method: "POST" })
     const { requireStaff } = await import("./staff.server");
     const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = { ...data.patch };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const patch: any = { ...data.patch };
     // Keep legacy columns in sync with the pipeline.
     if (data.patch.crm_stage) {
       patch.traite = data.patch.crm_stage === "clos";
