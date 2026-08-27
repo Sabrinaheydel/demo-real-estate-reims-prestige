@@ -60,8 +60,6 @@ export const Route = createFileRoute("/admin")({
   component: AdminRoute,
 });
 
-const ADMIN_EMAIL = "admin@dupuis.fr";
-const ADMIN_PASSWORD = "demo2026";
 
 
 
