@@ -1,66 +1,62 @@
-# Plan d'implémentation
+# Audit — Démo portfolio "Dupuis Immobilier" (site public + /admin)
 
-C'est un gros chantier qui touche la base de données, l'admin, et toutes les pages publiques. Je le découpe en 4 étapes.
+Aucune modification de code effectuée. Constats vérifiés dans le code.
 
-## 1. Activer Lovable Cloud + créer les tables
+## Ce qui fonctionne déjà bien (à ne PAS refaire)
 
-Activer Lovable Cloud (Supabase managé). Puis créer deux tables via migration :
+- **Site public solide et cohérent** : 16 annonces, catalogue avec filtres + vue carte, pages détail complètes (`annonces.$id.tsx`, 758 lignes : galerie, lightbox, caractéristiques, DPE, bloc agent, formulaire), simulateurs prêt (`LoanSimulator`) et loyer (`RentSimulator`), pages vendre / louer / honoraires / dernières ventes / mentions / RGPD. Charte navy + gold + crème, typo display : pas d'aspect "template IA".
+- **Barre de recherche mobile compacte** déjà traitée (44px, accordéon filtres, toggle liste/carte).
+- **Backend réel** : tables `properties`, `form_submissions`, `user_roles` + `has_role()`, RLS en place côté base.
+- **Chaîne lead fonctionnelle et démontrable** : formulaire → insert `form_submissions` → email Brevo au client + agent → `email_status` (pending/sent/failed/skipped) → bouton "Renvoyer" côté admin. C'est le vrai différenciateur du projet.
+- **Admin déjà crédible sur 4 écrans** : Tableau de bord (24h / 7j / à traiter / taux de délivrabilité), Mes annonces, Ajouter/éditer annonce (upload photos), Candidatures & formulaires (tableau, badges statut, badge email, marquer traité, détail).
+- **Notifications push navigateur** (permission, service worker, son, mode nuit, bouton test avec ligne éphémère "🧪 TEST") : très démonstratif en live.
+- **GA4** branché globalement (`G-GE530MHKM6`) avec page_view SPA + events personnalisés.
+- `/admin` en `noindex,nofollow`.
 
-**`properties`** (annonces)
-- `id` uuid PK, `reference` text unique, `titre`, `type` (vente/location), `statut`, `prix` numeric, `surface`, `pieces`, `chambres`, `quartier`, `description`, `meuble` bool, `parking` bool, `cave` bool, `dpe`, `photo_principale` text, `photos_supplementaires` text[], `latitude/longitude`, `visible` bool, `is_rental` bool, `furnished` bool, `availability_tag` text, `meta` jsonb (pour champs annexes du modèle Listing), `created_at`, `updated_at`.
-- RLS : lecture publique (`visible = true`), écriture réservée au rôle `admin`.
-- GRANTS : `SELECT` à `anon`/`authenticated`, `ALL` à `service_role`.
+## P0 — Bloquants avant publication LinkedIn
 
-**`form_submissions`**
-- `id`, `created_at`, `form_type`, `prenom`, `nom`, `email`, `telephone`, `reference_annonce`, `donnees_completes` jsonb, `statut` text (`nouveau` défaut), `traite` bool défaut false.
-- RLS : insertion publique (formulaires anonymes), lecture/maj réservée admin.
+1. **Fuite de données personnelles : les server functions de l'admin ne sont pas authentifiées.**
+   `listSubmissionsFn`, `setSubmissionTraiteFn`, `resendConfirmationEmailFn` (`src/lib/submissions.functions.ts`) et `updatePropertyFn` (`src/lib/properties.functions.ts`) utilisent `supabaseAdmin` (bypass RLS) **sans `requireSupabaseAuth`**. N'importe qui peut appeler l'endpoint RPC et récupérer nom, email, téléphone de tous les prospects, marquer traité, déclencher des envois d'emails, ou modifier les annonces. La RLS ne protège pas puisque le client admin la contourne.
+   → Ajouter `.middleware([requireSupabaseAuth])` + vérification `has_role(uid,'admin')` sur ces 4 fonctions.
+2. **Auth admin factice.** `admin.tsx` compare en clair `admin@dupuis.fr` / `demo2026` côté client et pose `sessionStorage`. Le mot de passe est dans le bundle JS public. Aucun contrôle serveur.
+   → Migrer vers Supabase Auth + rôle `admin` (le prérequis du point 1).
+3. **Données réelles mélangées à la démo.** Toute soumission de visiteur LinkedIn (email, téléphone) est stockée en base et déclenche un vrai email Brevo, sans mention explicite côté formulaire.
+   → Soit bandeau/checkbox de consentement explicite "données de démonstration, supprimées sous X jours", soit purge automatique + mode démo qui n'envoie pas d'email réel.
+4. **Aucune mention "démonstration" sur le site public.** Aucun bandeau : l'agence, l'agent, les annonces et les prix sont fictifs, ce n'est indiqué nulle part hors admin.
+   → Bandeau discret persistant + mention dans les mentions légales.
 
-**Rôles** : table `user_roles` + enum `app_role` + fonction `has_role()` (pattern standard Lovable).
+## P1 — Améliorations qui font la différence en portfolio
 
-## 2. Seed des 16 annonces
+5. **Profondeur CRM manquante.** Le module Candidatures est une **boîte de réception**, pas un CRM. Absent aujourd'hui : pipeline/kanban (Nouveau → Contacté → Qualifié → Visite → Offre → Signé), score de qualification, notes internes, historique d'activité, attribution à un agent, rappels/relances, rendez-vous de visite, matching prospect↔bien, conversion et taux par étape, recherche/filtres/tri dans le tableau.
+   → Pour être crédible comme "CRM immobilier", viser un socle minimum : statut pipeline + notes + assignation + score de qualification + RDV, avec métriques de conversion sur le dashboard.
+6. **Persistance incohérente des annonces.** L'ajout et la suppression d'annonce ne touchent que `localStorage` (`admin-listings`) ; seule la mise à jour d'une annonce déjà en base est persistée. En démo, "Créer" puis rechargement depuis un autre navigateur = l'annonce a disparu. Incohérence visible.
+7. **Retours d'état incomplets.** L'enregistrement d'annonce n'affiche pas de toast de succès (seulement une erreur), pas d'état "Enregistrement…" / bouton désactivé, pas de confirmation de suppression propre (`confirm()` natif), pas d'état de chargement ni d'état vide illustré sur les listes.
+8. **Responsive de l'admin.** Le tableau des candidatures repose sur un scroll horizontal à 8 colonnes ; le bloc profil/notification du header est masqué en `sm`. Sur mobile, prévoir des cartes empilées plutôt qu'un tableau.
+9. **Instrumentation analytics côté admin/parcours de démo.** GA4 suit le public, mais aucun event sur les actions de démonstration (ouverture /admin, test notification, changement de statut, simulateur utilisé) — ce sont pourtant les preuves d'engagement utiles pour un portfolio.
+10. **Pas de boucle de feedback.** Aucun moyen pour un visiteur LinkedIn de dire ce qu'il pense (mini-widget "Votre avis sur cette démo").
 
-Insérer les 16 annonces actuelles de `src/lib/listings.ts` dans `properties` via SQL `INSERT`, en conservant `reference` (DI-2024-XXX) et toutes les caractéristiques.
+## P2 — Confort / finition
 
-## 3. Migration du front
+11. Parcours de démo guidé : page `/demo` expliquant le scénario (déposer une demande → la voir arriver en temps réel dans l'admin), avec identifiants de démo affichés et bouton "Ouvrir l'admin".
+12. Reset automatique du jeu de données de démo (cron quotidien) pour que la démo reste propre.
+13. Accessibilité : contrastes sur texte `foreground/40-50`, focus visibles, labels ARIA sur les icônes-boutons.
+14. SEO/OG : vérifier que chaque route a un `head()` unique et une image OG absolue.
+15. README public : capture, stack, périmètre, "données fictives", lien démo — indispensable si le repo est publié sur GitHub.
+16. Accès admin : la sécurité par obscurité (URL non listée) ne suffit pas ; prévoir un compte de démo en lecture seule distinct du compte admin.
 
-**Lecture publique** :
-- Nouveau server fn `listProperties()` + `getPropertyById(id)` + `getSimilarProperties()`.
-- `/annonces`, `/acheter`, `/louer` lisent depuis Supabase (loader + TanStack Query).
-- Remplacer le hook `useListings` local par les requêtes Supabase.
+## Réponse directe : peut-on présenter l'admin comme un CRM ?
 
-**Page détail `/annonces/$id`** (déjà existe mais lit du statique) :
-- Récupère l'annonce via server fn, 404 si introuvable.
-- Garde la structure actuelle (fil d'ariane, galerie, 2 colonnes, formulaire contact, biens similaires) — elle correspond déjà à la spec.
-- Le formulaire contact / candidature location écrit dans `form_submissions` (plus de Brevo direct).
+**Pas encore.** Aujourd'hui c'est un **back-office de gestion d'annonces + inbox de leads avec suivi de délivrabilité email**, ce qui est déjà une bonne histoire — mais le mot "CRM" implique pipeline, qualification et relance, qui n'existent pas. Deux options honnêtes :
 
-**Admin** (`/admin`) :
-- Mise en place d'une auth Supabase réelle (email/password + rôle admin) à la place du `sessionStorage` hardcodé.
-- Le formulaire d'édition fait un `UPDATE` Supabase via server fn protégée par `has_role('admin')`.
-- Après save : toast vert "✅ Annonce mise à jour !", invalidation du cache → la page détail reflète immédiatement.
-- Section "Formulaires reçus" : liste les `form_submissions` triées par date, badges statut, boutons "Voir détail" / "Marquer traité", badge rouge "Admin ● N" dans le menu si nouvelles soumissions.
+- **Option A (rapide, sans dette)** : repositionner le discours sur "back-office agence + capture et suivi de leads temps réel avec notifications push et emails automatiques". Ne corriger que les P0. Publiable rapidement.
+- **Option B (recommandée pour le positionnement CRM)** : P0 + points 5, 6, 7 → pipeline, notes, assignation, RDV, persistance complète. Là, le terme "CRM / lead qualification workspace" devient défendable.
 
-## 4. Suppression mailto + confirmations propres
+## Périmètre de lancement recommandé pour LinkedIn
 
-- `grep -r mailto` → supprimer toutes les ouvertures de boîte mail dans les formulaires.
-- Tous les formulaires (estimation, contact annonce, candidature location, contact général, rappel rapide) :
-  1. POST vers server fn → insert dans `form_submissions`
-  2. Affichent immédiatement le bloc confirmation visuelle (✓ vert, message contextuel, réf de suivi générée côté serveur, CTA retour).
-- Refs de suivi : `EST-YYMMDD-XXXX`, `DI-XXX` (reprend la réf annonce), `DI-LOC-XXX`.
+1. Corriger les 4 P0 (sécurité + disclosure) — non négociable avant tout partage public.
+2. Ajouter le socle CRM du point 5 dans une version resserrée : statut pipeline, notes internes, assignation, RDV, matching simple prospect↔bien.
+3. Corriger la persistance annonces (6) et les retours d'état (7).
+4. Ajouter la page `/demo` guidée (11) + events analytics de démo (9).
+5. Publier avec le message : "Démo — CRM immobilier & qualification de leads en temps réel. Données fictives."
 
-## Détails techniques
-
-- Toutes les écritures admin passent par des `createServerFn` avec middleware `requireSupabaseAuth` + vérif `has_role('admin')`.
-- Les server fn touchant `supabaseAdmin` chargent le client server-only via `await import('@/integrations/supabase/client.server')` à l'intérieur du `.handler()`.
-- TanStack Query pour le cache côté UI (`useSuspenseQuery` sur les listes, `useMutation` + `queryClient.invalidateQueries` pour les updates admin).
-- Le hook `useListings` (localStorage) et le fichier `admin-storage.ts` créés au tour précédent sont supprimés.
-- L'authentification admin réelle remplace `admin@dupuis.fr / demo2026` ; je crée un compte admin de démo via migration (email + rôle `admin` dans `user_roles`) et te donne le mot de passe à changer ensuite.
-
-## Risques / points d'attention
-
-- **Auth admin** : passer d'un sessionStorage à une vraie auth casse l'accès actuel ; je te fournis les nouvelles credentials.
-- **Champs absents du modèle Listing** : certains champs riches (slug, photos multiples, coordonnées GPS, slots de visite, etc.) seront stockés dans `meta jsonb` pour ne rien perdre.
-- **Brevo** : on garde l'intégration côté serveur en commentaire/optionnel — l'insertion `form_submissions` est la source de vérité ; Brevo pourra être réactivé sans toucher au front.
-
-Confirme-moi que je peux y aller, et notamment :
-1. Tu valides l'activation de Lovable Cloud (création d'un backend Supabase managé).
-2. Tu valides la migration de l'auth admin vers Supabase Auth (le mot de passe `demo2026` ne fonctionnera plus, je créerai un nouveau compte admin).
+Dis-moi quelle option (A ou B) tu retiens et je transforme ça en plan d'implémentation chiffré.
