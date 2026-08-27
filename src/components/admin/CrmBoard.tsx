@@ -291,7 +291,10 @@ export default function CrmBoard() {
                           {l.lead_score ?? "—"}
                         </span>
                       </div>
-                      <p className="text-[11px] text-foreground/60 mt-0.5">{demandeLabel(l.form_type)}</p>
+                      <div className="mt-1">
+                        <SourceBadge formType={l.form_type} />
+                      </div>
+
                       {l.next_action && (
                         <p className="text-[11px] text-foreground/70 mt-1.5 truncate">➜ {l.next_action}</p>
                       )}
