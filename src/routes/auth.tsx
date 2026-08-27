@@ -33,11 +33,10 @@ function AuthPage() {
     setDemoBusy(true);
     setError(null);
     try {
-      const { email: demoEmail, tokenHash } = await startDemo();
+      const { tokenHash } = await startDemo();
       const { error: err } = await supabase.auth.verifyOtp({
         type: "email",
         token_hash: tokenHash,
-        email: demoEmail,
       });
       if (err) throw new Error(err.message);
       window.location.href = "/admin";
