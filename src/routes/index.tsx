@@ -393,6 +393,16 @@ function Hero() {
               Voir les annonces
             </Link>
           </div>
+          <Link
+            to="/demo"
+            className="mt-4 inline-flex w-fit items-center gap-2.5 px-6 py-3 rounded-lg bg-gold text-navy font-semibold shadow-card hover:bg-gold/90 transition-all hover:-translate-y-0.5 ring-2 ring-gold/40 ring-offset-2 ring-offset-navy"
+          >
+            <PlayCircle size={18} className="shrink-0" />
+            <span className="flex flex-col items-start leading-tight text-left">
+              <span>Tester le CRM en démonstration</span>
+              <span className="text-[11px] font-normal text-navy/70">Démo interactive · 5 min</span>
+            </span>
+          </Link>
         </div>
       </div>
       <div className="absolute bottom-6 left-6 lg:left-10 z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm text-white">
