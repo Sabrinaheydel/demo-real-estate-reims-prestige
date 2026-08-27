@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { LISTINGS, type Listing } from "@/lib/listings";
 import { useServerFn } from "@tanstack/react-start";
-import { listPropertiesFn, getPropertyFn, updatePropertyFn } from "@/lib/properties.functions";
+import { listPropertiesFn, getPropertyFn, updatePropertyFn, listStaffPropertiesFn } from "@/lib/properties.functions";
 
 // Reads listings from Supabase. Falls back to the static seed during the
 // initial hydration so the UI is never empty.
@@ -23,6 +23,26 @@ export function useListings(): Listing[] {
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
   }, [refresh]);
+  return list;
+}
+
+// Staff feed: admins get every listing, demo visitors only the fictional ones.
+export function useStaffListings(): Listing[] {
+  const fetchStaff = useServerFn(listStaffPropertiesFn);
+  const [list, setList] = useState<Listing[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchStaff()
+      .then((rows) => {
+        if (!cancelled && Array.isArray(rows)) setList(rows as Listing[]);
+      })
+      .catch(() => {
+        /* gate already handles auth errors */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchStaff]);
   return list;
 }
 

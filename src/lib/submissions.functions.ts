@@ -17,19 +17,23 @@ export type FormSubmission = {
   statut: string;
   traite: boolean;
   email_status: EmailStatus;
+  is_demo?: boolean;
 };
 
 export const listSubmissionsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { requireStaff } = await import("./staff.server");
-    await requireStaff(context.supabase, context.userId);
+    const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from("form_submissions")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(500);
+    // Demo visitors never see real leads.
+    if (role === "demo") query = query.eq("is_demo", true);
+    const { data, error } = await query;
     if (error) throw new Error(error.message);
     return (data ?? []) as unknown as FormSubmission[];
   });
@@ -45,13 +49,16 @@ export const setSubmissionTraiteFn = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ToggleSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { requireStaff } = await import("./staff.server");
-    await requireStaff(context.supabase, context.userId);
+    const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    let q = supabaseAdmin
       .from("form_submissions")
       .update({ traite: data.traite, statut: data.traite ? "traite" : "nouveau" })
       .eq("id", data.id);
+    if (role === "demo") q = q.eq("is_demo", true);
+    const { data: updated, error } = await q.select("id");
     if (error) throw new Error(error.message);
+    if (!updated || updated.length === 0) throw new Error("Forbidden: donnée non accessible en mode démo");
     return { ok: true as const };
   });
 
@@ -61,8 +68,8 @@ export const resendConfirmationEmailFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ResendSchema.parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true; email_status: EmailStatus }> => {
-    const { requireAdmin } = await import("./staff.server");
-    await requireAdmin(context.supabase, context.userId);
+    const { requireStaff } = await import("./staff.server");
+    const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("form_submissions")
@@ -74,6 +81,18 @@ export const resendConfirmationEmailFn = createServerFn({ method: "POST" })
       throw new Error("Renvoi disponible uniquement pour les candidatures location");
     }
     if (!row.email) throw new Error("Pas d'adresse email sur cette soumission");
+
+    // Demo sandbox: never contact Brevo, simulate the send instead.
+    if (role === "demo" || row.is_demo === true) {
+      const { error: simErr } = await supabaseAdmin
+        .from("form_submissions")
+        .update({ email_status: "skipped" })
+        .eq("id", row.id)
+        .eq("is_demo", true);
+      if (simErr) console.warn("[resend:demo] status update failed", simErr.message);
+      console.log("[resend:demo] envoi simulé (aucun email réel)", { id: row.id });
+      return { ok: true as const, email_status: "skipped" as EmailStatus };
+    }
 
     const donnees = (row.donnees_completes ?? {}) as Record<string, unknown>;
     const titre =

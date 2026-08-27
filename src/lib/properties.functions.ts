@@ -124,8 +124,8 @@ export const updatePropertyFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => UpdateSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const { requireAdmin } = await import("./staff.server");
-    await requireAdmin(context.supabase, context.userId);
+    const { requireStaff } = await import("./staff.server");
+    const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Resolve legacy_id → uuid if needed
     let uuid = data.id;
@@ -139,13 +139,33 @@ export const updatePropertyFn = createServerFn({ method: "POST" })
       if (!row) throw new Error("Annonce introuvable");
       uuid = row.id as string;
     }
-    const { data: updated, error } = await supabaseAdmin
+    let upd = supabaseAdmin
       .from("properties")
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .update(data.patch as any)
-      .eq("id", uuid)
-      .select("*")
-      .single();
+      .eq("id", uuid);
+    // Demo visitors can only touch fictional listings.
+    if (role === "demo") upd = upd.eq("is_demo", true);
+    const { data: updated, error } = await upd.select("*").maybeSingle();
     if (error) throw new Error(error.message);
+    if (!updated) throw new Error("Forbidden: annonce non modifiable en mode démo");
     return rowToListing(updated as unknown as PropertyRow);
+  });
+
+
+/**
+ * Staff listing feed: admins see everything, demo visitors only see the
+ * fictional (`is_demo`) listings. Enforced server-side, not in the UI.
+ */
+export const listStaffPropertiesFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { requireStaff } = await import("./staff.server");
+    const role = await requireStaff(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = supabaseAdmin.from("properties").select("*").order("created_at", { ascending: false });
+    if (role === "demo") q = q.eq("is_demo", true);
+    const { data, error } = await q;
+    if (error) throw new Error(error.message);
+    return (data as unknown as PropertyRow[]).map(rowToListing);
   });
