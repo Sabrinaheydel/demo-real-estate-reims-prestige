@@ -197,18 +197,41 @@ export const submitDemoFeedbackFn = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("form_submissions").insert({
-      form_type: "feedback-demo",
-      email: data.email ? data.email : null,
-      is_demo: true,
-      email_status: "skipped",
-      statut: "nouveau",
-      donnees_completes: {
-        note: data.rating,
-        commentaire: data.comment ?? "",
-        source: "demo-crm",
-      },
-    });
+    const { data: row, error } = await supabaseAdmin
+      .from("form_submissions")
+      .insert({
+        form_type: "feedback-demo",
+        email: data.email ? data.email : null,
+        is_demo: true,
+        email_status: "pending",
+        statut: "nouveau",
+        donnees_completes: {
+          note: data.rating,
+          commentaire: data.comment ?? "",
+          source: "demo-crm",
+        },
+      })
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
-    return { ok: true };
+
+    let emailStatus = "sent";
+    try {
+      const { sendDemoFeedbackNotification } = await import("@/lib/brevo.server");
+      await sendDemoFeedbackNotification({
+        rating: data.rating,
+        comment: data.comment,
+        testerEmail: data.email || undefined,
+      });
+    } catch (e) {
+      emailStatus = "failed";
+      console.error("[feedback] notification email failed:", e instanceof Error ? e.message : e);
+    }
+    if (row?.id) {
+      await supabaseAdmin
+        .from("form_submissions")
+        .update({ email_status: emailStatus })
+        .eq("id", row.id);
+    }
+    return { ok: true, emailStatus };
   });
