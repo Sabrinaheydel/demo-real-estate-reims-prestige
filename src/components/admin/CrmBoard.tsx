@@ -91,8 +91,10 @@ export default function CrmBoard() {
 
   const refresh = useCallback(async () => {
     try {
-      const s = await fetchSnapshot();
-      setSnap(s as CrmSnapshot);
+      const s = (await fetchSnapshot()) as CrmSnapshot;
+      setSnap(s);
+      const firstFilled = CRM_STAGES.find((st) => s.leads.some((l) => l.crm_stage === st));
+      if (firstFilled) setMobileStage(firstFilled);
     } catch (e) {
       console.warn("[crm] load failed", e);
       toast.error("Chargement du CRM impossible");
