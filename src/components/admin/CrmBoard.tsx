@@ -44,25 +44,31 @@ function demandeLabel(t: string) {
     "feedback-demo": "Avis démo",
     "simulation-pret": "Calculateur prêt",
     "simulation-loyer": "Calculateur loyer",
+    "profil-candidat": "Profil candidat",
   };
   return map[t] ?? t.replace(/-/g, " ");
 }
 
 const CALCULATOR_TYPES = ["simulation-pret", "simulation-loyer"];
+const PROFILE_TYPE = "profil-candidat";
+/** Lead types created from public demo tools: no real personal data. */
+const SYNTHETIC_TYPES = [...CALCULATOR_TYPES, PROFILE_TYPE];
 
 function SourceBadge({ formType }: { formType: string }) {
   const isCalc = CALCULATOR_TYPES.includes(formType);
+  const isProfile = formType === PROFILE_TYPE;
   return (
     <span
       className={`inline-block text-[10px] px-1.5 py-0.5 rounded font-semibold ${
-        isCalc ? "bg-gold/25 text-navy" : "bg-navy/10 text-navy/80"
+        isCalc || isProfile ? "bg-gold/25 text-navy" : "bg-navy/10 text-navy/80"
       }`}
     >
-      {isCalc ? "🧮 " : ""}
+      {isCalc ? "🧮 " : isProfile ? "👤 " : ""}
       {demandeLabel(formType)}
     </span>
   );
 }
+
 
 /** Readable key/value summary of the stored simulation data (never raw JSON). */
 function SimulationSummary({ lead }: { lead: CrmLead }) {
