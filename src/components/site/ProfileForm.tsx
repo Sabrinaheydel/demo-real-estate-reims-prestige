@@ -157,9 +157,10 @@ export function ProfileForm({ defaultType = "location" }: Props) {
         <div className="sm:col-span-2 flex flex-wrap items-center gap-3 pt-2">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-rental text-white font-semibold hover:bg-rental/90 transition-colors"
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-rental text-white font-semibold hover:bg-rental/90 transition-colors disabled:opacity-60"
           >
-            {hasExisting ? "Mettre à jour mon profil" : "Enregistrer mon profil"}
+            {loading ? "Enregistrement…" : hasExisting ? "Mettre à jour mon profil" : "Enregistrer mon profil"}
           </button>
           {hasExisting && (
             <button
@@ -168,21 +169,33 @@ export function ProfileForm({ defaultType = "location" }: Props) {
                 clearProfile();
                 setForm({ situation_pro: "", revenus_mensuels: 0, revenus_label: "", garant: "", type_recherche: defaultType });
                 setHasExisting(false);
+                setSaved(false);
+                setCrmDone(false);
+                setSentSignature(null);
               }}
               className="text-sm text-foreground/60 hover:text-navy underline"
             >
               Effacer
             </button>
           )}
-          {saved && (
+          {saved && !loading && (
             <span className="inline-flex items-center gap-1.5 text-sm text-rental">
-              <Check size={16} /> Profil enregistré
+              <Check size={16} /> {crmDone ? "Profil enregistré et ajouté au CRM de démonstration" : "Profil enregistré"}
             </span>
           )}
+          {crmDone && (
+            <Link
+              to="/demo"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-navy text-white text-sm font-medium hover:bg-navy/90"
+            >
+              Voir dans le CRM
+            </Link>
+          )}
           <span className="text-xs text-foreground/50 ml-auto">
-            Données stockées localement, conservées 30 jours.
+            Données stockées localement, conservées 30 jours. Cette démo ne collecte ni nom, ni e-mail, ni téléphone.
           </span>
         </div>
+
       </form>
     </div>
   );
