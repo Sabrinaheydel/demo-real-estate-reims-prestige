@@ -54,7 +54,7 @@ export default function DemoFeedback() {
 
             {done ? (
               <div className="py-3">
-                <p className="text-sm text-emerald-700 font-semibold">Merci, votre avis a bien été enregistré.</p>
+                <p className="text-sm text-emerald-700 font-semibold">Merci, votre avis a bien été envoyé.</p>
                 <button onClick={() => setOpen(false)} className="mt-4 px-4 py-2 rounded-lg bg-navy text-white text-sm">
                   Fermer
                 </button>

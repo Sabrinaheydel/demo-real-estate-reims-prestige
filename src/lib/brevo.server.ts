@@ -174,3 +174,42 @@ export function normalizePhoneFR(input?: string): string | undefined {
   if (cleaned.length === 9) return "+33" + cleaned;
   return undefined;
 }
+
+export async function sendDemoFeedbackNotification(input: {
+  rating: number;
+  comment?: string;
+  testerEmail?: string;
+}): Promise<void> {
+  const esc = (s: string) =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  const date = new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" });
+  const comment = input.comment?.trim() ? esc(input.comment.trim()) : "—";
+  const tester = input.testerEmail?.trim() ? esc(input.testerEmail.trim()) : "Non renseigné";
+  const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#FAF7F2;font-family:Inter,Arial,sans-serif;color:#1B1B2F;">
+  <div style="max-width:560px;margin:0 auto;padding:24px;">
+    <div style="background:#fff;border-radius:12px;padding:24px;">
+      <h1 style="margin:0 0 16px;font-size:18px;">Nouvel avis sur la démo CRM immobilier</h1>
+      <p style="margin:0 0 8px;font-size:22px;font-weight:700;">${input.rating}/5</p>
+      <p style="margin:0 0 4px;font-size:13px;color:#666;">Commentaire</p>
+      <p style="margin:0 0 16px;white-space:pre-wrap;">${comment}</p>
+      <table style="width:100%;font-size:13px;color:#444;">
+        <tr><td style="padding:4px 0;">Email du testeur</td><td align="right">${tester}</td></tr>
+        <tr><td style="padding:4px 0;">Date</td><td align="right">${esc(date)}</td></tr>
+        <tr><td style="padding:4px 0;">Source</td><td align="right">Démo CRM immobilier</td></tr>
+      </table>
+    </div>
+  </div>
+</body></html>`;
+
+  await sendBrevoHtmlEmail({
+    to: [{ email: "sabrina.heydel@agence360digital.fr" }],
+    subject: `Nouvel avis sur la démo CRM immobilier — ${input.rating}/5`,
+    htmlContent: html,
+    sender: { name: "Démo CRM immobilier", email: "sabrina@agence360cabinets.fr" },
+    ...(input.testerEmail?.trim() ? { replyTo: { email: input.testerEmail.trim() } } : {}),
+  });
+}
