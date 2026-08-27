@@ -15,6 +15,7 @@ import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LouerRouteImport } from './routes/louer'
 import { Route as HonorairesRouteImport } from './routes/honoraires'
 import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -51,6 +52,11 @@ const HonorairesRoute = HonorairesRouteImport.update({
 const DernieresVentesRoute = DernieresVentesRouteImport.update({
   id: '/dernieres-ventes',
   path: '/dernieres-ventes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
   '/louer': typeof LouerRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
   '/louer': typeof LouerRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
   '/louer': typeof LouerRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/demo'
     | '/dernieres-ventes'
     | '/honoraires'
     | '/louer'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/demo'
     | '/dernieres-ventes'
     | '/honoraires'
     | '/louer'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/demo'
     | '/dernieres-ventes'
     | '/honoraires'
     | '/louer'
@@ -189,6 +201,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  DemoRoute: typeof DemoRoute
   DernieresVentesRoute: typeof DernieresVentesRoute
   HonorairesRoute: typeof HonorairesRoute
   LouerRoute: typeof LouerRoute
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/dernieres-ventes'
       fullPath: '/dernieres-ventes'
       preLoaderRoute: typeof DernieresVentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -301,6 +321,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  DemoRoute: DemoRoute,
   DernieresVentesRoute: DernieresVentesRoute,
   HonorairesRoute: HonorairesRoute,
   LouerRoute: LouerRoute,

@@ -202,7 +202,9 @@ export function Footer() {
             <li><Link to="/mentions-legales" className="hover:text-gold transition-colors">Mentions légales</Link></li>
             <li><Link to="/politique-rgpd" className="hover:text-gold transition-colors">Politique RGPD</Link></li>
             <li><Link to="/honoraires" className="hover:text-gold transition-colors">Honoraires</Link></li>
+            <li><Link to="/demo" className="text-gold hover:underline font-semibold">Tester le CRM en démonstration</Link></li>
             <li><Link to="/admin" className="hover:text-gold transition-colors">Espace admin</Link></li>
+
           </ul>
         </div>
       </div>

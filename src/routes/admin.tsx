@@ -221,7 +221,9 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
       setTab("messages");
       setOpenSubmissionId(open);
     }
+    if (params.get("tab") === "crm" || params.get("guide") === "1") setTab("crm");
   }, []);
+
 
   // Register service worker once
   useEffect(() => { registerAdminServiceWorker(); }, []);
@@ -336,12 +338,12 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
   return (
     <div className="min-h-screen bg-cream">
       {isDemo && (
-        <div className="bg-gold text-navy text-center text-sm font-semibold px-4 py-2">
-          Mode démonstration · données fictives · aucune action réelle
+        <div className="bg-gold text-navy text-center text-xs sm:text-sm font-semibold px-3 py-2">
+          Bêta publique · mode démonstration · agence, agents, annonces et prospects entièrement fictifs
         </div>
       )}
       <header className="bg-navy text-white">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-4">
             <Link to="/" className="font-display text-xl text-white hover:text-gold transition-colors">
               Dupuis <span className="text-gold italic">Immobilier</span>
@@ -370,15 +372,15 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <h1 className="font-display text-3xl text-navy mb-2">Tableau de bord</h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <h1 className="font-display text-2xl sm:text-3xl text-navy mb-2">Tableau de bord</h1>
         <p className="text-foreground/70 mb-8">
           <strong className="text-navy">{listings.length} annonces actives</strong>
           {" · "}
           <strong className="text-navy">{newMessagesThisWeek} formulaires reçus</strong> à traiter
         </p>
 
-        <nav className="flex flex-wrap gap-2 mb-8">
+        <nav className="flex flex-wrap gap-2 mb-6 sm:mb-8">
           <TabButton active={tab === "dashboard"} onClick={() => setTab("dashboard")} icon={LayoutDashboard}>
             Tableau de bord
           </TabButton>

@@ -1,82 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-
-export const CRM_STAGES = ["nouveau", "a_qualifier", "en_cours", "rdv", "clos"] as const;
-export type CrmStage = (typeof CRM_STAGES)[number];
-
-export const STAGE_LABELS: Record<CrmStage, string> = {
-  nouveau: "Nouveau",
-  a_qualifier: "À qualifier",
-  en_cours: "En cours",
-  rdv: "RDV / Visite",
-  clos: "Clos",
-};
-
-export type CrmLead = {
-  id: string;
-  created_at: string;
-  form_type: string;
-  prenom: string | null;
-  nom: string | null;
-  email: string | null;
-  telephone: string | null;
-  reference_annonce: string | null;
-  donnees_completes: Record<string, string | number | boolean | null | string[]>;
-  statut: string;
-  traite: boolean;
-  is_demo: boolean;
-  crm_stage: CrmStage;
-  lead_score: number | null;
-  assigned_to: string | null;
-  next_action: string | null;
-  next_action_at: string | null;
-};
-
-export type CrmNote = {
-  id: string;
-  lead_id: string;
-  content: string;
-  created_by: string | null;
-  created_at: string;
-};
-
-export type CrmAppointment = {
-  id: string;
-  lead_id: string;
-  scheduled_at: string;
-  appointment_type: string;
-  status: string;
-  notes: string | null;
-};
-
-export type CrmMatch = {
-  id: string;
-  lead_id: string;
-  property_id: string;
-  match_score: number | null;
-  status: string;
-};
-
-export type CrmProperty = {
-  id: string;
-  reference: string;
-  titre: string;
-  prix: number;
-  quartier: string | null;
-  type: string;
-};
-
-export type CrmSnapshot = {
-  role: "admin" | "demo";
-  leads: CrmLead[];
-  notes: CrmNote[];
-  appointments: CrmAppointment[];
-  matches: CrmMatch[];
-  properties: CrmProperty[];
-};
-
-export const DEMO_BLOCKED = "Action simulée ou indisponible en mode démonstration";
+import { CRM_STAGES, DEMO_BLOCKED, type CrmSnapshot, type CrmLead, type CrmNote, type CrmAppointment, type CrmMatch } from "./crm.model";
 
 export const getCrmSnapshotFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -113,35 +38,36 @@ export const getCrmSnapshotFn = createServerFn({ method: "GET" })
     }
     return {
       role,
-      leads: (leads.data ?? []) as unknown as CrmLead[],
-      notes: (notes.data ?? []) as unknown as CrmNote[],
-      appointments: (appts.data ?? []) as unknown as CrmAppointment[],
-      matches: (matches.data ?? []) as unknown as CrmMatch[],
-      properties: (props.data ?? []) as unknown as CrmProperty[],
+      leads: (leads.data ?? []) as unknown as CrmSnapshot["leads"],
+      notes: (notes.data ?? []) as unknown as CrmSnapshot["notes"],
+      appointments: (appts.data ?? []) as unknown as CrmSnapshot["appointments"],
+      matches: (matches.data ?? []) as unknown as CrmSnapshot["matches"],
+      properties: (props.data ?? []) as unknown as CrmSnapshot["properties"],
     };
   });
 
-const UpdateLeadSchema = z.object({
-  id: z.string().uuid(),
-  patch: z.object({
-    crm_stage: z.enum(CRM_STAGES).optional(),
-    lead_score: z.number().int().min(0).max(100).nullable().optional(),
-    assigned_to: z.string().max(120).nullable().optional(),
-    next_action: z.string().max(300).nullable().optional(),
-    next_action_at: z.string().max(40).nullable().optional(),
-  }),
-});
-
 export const updateLeadCrmFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => UpdateLeadSchema.parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        patch: z.object({
+          crm_stage: z.enum(CRM_STAGES).optional(),
+          lead_score: z.number().int().min(0).max(100).nullable().optional(),
+          assigned_to: z.string().max(120).nullable().optional(),
+          next_action: z.string().max(300).nullable().optional(),
+          next_action_at: z.string().max(40).nullable().optional(),
+        }),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { requireStaff } = await import("./staff.server");
     const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const patch: any = { ...data.patch };
-    // Keep legacy columns in sync with the pipeline.
     if (data.patch.crm_stage) {
       patch.traite = data.patch.crm_stage === "clos";
       patch.statut = data.patch.crm_stage === "clos" ? "traite" : "nouveau";
@@ -154,33 +80,16 @@ export const updateLeadCrmFn = createServerFn({ method: "POST" })
     return rows[0] as unknown as CrmLead;
   });
 
-/** Returns the lead if the caller's role may act on it, else throws. */
-async function assertLeadAccess(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabaseAdmin: any,
-  role: "admin" | "demo",
-  leadId: string,
-): Promise<{ is_demo: boolean }> {
-  const { data, error } = await supabaseAdmin
-    .from("form_submissions")
-    .select("id, is_demo")
-    .eq("id", leadId)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Lead introuvable");
-  if (role === "demo" && data.is_demo !== true) throw new Error(DEMO_BLOCKED);
-  return data as { is_demo: boolean };
-}
-
-const NoteSchema = z.object({ lead_id: z.string().uuid(), content: z.string().min(1).max(4000) });
-
 export const addCrmNoteFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => NoteSchema.parse(d))
+  .inputValidator((d: unknown) =>
+    z.object({ lead_id: z.string().uuid(), content: z.string().min(1).max(4000) }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { requireStaff } = await import("./staff.server");
     const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { assertLeadAccess } = await import("./crm.server");
     const lead = await assertLeadAccess(supabaseAdmin, role, data.lead_id);
     const { data: row, error } = await supabaseAdmin
       .from("crm_notes")
@@ -196,26 +105,31 @@ export const addCrmNoteFn = createServerFn({ method: "POST" })
     return row as unknown as CrmNote;
   });
 
-const ApptSchema = z.object({
-  lead_id: z.string().uuid(),
-  scheduled_at: z.string().min(4).max(40),
-  appointment_type: z.string().min(1).max(50),
-  notes: z.string().max(2000).nullable().optional(),
-});
-
 export const addCrmAppointmentFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ApptSchema.parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        lead_id: z.string().uuid(),
+        scheduled_at: z.string().min(4).max(40),
+        appointment_type: z.string().min(1).max(50),
+        notes: z.string().max(2000).nullable().optional(),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { requireStaff } = await import("./staff.server");
     const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { assertLeadAccess } = await import("./crm.server");
     const lead = await assertLeadAccess(supabaseAdmin, role, data.lead_id);
+    const when = new Date(data.scheduled_at);
+    if (Number.isNaN(when.getTime())) throw new Error("Date de rendez-vous invalide");
     const { data: row, error } = await supabaseAdmin
       .from("crm_appointments")
       .insert({
         lead_id: data.lead_id,
-        scheduled_at: new Date(data.scheduled_at).toISOString(),
+        scheduled_at: when.toISOString(),
         appointment_type: data.appointment_type,
         notes: data.notes ?? null,
         is_demo: lead.is_demo,
@@ -226,19 +140,22 @@ export const addCrmAppointmentFn = createServerFn({ method: "POST" })
     return row as unknown as CrmAppointment;
   });
 
-const MatchSchema = z.object({
-  lead_id: z.string().uuid(),
-  property_id: z.string().uuid(),
-  match_score: z.number().int().min(0).max(100).nullable().optional(),
-});
-
 export const addCrmMatchFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => MatchSchema.parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        lead_id: z.string().uuid(),
+        property_id: z.string().uuid(),
+        match_score: z.number().int().min(0).max(100).nullable().optional(),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { requireStaff } = await import("./staff.server");
     const role = await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { assertLeadAccess } = await import("./crm.server");
     const lead = await assertLeadAccess(supabaseAdmin, role, data.lead_id);
     const { data: prop, error: propErr } = await supabaseAdmin
       .from("properties")
@@ -263,4 +180,32 @@ export const addCrmMatchFn = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
     return row as unknown as CrmMatch;
+  });
+
+export const submitDemoFeedbackFn = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        rating: z.number().int().min(1).max(5),
+        comment: z.string().max(2000).optional(),
+        email: z.string().email().max(200).optional().or(z.literal("")),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("form_submissions").insert({
+      form_type: "feedback-demo",
+      email: data.email ? data.email : null,
+      is_demo: true,
+      email_status: "skipped",
+      statut: "nouveau",
+      donnees_completes: {
+        note: data.rating,
+        commentaire: data.comment ?? "",
+        source: "demo-crm",
+      },
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
