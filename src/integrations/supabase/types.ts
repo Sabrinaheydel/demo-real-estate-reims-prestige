@@ -22,6 +22,7 @@ export type Database = {
           email_status: string
           form_type: string
           id: string
+          is_demo: boolean
           nom: string | null
           prenom: string | null
           reference_annonce: string | null
@@ -36,6 +37,7 @@ export type Database = {
           email_status?: string
           form_type: string
           id?: string
+          is_demo?: boolean
           nom?: string | null
           prenom?: string | null
           reference_annonce?: string | null
@@ -50,6 +52,7 @@ export type Database = {
           email_status?: string
           form_type?: string
           id?: string
+          is_demo?: boolean
           nom?: string | null
           prenom?: string | null
           reference_annonce?: string | null
@@ -67,6 +70,7 @@ export type Database = {
           description: string | null
           dpe: string | null
           id: string
+          is_demo: boolean
           legacy_id: string | null
           meta: Json
           meuble: boolean | null
@@ -90,6 +94,7 @@ export type Database = {
           description?: string | null
           dpe?: string | null
           id?: string
+          is_demo?: boolean
           legacy_id?: string | null
           meta?: Json
           meuble?: boolean | null
@@ -113,6 +118,7 @@ export type Database = {
           description?: string | null
           dpe?: string | null
           id?: string
+          is_demo?: boolean
           legacy_id?: string | null
           meta?: Json
           meuble?: boolean | null

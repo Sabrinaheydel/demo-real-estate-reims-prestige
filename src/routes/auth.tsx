@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { demoSignInFn } from "@/lib/demo-access.functions";
 import { ArrowLeft, Lock, MailCheck } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
@@ -24,6 +26,26 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [demoBusy, setDemoBusy] = useState(false);
+  const startDemo = useServerFn(demoSignInFn);
+
+  async function enterDemo() {
+    setDemoBusy(true);
+    setError(null);
+    try {
+      const { tokenHash } = await startDemo();
+      const { error: err } = await supabase.auth.verifyOtp({
+        type: "email",
+        token_hash: tokenHash,
+      });
+      if (err) throw new Error(err.message);
+      window.location.href = "/admin";
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Mode démo indisponible");
+    } finally {
+      setDemoBusy(false);
+    }
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
@@ -118,6 +140,21 @@ function AuthPage() {
                 {busy ? "Envoi…" : "Recevoir le lien de connexion"}
               </button>
             </form>
+
+            <div className="mt-8 pt-6 border-t border-border">
+              <p className="text-xs text-foreground/60 mb-3">
+                Vous découvrez cette démonstration ? Entrez en visiteur : accès en lecture à un jeu de
+                données entièrement fictif, sans aucun envoi d'email ni accès aux données réelles.
+              </p>
+              <button
+                type="button"
+                onClick={enterDemo}
+                disabled={demoBusy}
+                className="w-full px-5 py-3 rounded-lg border border-navy text-navy font-semibold hover:bg-navy hover:text-white transition-colors disabled:opacity-60"
+              >
+                {demoBusy ? "Ouverture…" : "Entrer en mode démonstration"}
+              </button>
+            </div>
           </>
         )}
       </div>

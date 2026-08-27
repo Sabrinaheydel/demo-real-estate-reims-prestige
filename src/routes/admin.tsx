@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { LISTINGS as SEED_LISTINGS, type Listing } from "@/lib/listings";
-import { useListings, useUpdateListing } from "@/lib/admin-storage";
+import { useListings, useUpdateListing, useStaffListings } from "@/lib/admin-storage";
 import { useServerFn } from "@tanstack/react-start";
 import { listSubmissionsFn, setSubmissionTraiteFn, resendConfirmationEmailFn, type FormSubmission, type EmailStatus } from "@/lib/submissions.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -153,15 +153,18 @@ function AdminRoute() {
 type Tab = "dashboard" | "annonces" | "ajouter" | "messages";
 
 function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffRole }) {
-  void role;
-  const supabaseListings = useListings();
+  const isDemo = role === "demo";
+  const publicListings = useListings();
+  const staffListings = useStaffListings();
+  const supabaseListings = isDemo ? staffListings : publicListings;
   const [localListings, setLocalListings] = useLocalState<Listing[]>("admin-listings", SEED_LISTINGS);
   // Prefer Supabase data once it arrives; fall back to local state for newly-added items.
   const listings = useMemo(() => {
+    if (isDemo) return supabaseListings;
     const supaIds = new Set(supabaseListings.map((l) => l.id));
     const extras = localListings.filter((l) => !supaIds.has(l.id));
     return supabaseListings.length > 0 ? [...supabaseListings, ...extras] : localListings;
-  }, [supabaseListings, localListings]);
+  }, [isDemo, supabaseListings, localListings]);
   const updateListing = useUpdateListing();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [editing, setEditing] = useState<Listing | null>(null);
@@ -319,6 +322,10 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
   }
 
   function deleteListing(id: string) {
+    if (isDemo) {
+      toast.error("Action désactivée en mode démonstration.");
+      return;
+    }
     if (!confirm("Supprimer définitivement cette annonce ?")) return;
     setLocalListings((prev) => prev.filter((l) => l.id !== id));
   }
@@ -326,6 +333,11 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
 
   return (
     <div className="min-h-screen bg-cream">
+      {isDemo && (
+        <div className="bg-gold text-navy text-center text-sm font-semibold px-4 py-2">
+          Mode démonstration · données fictives · aucune action réelle
+        </div>
+      )}
       <header className="bg-navy text-white">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
