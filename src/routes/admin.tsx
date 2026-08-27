@@ -46,8 +46,10 @@ import {
   MailWarning,
   MailCheck,
   RefreshCw,
+  KanbanSquare,
 } from "lucide-react";
 
+import CrmBoard from "@/components/admin/CrmBoard";
 import portraitAvatar from "@/assets/photo-profil-1.jpg.asset.json";
 
 export const Route = createFileRoute("/admin")({
@@ -150,7 +152,7 @@ function AdminRoute() {
 }
 
 
-type Tab = "dashboard" | "annonces" | "ajouter" | "messages";
+type Tab = "dashboard" | "crm" | "annonces" | "ajouter" | "messages";
 
 function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffRole }) {
   const isDemo = role === "demo";
@@ -380,6 +382,9 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
           <TabButton active={tab === "dashboard"} onClick={() => setTab("dashboard")} icon={LayoutDashboard}>
             Tableau de bord
           </TabButton>
+          <TabButton active={tab === "crm"} onClick={() => setTab("crm")} icon={KanbanSquare}>
+            CRM &amp; Pipeline
+          </TabButton>
           <TabButton active={tab === "annonces"} onClick={() => { setEditing(null); setTab("annonces"); }} icon={Building2}>
             Mes annonces
           </TabButton>
@@ -416,6 +421,7 @@ function AdminDashboard({ onLogout, role }: { onLogout: () => void; role: StaffR
             onOpenSubmission={(id) => { setOpenSubmissionId(id); setTab("messages"); }}
           />
         )}
+        {tab === "crm" && <CrmBoard />}
         {tab === "annonces" && !editing && (
           <ListingsList
             listings={listings}
