@@ -403,13 +403,16 @@ function LeadDrawer({
   const [assigned, setAssigned] = useState(lead.assigned_to ?? "");
   const [nextAction, setNextAction] = useState(lead.next_action ?? "");
   const [nextAt, setNextAt] = useState(lead.next_action_at ? lead.next_action_at.slice(0, 10) : "");
-  const [busy, setBusy] = useState<null | "note" | "appt" | "match">(null);
+  const [busy, setBusy] = useState<null | "note" | "appt" | "match" | "followup">(null);
+  const [followUpDone, setFollowUpDone] = useState(false);
 
   const notes = snap.notes.filter((n) => n.lead_id === lead.id);
   const appts = snap.appointments.filter((a) => a.lead_id === lead.id);
   const matches = snap.matches.filter((m) => m.lead_id === lead.id);
+  const isCalculatorLead = CALCULATOR_TYPES.includes(lead.form_type);
 
-  async function run(kind: "note" | "appt" | "match", fn: () => Promise<void>) {
+  async function run(kind: "note" | "appt" | "match" | "followup", fn: () => Promise<void>) {
+
     setBusy(kind);
     try {
       await fn();
