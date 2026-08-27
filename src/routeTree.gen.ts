@@ -16,6 +16,7 @@ import { Route as LouerRouteImport } from './routes/louer'
 import { Route as HonorairesRouteImport } from './routes/honoraires'
 import { Route as DernieresVentesRouteImport } from './routes/dernieres-ventes'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcheterRouteImport } from './routes/acheter'
 import { Route as IndexRouteImport } from './routes/index'
@@ -57,6 +58,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/acheter': typeof AcheterRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/dernieres-ventes': typeof DernieresVentesRoute
   '/honoraires': typeof HonorairesRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/admin'
+    | '/auth'
     | '/contact'
     | '/dernieres-ventes'
     | '/honoraires'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/admin'
+    | '/auth'
     | '/contact'
     | '/dernieres-ventes'
     | '/honoraires'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acheter'
     | '/admin'
+    | '/auth'
     | '/contact'
     | '/dernieres-ventes'
     | '/honoraires'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AcheterRoute: typeof AcheterRoute
   AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   DernieresVentesRoute: typeof DernieresVentesRoute
   HonorairesRoute: typeof HonorairesRoute
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcheterRoute: AcheterRoute,
   AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   DernieresVentesRoute: DernieresVentesRoute,
   HonorairesRoute: HonorairesRoute,
