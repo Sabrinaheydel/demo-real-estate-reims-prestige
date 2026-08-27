@@ -14,15 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      form_submissions: {
+      crm_appointments: {
+        Row: {
+          appointment_type: string
+          created_at: string
+          id: string
+          is_demo: boolean
+          lead_id: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+        }
+        Insert: {
+          appointment_type?: string
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          lead_id: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+        }
+        Update: {
+          appointment_type?: string
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          lead_id?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_appointments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "form_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_matches: {
         Row: {
           created_at: string
+          id: string
+          is_demo: boolean
+          lead_id: string
+          match_score: number | null
+          property_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          lead_id: string
+          match_score?: number | null
+          property_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          lead_id?: string
+          match_score?: number | null
+          property_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_matches_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "form_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_matches_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_notes: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_demo: boolean
+          lead_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_demo?: boolean
+          lead_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_demo?: boolean
+          lead_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_notes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "form_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_submissions: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          crm_stage: string
           donnees_completes: Json
           email: string | null
           email_status: string
           form_type: string
           id: string
           is_demo: boolean
+          lead_score: number | null
+          next_action: string | null
+          next_action_at: string | null
           nom: string | null
           prenom: string | null
           reference_annonce: string | null
@@ -31,13 +157,18 @@ export type Database = {
           traite: boolean
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
+          crm_stage?: string
           donnees_completes?: Json
           email?: string | null
           email_status?: string
           form_type: string
           id?: string
           is_demo?: boolean
+          lead_score?: number | null
+          next_action?: string | null
+          next_action_at?: string | null
           nom?: string | null
           prenom?: string | null
           reference_annonce?: string | null
@@ -46,13 +177,18 @@ export type Database = {
           traite?: boolean
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
+          crm_stage?: string
           donnees_completes?: Json
           email?: string | null
           email_status?: string
           form_type?: string
           id?: string
           is_demo?: boolean
+          lead_score?: number | null
+          next_action?: string | null
+          next_action_at?: string | null
           nom?: string | null
           prenom?: string | null
           reference_annonce?: string | null
