@@ -120,8 +120,11 @@ const UpdateSchema = z.object({
 });
 
 export const updatePropertyFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => UpdateSchema.parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { requireAdmin } = await import("./staff.server");
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Resolve legacy_id → uuid if needed
     let uuid = data.id;
