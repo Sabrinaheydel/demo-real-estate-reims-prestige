@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SimulationToCrm } from "./SimulationToCrm";
+
 
 const DURATIONS = [10, 15, 20, 25, 30];
 
