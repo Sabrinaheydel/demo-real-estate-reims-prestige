@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
 import { Check, User } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { loadProfile, saveProfile, clearProfile, REVENU_OPTIONS, type Profile } from "@/lib/profile";
+import { createProfileLeadFn } from "@/lib/profile.functions";
+import { track } from "@/lib/analytics";
 
 type Props = { defaultType?: "location" | "achat" };
 
+const PRO_LABELS: Record<string, string> = {
+  cdi: "CDI",
+  cdd: "CDD",
+  freelance: "Freelance / Indépendant",
+  etudiant: "Étudiant",
+  retraite: "Retraité",
+  autre: "Autre",
+};
+
 export function ProfileForm({ defaultType = "location" }: Props) {
+  const createLead = useServerFn(createProfileLeadFn);
   const [form, setForm] = useState<Omit<Profile, "updatedAt">>({
     situation_pro: "",
     revenus_mensuels: 0,
@@ -14,6 +28,10 @@ export function ProfileForm({ defaultType = "location" }: Props) {
   });
   const [saved, setSaved] = useState(false);
   const [hasExisting, setHasExisting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [crmDone, setCrmDone] = useState(false);
+  /** Signature of the profile already pushed to the demo CRM (anti-duplicate). */
+  const [sentSignature, setSentSignature] = useState<string | null>(null);
 
   useEffect(() => {
     const p = loadProfile();
@@ -29,13 +47,35 @@ export function ProfileForm({ defaultType = "location" }: Props) {
     }
   }, [defaultType]);
 
-  function handleSubmit(e: React.FormEvent) {
+  const signature = `${form.situation_pro}|${form.revenus_label}|${form.garant}|${form.type_recherche}`;
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     saveProfile(form);
-    setSaved(true);
     setHasExisting(true);
-    setTimeout(() => setSaved(false), 3000);
+    setSaved(true);
+
+    if (sentSignature === signature || !form.garant || !form.type_recherche) return;
+    setLoading(true);
+    try {
+      await createLead({
+        data: {
+          situation_pro: PRO_LABELS[form.situation_pro] ?? form.situation_pro,
+          revenus_label: form.revenus_label,
+          garant: form.garant,
+          type_recherche: form.type_recherche,
+        },
+      });
+      track("candidate_profile_lead_created", {});
+      setSentSignature(signature);
+      setCrmDone(true);
+    } catch {
+      /* le profil local reste enregistré même si le CRM démo est indisponible */
+    } finally {
+      setLoading(false);
+    }
   }
+
 
   return (
     <div id="profil" tabIndex={-1} aria-labelledby="profil-heading" className="bg-white rounded-xl border border-border shadow-soft p-6 lg:p-8 scroll-mt-28 outline-none focus-visible:ring-2 focus-visible:ring-gold/50">
