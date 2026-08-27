@@ -427,20 +427,62 @@ function LeadDrawer({
         <div className="flex items-start justify-between gap-2 mb-4">
           <div className="min-w-0">
             <h2 className="font-display text-xl text-navy truncate">{leadName(lead)}</h2>
-            <p className="text-xs text-foreground/60">
-              {demandeLabel(lead.form_type)} · reçu le {fmtDate(lead.created_at)}
-            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <SourceBadge formType={lead.form_type} />
+              <span className="text-xs text-foreground/60">reçu le {fmtDate(lead.created_at)}</span>
+            </div>
           </div>
           <button onClick={onClose} aria-label="Fermer" className="p-1.5 rounded hover:bg-navy/10 shrink-0">
             <X size={18} />
           </button>
         </div>
 
-        <Section title="Coordonnées">
-          <p className="text-sm break-words">{lead.email ?? "—"}</p>
-          <p className="text-sm">{lead.telephone ?? "—"}</p>
-          {lead.reference_annonce && <p className="text-xs text-gold mt-1">Réf. {lead.reference_annonce}</p>}
-        </Section>
+        {isCalculatorLead ? (
+          <Section title="Détail de la simulation">
+            <SimulationSummary lead={lead} />
+            {lead.is_demo && (
+              <div className="mt-3">
+                <button
+                  type="button"
+                  disabled={busy === "followup" || followUpDone}
+                  onClick={() =>
+                    run("followup", async () => {
+                      const when = new Date().toLocaleString("fr-FR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      });
+                      await onAddNote(`Relance simulée le ${when} (aucun message réel envoyé).`);
+                      onPatch(lead, { next_action: "Attendre le retour du prospect" });
+                      setNextAction("Attendre le retour du prospect");
+                      setFollowUpDone(true);
+                      track("demo_followup_simulated", {});
+                    })
+                  }
+                  className="px-3 py-2 rounded-lg bg-navy text-white text-sm disabled:opacity-60"
+                >
+                  {followUpDone
+                    ? "Relance simulée ✓"
+                    : busy === "followup"
+                      ? "Simulation en cours…"
+                      : "Simuler une relance"}
+                </button>
+                <p className="text-[11px] text-foreground/50 mt-1">
+                  Démonstration : aucun e-mail ni SMS n'est réellement envoyé.
+                </p>
+              </div>
+            )}
+          </Section>
+        ) : (
+          <Section title="Coordonnées">
+            <p className="text-sm break-words">{lead.email ?? "—"}</p>
+            <p className="text-sm">{lead.telephone ?? "—"}</p>
+            {lead.reference_annonce && <p className="text-xs text-gold mt-1">Réf. {lead.reference_annonce}</p>}
+          </Section>
+        )}
+
 
         <Section title="Pilotage">
           <label className="block text-xs text-foreground/60 mb-1">Étape</label>
