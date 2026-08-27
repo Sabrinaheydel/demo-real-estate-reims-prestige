@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SimulationToCrm } from "./SimulationToCrm";
+
 
 const DURATIONS = [10, 15, 20, 25, 30];
 
@@ -363,7 +365,36 @@ export function LoanSimulator() {
           )}
         </div>
 
+        <SimulationToCrm
+          calculator="loan"
+          signature={[price, downPayment, years, rate, includeInsurance, incomeNum].join("|")}
+          leadScore={
+            capacityStatus === "ok" ? 85 : capacityStatus === "warn" ? 65 : capacityStatus === "bad" ? 40 : 50
+          }
+          details={{
+            "Prix du bien": `${Math.round(price)} €`,
+            Apport: `${Math.round(downPayment)} €`,
+            "Montant emprunté": `${Math.round(borrowed)} €`,
+            Durée: `${years} ans`,
+            Taux: `${rate.toFixed(1)} %`,
+            "Assurance incluse": includeInsurance,
+            "Mensualité totale": `${Math.round(totalMonthly)} €`,
+            "Coût du crédit": `${Math.round(creditCost)} €`,
+            "Frais de notaire": `${Math.round(notaryFees)} €`,
+            "Revenu mensuel net saisi": incomeNum > 0 ? `${Math.round(incomeNum)} €` : null,
+            "Statut capacité":
+              capacityStatus === "ok"
+                ? "Compatible"
+                : capacityStatus === "warn"
+                  ? "Profil limite"
+                  : capacityStatus === "bad"
+                    ? "Dépasse la capacité"
+                    : "Non renseigné",
+          }}
+        />
+
         {/* Tableau amortissement */}
+
         <div>
           <button
             type="button"

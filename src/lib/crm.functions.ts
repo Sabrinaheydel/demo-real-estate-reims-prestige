@@ -16,7 +16,10 @@ export const getCrmSnapshotFn = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false })
       .limit(500);
-    if (demoOnly) leadsQ = leadsQ.eq("is_demo", true);
+    // Demo visitors never see real personal data: demo-only rows, and the
+    // public feedback form (which can contain a real email) is excluded.
+    if (demoOnly) leadsQ = leadsQ.eq("is_demo", true).neq("form_type", "feedback-demo");
+
 
     let notesQ = supabaseAdmin.from("crm_notes").select("*").order("created_at", { ascending: false });
     let apptQ = supabaseAdmin.from("crm_appointments").select("*").order("scheduled_at", { ascending: true });

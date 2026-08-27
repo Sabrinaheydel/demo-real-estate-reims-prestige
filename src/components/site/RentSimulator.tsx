@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Building2, Home as HomeIcon, Sofa, Square, Sparkles, ThumbsUp, Wrench, Phone, Download } from "lucide-react";
 import { jsPDF } from "jspdf";
+import { SimulationToCrm } from "./SimulationToCrm";
+
 
 type BienType = "appartement" | "maison" | "meuble" | "studio";
 type Etat = "renove" | "bon" | "rafraichir";
@@ -424,7 +426,28 @@ export function RentSimulator() {
             </div>
           </div>
 
+          <div className="mt-8">
+            <SimulationToCrm
+              calculator="rent"
+              signature={[bien, surface, quartier, etat, calc.valNum].join("|")}
+              leadScore={calc.valNum <= 0 ? 55 : calc.rdtNet >= 5 ? 80 : calc.rdtNet >= 3 ? 65 : 45}
+              details={{
+                "Type de bien": BIEN_OPTS.find((b) => b.value === bien)?.label ?? bien,
+                Surface: `${surface} m²`,
+                Quartier: QUARTIERS.find((q) => q.value === quartier)?.label ?? quartier,
+                État: ETAT_OPTS.find((e) => e.value === etat)?.label ?? etat,
+                "Loyer estimé": `${calc.brut} € / mois`,
+                "Fourchette de loyer": `${calc.bas} € – ${calc.haut} €`,
+                "Revenu net mensuel": `${calc.net} €`,
+                "Valeur du bien": calc.valNum > 0 ? `${calc.valNum} €` : null,
+                "Rendement brut": calc.valNum > 0 ? `${calc.rdtBrut} %` : null,
+                "Rendement net": calc.valNum > 0 ? `${calc.rdtNet} %` : null,
+              }}
+            />
+          </div>
+
           <p className="text-[11px] italic text-muted-foreground mt-8">
+
             * Ces estimations sont fournies à titre indicatif et basées sur les données du marché
             locatif rémois observées en 2026. Elles ne constituent pas une offre contractuelle. Une
             visite du bien est nécessaire pour une estimation précise.

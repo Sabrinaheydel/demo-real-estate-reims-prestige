@@ -42,9 +42,48 @@ function demandeLabel(t: string) {
     contact: "Contact",
     "recherche-achat": "Recherche achat",
     "feedback-demo": "Avis démo",
+    "simulation-pret": "Calculateur prêt",
+    "simulation-loyer": "Calculateur loyer",
   };
   return map[t] ?? t.replace(/-/g, " ");
 }
+
+const CALCULATOR_TYPES = ["simulation-pret", "simulation-loyer"];
+
+function SourceBadge({ formType }: { formType: string }) {
+  const isCalc = CALCULATOR_TYPES.includes(formType);
+  return (
+    <span
+      className={`inline-block text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+        isCalc ? "bg-gold/25 text-navy" : "bg-navy/10 text-navy/80"
+      }`}
+    >
+      {isCalc ? "🧮 " : ""}
+      {demandeLabel(formType)}
+    </span>
+  );
+}
+
+/** Readable key/value summary of the stored simulation data (never raw JSON). */
+function SimulationSummary({ lead }: { lead: CrmLead }) {
+  const entries = Object.entries(lead.donnees_completes ?? {}).filter(
+    ([, v]) => v !== null && v !== "" && v !== undefined,
+  );
+  if (entries.length === 0) return <p className="text-xs text-foreground/40 italic">Aucun détail</p>;
+  return (
+    <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+      {entries.map(([k, v]) => (
+        <div key={k} className="min-w-0">
+          <dt className="text-[11px] text-foreground/55 truncate">{k}</dt>
+          <dd className="text-sm text-navy font-medium break-words">
+            {typeof v === "boolean" ? (v ? "Oui" : "Non") : String(v)}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 
 function scoreColor(s: number | null) {
   if (s === null) return "bg-gray-200 text-gray-600";
@@ -252,7 +291,10 @@ export default function CrmBoard() {
                           {l.lead_score ?? "—"}
                         </span>
                       </div>
-                      <p className="text-[11px] text-foreground/60 mt-0.5">{demandeLabel(l.form_type)}</p>
+                      <div className="mt-1">
+                        <SourceBadge formType={l.form_type} />
+                      </div>
+
                       {l.next_action && (
                         <p className="text-[11px] text-foreground/70 mt-1.5 truncate">➜ {l.next_action}</p>
                       )}
@@ -361,13 +403,16 @@ function LeadDrawer({
   const [assigned, setAssigned] = useState(lead.assigned_to ?? "");
   const [nextAction, setNextAction] = useState(lead.next_action ?? "");
   const [nextAt, setNextAt] = useState(lead.next_action_at ? lead.next_action_at.slice(0, 10) : "");
-  const [busy, setBusy] = useState<null | "note" | "appt" | "match">(null);
+  const [busy, setBusy] = useState<null | "note" | "appt" | "match" | "followup">(null);
+  const [followUpDone, setFollowUpDone] = useState(false);
 
   const notes = snap.notes.filter((n) => n.lead_id === lead.id);
   const appts = snap.appointments.filter((a) => a.lead_id === lead.id);
   const matches = snap.matches.filter((m) => m.lead_id === lead.id);
+  const isCalculatorLead = CALCULATOR_TYPES.includes(lead.form_type);
 
-  async function run(kind: "note" | "appt" | "match", fn: () => Promise<void>) {
+  async function run(kind: "note" | "appt" | "match" | "followup", fn: () => Promise<void>) {
+
     setBusy(kind);
     try {
       await fn();
@@ -385,20 +430,62 @@ function LeadDrawer({
         <div className="flex items-start justify-between gap-2 mb-4">
           <div className="min-w-0">
             <h2 className="font-display text-xl text-navy truncate">{leadName(lead)}</h2>
-            <p className="text-xs text-foreground/60">
-              {demandeLabel(lead.form_type)} · reçu le {fmtDate(lead.created_at)}
-            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <SourceBadge formType={lead.form_type} />
+              <span className="text-xs text-foreground/60">reçu le {fmtDate(lead.created_at)}</span>
+            </div>
           </div>
           <button onClick={onClose} aria-label="Fermer" className="p-1.5 rounded hover:bg-navy/10 shrink-0">
             <X size={18} />
           </button>
         </div>
 
-        <Section title="Coordonnées">
-          <p className="text-sm break-words">{lead.email ?? "—"}</p>
-          <p className="text-sm">{lead.telephone ?? "—"}</p>
-          {lead.reference_annonce && <p className="text-xs text-gold mt-1">Réf. {lead.reference_annonce}</p>}
-        </Section>
+        {isCalculatorLead ? (
+          <Section title="Détail de la simulation">
+            <SimulationSummary lead={lead} />
+            {lead.is_demo && (
+              <div className="mt-3">
+                <button
+                  type="button"
+                  disabled={busy === "followup" || followUpDone}
+                  onClick={() =>
+                    run("followup", async () => {
+                      const when = new Date().toLocaleString("fr-FR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      });
+                      await onAddNote(`Relance simulée le ${when} (aucun message réel envoyé).`);
+                      onPatch(lead, { next_action: "Attendre le retour du prospect" });
+                      setNextAction("Attendre le retour du prospect");
+                      setFollowUpDone(true);
+                      track("demo_followup_simulated", {});
+                    })
+                  }
+                  className="px-3 py-2 rounded-lg bg-navy text-white text-sm disabled:opacity-60"
+                >
+                  {followUpDone
+                    ? "Relance simulée ✓"
+                    : busy === "followup"
+                      ? "Simulation en cours…"
+                      : "Simuler une relance"}
+                </button>
+                <p className="text-[11px] text-foreground/50 mt-1">
+                  Démonstration : aucun e-mail ni SMS n'est réellement envoyé.
+                </p>
+              </div>
+            )}
+          </Section>
+        ) : (
+          <Section title="Coordonnées">
+            <p className="text-sm break-words">{lead.email ?? "—"}</p>
+            <p className="text-sm">{lead.telephone ?? "—"}</p>
+            {lead.reference_annonce && <p className="text-xs text-gold mt-1">Réf. {lead.reference_annonce}</p>}
+          </Section>
+        )}
+
 
         <Section title="Pilotage">
           <label className="block text-xs text-foreground/60 mb-1">Étape</label>
