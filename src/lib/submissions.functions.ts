@@ -41,8 +41,11 @@ const ToggleSchema = z.object({
 });
 
 export const setSubmissionTraiteFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ToggleSchema.parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { requireStaff } = await import("./staff.server");
+    await requireStaff(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("form_submissions")
