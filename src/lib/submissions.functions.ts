@@ -58,8 +58,11 @@ export const setSubmissionTraiteFn = createServerFn({ method: "POST" })
 const ResendSchema = z.object({ id: z.string().uuid() });
 
 export const resendConfirmationEmailFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ResendSchema.parse(d))
-  .handler(async ({ data }): Promise<{ ok: true; email_status: EmailStatus }> => {
+  .handler(async ({ data, context }): Promise<{ ok: true; email_status: EmailStatus }> => {
+    const { requireAdmin } = await import("./staff.server");
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("form_submissions")
