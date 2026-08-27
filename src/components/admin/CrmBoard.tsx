@@ -415,7 +415,7 @@ function LeadDrawer({
   const notes = snap.notes.filter((n) => n.lead_id === lead.id);
   const appts = snap.appointments.filter((a) => a.lead_id === lead.id);
   const matches = snap.matches.filter((m) => m.lead_id === lead.id);
-  const isCalculatorLead = CALCULATOR_TYPES.includes(lead.form_type);
+  const isCalculatorLead = SYNTHETIC_TYPES.includes(lead.form_type);
 
   async function run(kind: "note" | "appt" | "match" | "followup", fn: () => Promise<void>) {
 
@@ -447,7 +447,8 @@ function LeadDrawer({
         </div>
 
         {isCalculatorLead ? (
-          <Section title="Détail de la simulation">
+          <Section title={lead.form_type === PROFILE_TYPE ? "Profil candidat" : "Détail de la simulation"}>
+
             <SimulationSummary lead={lead} />
             {lead.is_demo && (
               <div className="mt-3">
