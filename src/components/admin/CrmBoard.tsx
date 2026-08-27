@@ -2,18 +2,24 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
-  CRM_STAGES,
-  STAGE_LABELS,
   getCrmSnapshotFn,
   updateLeadCrmFn,
   addCrmNoteFn,
   addCrmAppointmentFn,
   addCrmMatchFn,
+} from "@/lib/crm.functions";
+import {
+  CRM_STAGES,
+  STAGE_LABELS,
   type CrmSnapshot,
   type CrmStage,
   type CrmLead,
-} from "@/lib/crm.functions";
-import { X, CalendarClock, StickyNote, Link2, Users, Target, CheckCircle2 } from "lucide-react";
+} from "@/lib/crm.model";
+import { track } from "@/lib/analytics";
+import { useIsMobile } from "@/hooks/use-mobile";
+import DemoGuide from "./DemoGuide";
+import DemoFeedback from "./DemoFeedback";
+import { X, CalendarClock, StickyNote, Link2, Users, Target, CheckCircle2, PlayCircle } from "lucide-react";
 
 const EMPTY: CrmSnapshot = {
   role: "demo",
@@ -33,8 +39,9 @@ function demandeLabel(t: string) {
   const map: Record<string, string> = {
     "candidature-location": "Candidature location",
     "estimation-vendre": "Estimation vente",
-    "contact": "Contact",
+    contact: "Contact",
     "recherche-achat": "Recherche achat",
+    "feedback-demo": "Avis démo",
   };
   return map[t] ?? t.replace(/-/g, " ");
 }
@@ -74,10 +81,13 @@ export default function CrmBoard() {
   const addNote = useServerFn(addCrmNoteFn);
   const addAppt = useServerFn(addCrmAppointmentFn);
   const addMatch = useServerFn(addCrmMatchFn);
+  const isMobile = useIsMobile();
 
   const [snap, setSnap] = useState<CrmSnapshot>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [mobileStage, setMobileStage] = useState<CrmStage>("nouveau");
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -85,6 +95,7 @@ export default function CrmBoard() {
       setSnap(s as CrmSnapshot);
     } catch (e) {
       console.warn("[crm] load failed", e);
+      toast.error("Chargement du CRM impossible");
     } finally {
       setLoading(false);
     }
@@ -93,6 +104,15 @@ export default function CrmBoard() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("guide") === "1" || window.sessionStorage.getItem("crm_guide") === "1") {
+      setGuideOpen(true);
+      window.sessionStorage.removeItem("crm_guide");
+    }
+  }, []);
 
   const kpis = useMemo(() => {
     const l = snap.leads;
@@ -105,6 +125,7 @@ export default function CrmBoard() {
   }, [snap]);
 
   const openLead = snap.leads.find((l) => l.id === openId) ?? null;
+  const isDemo = snap.role === "demo";
 
   function fail(e: unknown) {
     const msg = e instanceof Error ? e.message : "Action impossible";
@@ -116,6 +137,7 @@ export default function CrmBoard() {
     setSnap((s) => ({ ...s, leads: s.leads.map((l) => (l.id === lead.id ? { ...l, crm_stage: stage } : l)) }));
     try {
       await updateLead({ data: { id: lead.id, patch: { crm_stage: stage } } });
+      track("lead_stage_changed", { stage, demo: isDemo });
       toast.success(`Étape : ${STAGE_LABELS[stage]}`);
     } catch (e) {
       setSnap((s) => ({ ...s, leads: prev }));
@@ -123,7 +145,10 @@ export default function CrmBoard() {
     }
   }
 
-  async function patchLead(lead: CrmLead, patch: Partial<Pick<CrmLead, "lead_score" | "assigned_to" | "next_action" | "next_action_at">>) {
+  async function patchLead(
+    lead: CrmLead,
+    patch: Partial<Pick<CrmLead, "lead_score" | "assigned_to" | "next_action" | "next_action_at">>,
+  ) {
     const prev = snap.leads;
     setSnap((s) => ({ ...s, leads: s.leads.map((l) => (l.id === lead.id ? { ...l, ...patch } : l)) }));
     try {
@@ -136,11 +161,35 @@ export default function CrmBoard() {
   }
 
   if (loading) {
-    return <div className="bg-white rounded-xl border border-border p-8 text-center text-foreground/60">Chargement du CRM…</div>;
+    return (
+      <div className="bg-white rounded-xl border border-border p-8 text-center text-foreground/60">
+        Chargement du CRM…
+      </div>
+    );
   }
 
+  const stagesToRender: CrmStage[] = isMobile ? [mobileStage] : [...CRM_STAGES];
+
   return (
-    <div>
+    <div className="min-w-0">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <p className="text-xs px-2.5 py-1 rounded-full bg-navy/10 text-navy font-semibold">
+          Bêta publique · données immobilières simulées
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setGuideOpen(true);
+              track("demo_started", { source: "relaunch" });
+            }}
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-navy text-navy hover:bg-navy hover:text-white transition-colors"
+          >
+            <PlayCircle size={14} /> Démo guidée
+          </button>
+          {isDemo && <DemoFeedback />}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <Kpi icon={Users} label="Leads ouverts" value={kpis.ouverts} />
         <Kpi icon={Target} label="À qualifier" value={kpis.aQualifier} />
@@ -148,8 +197,25 @@ export default function CrmBoard() {
         <Kpi icon={CheckCircle2} label="Clos" value={kpis.clos} />
       </div>
 
+      {isMobile && (
+        <label className="block mb-3">
+          <span className="block text-xs text-foreground/60 mb-1">Étape du pipeline</span>
+          <select
+            value={mobileStage}
+            onChange={(e) => setMobileStage(e.target.value as CrmStage)}
+            className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-white"
+          >
+            {CRM_STAGES.map((s) => (
+              <option key={s} value={s}>
+                {STAGE_LABELS[s]} ({snap.leads.filter((l) => l.crm_stage === s).length})
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
       <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-5 items-start">
-        {CRM_STAGES.map((stage) => {
+        {stagesToRender.map((stage) => {
           const items = snap.leads.filter((l) => l.crm_stage === stage);
           return (
             <div key={stage} className="bg-white/70 rounded-xl border border-border p-3 min-w-0">
@@ -165,7 +231,7 @@ export default function CrmBoard() {
                   return (
                     <div
                       key={l.id}
-                      className="bg-white rounded-lg border border-border p-3 hover:border-gold transition-colors cursor-pointer"
+                      className="bg-white rounded-lg border border-border p-3 hover:border-gold transition-colors cursor-pointer min-w-0"
                       onClick={() => setOpenId(l.id)}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -212,46 +278,39 @@ export default function CrmBoard() {
           onPatch={patchLead}
           onStage={setStage}
           onAddNote={async (content) => {
-            try {
-              const n = await addNote({ data: { lead_id: openLead.id, content } });
-              setSnap((s) => ({ ...s, notes: [n as never, ...s.notes] }));
-              toast.success("Note ajoutée");
-            } catch (e) {
-              fail(e);
-            }
+            const n = await addNote({ data: { lead_id: openLead.id, content } });
+            setSnap((s) => ({ ...s, notes: [n as never, ...s.notes] }));
+            toast.success("Note ajoutée");
           }}
           onAddAppt={async (scheduled_at, appointment_type, notes) => {
-            try {
-              const a = await addAppt({ data: { lead_id: openLead.id, scheduled_at, appointment_type, notes } });
-              setSnap((s) => ({ ...s, appointments: [...s.appointments, a as never] }));
-              toast.success("RDV planifié");
-            } catch (e) {
-              fail(e);
-            }
+            const a = await addAppt({ data: { lead_id: openLead.id, scheduled_at, appointment_type, notes } });
+            setSnap((s) => ({ ...s, appointments: [...s.appointments, a as never] }));
+            track("appointment_created", { type: appointment_type, demo: isDemo });
+            toast.success("RDV enregistré");
           }}
           onAddMatch={async (property_id, match_score) => {
-            try {
-              const m = await addMatch({ data: { lead_id: openLead.id, property_id, match_score } });
-              setSnap((s) => ({
-                ...s,
-                matches: [m as never, ...s.matches.filter((x) => x.id !== (m as { id: string }).id)],
-              }));
-              toast.success("Bien associé");
-            } catch (e) {
-              fail(e);
-            }
+            const m = await addMatch({ data: { lead_id: openLead.id, property_id, match_score } });
+            setSnap((s) => ({
+              ...s,
+              matches: [m as never, ...s.matches.filter((x) => x.id !== (m as { id: string }).id)],
+            }));
+            track("property_matched", { demo: isDemo });
+            toast.success("Bien associé");
           }}
+          onError={fail}
         />
       )}
+
+      {guideOpen && <DemoGuide onClose={() => setGuideOpen(false)} />}
     </div>
   );
 }
 
 function Kpi({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) {
   return (
-    <div className="bg-white rounded-xl border border-border p-4">
+    <div className="bg-white rounded-xl border border-border p-4 min-w-0">
       <div className="flex items-center gap-2 text-foreground/60 text-xs mb-1">
-        <Icon size={14} className="text-gold" /> {label}
+        <Icon size={14} className="text-gold shrink-0" /> <span className="truncate">{label}</span>
       </div>
       <p className="font-display text-2xl text-navy">{value}</p>
     </div>
@@ -267,15 +326,20 @@ function LeadDrawer({
   onAddNote,
   onAddAppt,
   onAddMatch,
+  onError,
 }: {
   lead: CrmLead;
   snap: CrmSnapshot;
   onClose: () => void;
-  onPatch: (l: CrmLead, patch: Partial<Pick<CrmLead, "lead_score" | "assigned_to" | "next_action" | "next_action_at">>) => void;
+  onPatch: (
+    l: CrmLead,
+    patch: Partial<Pick<CrmLead, "lead_score" | "assigned_to" | "next_action" | "next_action_at">>,
+  ) => void;
   onStage: (l: CrmLead, s: CrmStage) => void;
-  onAddNote: (content: string) => void;
-  onAddAppt: (scheduledAt: string, type: string, notes: string | null) => void;
-  onAddMatch: (propertyId: string, score: number | null) => void;
+  onAddNote: (content: string) => Promise<void>;
+  onAddAppt: (scheduledAt: string, type: string, notes: string | null) => Promise<void>;
+  onAddMatch: (propertyId: string, score: number | null) => Promise<void>;
+  onError: (e: unknown) => void;
 }) {
   const [note, setNote] = useState("");
   const [apptDate, setApptDate] = useState("");
@@ -285,29 +349,41 @@ function LeadDrawer({
   const [assigned, setAssigned] = useState(lead.assigned_to ?? "");
   const [nextAction, setNextAction] = useState(lead.next_action ?? "");
   const [nextAt, setNextAt] = useState(lead.next_action_at ? lead.next_action_at.slice(0, 10) : "");
+  const [busy, setBusy] = useState<null | "note" | "appt" | "match">(null);
 
   const notes = snap.notes.filter((n) => n.lead_id === lead.id);
   const appts = snap.appointments.filter((a) => a.lead_id === lead.id);
   const matches = snap.matches.filter((m) => m.lead_id === lead.id);
 
+  async function run(kind: "note" | "appt" | "match", fn: () => Promise<void>) {
+    setBusy(kind);
+    try {
+      await fn();
+    } catch (e) {
+      onError(e);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-navy/40" onClick={onClose} />
-      <aside className="relative w-full max-w-md h-full overflow-y-auto bg-cream border-l border-border p-5">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h2 className="font-display text-xl text-navy">{leadName(lead)}</h2>
+      <aside className="relative w-full sm:max-w-md h-full overflow-y-auto bg-cream border-l border-border p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-2 mb-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-xl text-navy truncate">{leadName(lead)}</h2>
             <p className="text-xs text-foreground/60">
               {demandeLabel(lead.form_type)} · reçu le {fmtDate(lead.created_at)}
             </p>
           </div>
-          <button onClick={onClose} aria-label="Fermer" className="p-1.5 rounded hover:bg-navy/10">
+          <button onClick={onClose} aria-label="Fermer" className="p-1.5 rounded hover:bg-navy/10 shrink-0">
             <X size={18} />
           </button>
         </div>
 
         <Section title="Coordonnées">
-          <p className="text-sm">{lead.email ?? "—"}</p>
+          <p className="text-sm break-words">{lead.email ?? "—"}</p>
           <p className="text-sm">{lead.telephone ?? "—"}</p>
           {lead.reference_annonce && <p className="text-xs text-gold mt-1">Réf. {lead.reference_annonce}</p>}
         </Section>
@@ -317,7 +393,7 @@ function LeadDrawer({
           <select
             value={lead.crm_stage}
             onChange={(e) => onStage(lead, e.target.value as CrmStage)}
-            className="w-full text-sm border border-border rounded px-2 py-1.5 bg-white mb-3"
+            className="w-full text-sm border border-border rounded px-2 py-2 bg-white mb-3"
           >
             {CRM_STAGES.map((s) => (
               <option key={s} value={s}>
@@ -326,8 +402,8 @@ function LeadDrawer({
             ))}
           </select>
 
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+            <div className="min-w-0">
               <label className="block text-xs text-foreground/60 mb-1">Score (0-100)</label>
               <input
                 type="number"
@@ -338,16 +414,16 @@ function LeadDrawer({
                 onBlur={() =>
                   onPatch(lead, { lead_score: score === "" ? null : Math.max(0, Math.min(100, Number(score))) })
                 }
-                className="w-full text-sm border border-border rounded px-2 py-1.5 bg-white"
+                className="w-full text-sm border border-border rounded px-2 py-2 bg-white"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs text-foreground/60 mb-1">Responsable</label>
               <input
                 value={assigned}
                 onChange={(e) => setAssigned(e.target.value)}
                 onBlur={() => onPatch(lead, { assigned_to: assigned || null })}
-                className="w-full text-sm border border-border rounded px-2 py-1.5 bg-white"
+                className="w-full text-sm border border-border rounded px-2 py-2 bg-white"
               />
             </div>
           </div>
@@ -357,14 +433,14 @@ function LeadDrawer({
             value={nextAction}
             onChange={(e) => setNextAction(e.target.value)}
             onBlur={() => onPatch(lead, { next_action: nextAction || null })}
-            className="w-full text-sm border border-border rounded px-2 py-1.5 bg-white mb-2"
+            className="w-full text-sm border border-border rounded px-2 py-2 bg-white mb-2"
           />
           <input
             type="date"
             value={nextAt}
             onChange={(e) => setNextAt(e.target.value)}
             onBlur={() => onPatch(lead, { next_action_at: nextAt ? new Date(nextAt).toISOString() : null })}
-            className="w-full text-sm border border-border rounded px-2 py-1.5 bg-white"
+            className="w-full text-sm border border-border rounded px-2 py-2 bg-white"
           />
         </Section>
 
@@ -373,7 +449,7 @@ function LeadDrawer({
             {notes.length === 0 && <p className="text-xs text-foreground/40 italic">Aucune note</p>}
             {notes.map((n) => (
               <div key={n.id} className="bg-white rounded border border-border p-2">
-                <p className="text-sm whitespace-pre-wrap">{n.content}</p>
+                <p className="text-sm whitespace-pre-wrap break-words">{n.content}</p>
                 <p className="text-[11px] text-foreground/50 mt-1">
                   {n.created_by ?? "—"} · {fmtDateTime(n.created_at)}
                 </p>
@@ -385,17 +461,21 @@ function LeadDrawer({
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder="Ajouter une note…"
-            className="w-full text-sm border border-border rounded px-2 py-1.5 bg-white"
+            className="w-full text-sm border border-border rounded px-2 py-2 bg-white"
           />
           <button
+            disabled={busy === "note"}
             onClick={() => {
               if (!note.trim()) return;
-              onAddNote(note.trim());
-              setNote("");
+              const content = note.trim();
+              run("note", async () => {
+                await onAddNote(content);
+                setNote("");
+              });
             }}
-            className="mt-2 px-3 py-1.5 rounded-lg bg-navy text-white text-sm"
+            className="mt-2 px-3 py-2 rounded-lg bg-navy text-white text-sm disabled:opacity-60"
           >
-            Ajouter la note
+            {busy === "note" ? "Enregistrement…" : "Ajouter la note"}
           </button>
         </Section>
 
@@ -406,21 +486,21 @@ function LeadDrawer({
               <div key={a.id} className="bg-white rounded border border-border p-2 text-sm">
                 <strong className="text-navy">{a.appointment_type}</strong> · {fmtDateTime(a.scheduled_at)}
                 <span className="ml-2 text-[11px] text-foreground/50">{a.status}</span>
-                {a.notes && <p className="text-xs text-foreground/60 mt-0.5">{a.notes}</p>}
+                {a.notes && <p className="text-xs text-foreground/60 mt-0.5 break-words">{a.notes}</p>}
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="datetime-local"
               value={apptDate}
               onChange={(e) => setApptDate(e.target.value)}
-              className="text-sm border border-border rounded px-2 py-1.5 bg-white"
+              className="w-full min-w-0 text-sm border border-border rounded px-2 py-2 bg-white"
             />
             <select
               value={apptType}
               onChange={(e) => setApptType(e.target.value)}
-              className="text-sm border border-border rounded px-2 py-1.5 bg-white"
+              className="w-full min-w-0 text-sm border border-border rounded px-2 py-2 bg-white"
             >
               <option value="visite">Visite</option>
               <option value="rdv-agence">RDV agence</option>
@@ -429,14 +509,22 @@ function LeadDrawer({
             </select>
           </div>
           <button
+            disabled={busy === "appt"}
             onClick={() => {
-              if (!apptDate) return;
-              onAddAppt(apptDate, apptType, null);
-              setApptDate("");
+              if (!apptDate) {
+                toast.error("Choisissez une date et une heure");
+                return;
+              }
+              const when = apptDate;
+              const type = apptType;
+              run("appt", async () => {
+                await onAddAppt(when, type, null);
+                setApptDate("");
+              });
             }}
-            className="mt-2 px-3 py-1.5 rounded-lg bg-navy text-white text-sm"
+            className="mt-2 px-3 py-2 rounded-lg bg-navy text-white text-sm disabled:opacity-60"
           >
-            Planifier
+            {busy === "appt" ? "Planification…" : "Planifier"}
           </button>
         </Section>
 
@@ -446,12 +534,13 @@ function LeadDrawer({
             {matches.map((m) => {
               const p = snap.properties.find((x) => x.id === m.property_id);
               return (
-                <div key={m.id} className="bg-white rounded border border-border p-2 text-sm flex items-center justify-between gap-2">
-                  <span className="truncate">
-                    {p ? `${p.reference} · ${p.titre}` : m.property_id}
-                  </span>
+                <div
+                  key={m.id}
+                  className="bg-white rounded border border-border p-2 text-sm flex items-center justify-between gap-2"
+                >
+                  <span className="truncate">{p ? `${p.reference} · ${p.titre}` : m.property_id}</span>
                   {m.match_score !== null && (
-                    <span className={`text-[11px] px-1.5 py-0.5 rounded font-semibold ${scoreColor(m.match_score)}`}>
+                    <span className={`text-[11px] px-1.5 py-0.5 rounded font-semibold shrink-0 ${scoreColor(m.match_score)}`}>
                       {m.match_score}%
                     </span>
                   )}
@@ -463,7 +552,7 @@ function LeadDrawer({
             <select
               value={propId}
               onChange={(e) => setPropId(e.target.value)}
-              className="flex-1 min-w-0 text-sm border border-border rounded px-2 py-1.5 bg-white"
+              className="flex-1 min-w-0 text-sm border border-border rounded px-2 py-2 bg-white"
             >
               <option value="">Choisir un bien…</option>
               {snap.properties.map((p) => (
@@ -473,14 +562,18 @@ function LeadDrawer({
               ))}
             </select>
             <button
+              disabled={busy === "match"}
               onClick={() => {
                 if (!propId) return;
-                onAddMatch(propId, lead.lead_score ?? 70);
-                setPropId("");
+                const id = propId;
+                run("match", async () => {
+                  await onAddMatch(id, lead.lead_score ?? 70);
+                  setPropId("");
+                });
               }}
-              className="px-3 py-1.5 rounded-lg bg-navy text-white text-sm shrink-0"
+              className="px-3 py-2 rounded-lg bg-navy text-white text-sm shrink-0 disabled:opacity-60"
             >
-              Associer
+              {busy === "match" ? "…" : "Associer"}
             </button>
           </div>
         </Section>
@@ -491,7 +584,7 @@ function LeadDrawer({
 
 function Section({ title, icon: Icon, children }: { title: string; icon?: typeof Users; children: React.ReactNode }) {
   return (
-    <section className="mb-5">
+    <section className="mb-5 min-w-0">
       <h3 className="text-xs uppercase tracking-wider text-foreground/50 mb-2 flex items-center gap-1.5">
         {Icon && <Icon size={13} className="text-gold" />} {title}
       </h3>
