@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { LISTINGS as SEED_LISTINGS, type Listing } from "@/lib/listings";
 import { useListings, useUpdateListing } from "@/lib/admin-storage";
