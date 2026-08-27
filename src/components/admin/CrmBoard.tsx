@@ -42,9 +42,48 @@ function demandeLabel(t: string) {
     contact: "Contact",
     "recherche-achat": "Recherche achat",
     "feedback-demo": "Avis démo",
+    "simulation-pret": "Calculateur prêt",
+    "simulation-loyer": "Calculateur loyer",
   };
   return map[t] ?? t.replace(/-/g, " ");
 }
+
+const CALCULATOR_TYPES = ["simulation-pret", "simulation-loyer"];
+
+function SourceBadge({ formType }: { formType: string }) {
+  const isCalc = CALCULATOR_TYPES.includes(formType);
+  return (
+    <span
+      className={`inline-block text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+        isCalc ? "bg-gold/25 text-navy" : "bg-navy/10 text-navy/80"
+      }`}
+    >
+      {isCalc ? "🧮 " : ""}
+      {demandeLabel(formType)}
+    </span>
+  );
+}
+
+/** Readable key/value summary of the stored simulation data (never raw JSON). */
+function SimulationSummary({ lead }: { lead: CrmLead }) {
+  const entries = Object.entries(lead.donnees_completes ?? {}).filter(
+    ([, v]) => v !== null && v !== "" && v !== undefined,
+  );
+  if (entries.length === 0) return <p className="text-xs text-foreground/40 italic">Aucun détail</p>;
+  return (
+    <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+      {entries.map(([k, v]) => (
+        <div key={k} className="min-w-0">
+          <dt className="text-[11px] text-foreground/55 truncate">{k}</dt>
+          <dd className="text-sm text-navy font-medium break-words">
+            {typeof v === "boolean" ? (v ? "Oui" : "Non") : String(v)}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 
 function scoreColor(s: number | null) {
   if (s === null) return "bg-gray-200 text-gray-600";
