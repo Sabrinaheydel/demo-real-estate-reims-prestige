@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Building2, Home as HomeIcon, Sofa, Square, Sparkles, ThumbsUp, Wrench, Phone, Download } from "lucide-react";
 import { jsPDF } from "jspdf";
+import { SimulationToCrm } from "./SimulationToCrm";
+
 
 type BienType = "appartement" | "maison" | "meuble" | "studio";
 type Etat = "renove" | "bon" | "rafraichir";
