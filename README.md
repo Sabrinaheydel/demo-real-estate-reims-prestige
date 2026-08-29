@@ -1,208 +1,172 @@
-# DEMO - Real Estate - Reims Prestige
+# Reims Prestige
 
-Crée un site vitrine haut de gamme pour un agent immobilier indépendant 
+### Real-estate acquisition website + CRM product demo
 
-basé à Reims, France. Le site s'appelle "Lestradet Immobilier" 
+A public portfolio demo showing how a real-estate website can become more than a catalogue of listings.
 
-(agent fictif pour démo).
+The product connects public acquisition flows, calculators and candidate profiles to an operational CRM where an agency team can qualify leads, prioritize follow-up, plan visits and match prospects with properties.
 
-## DESIGN SYSTEM
+**Live product:** https://reims-gem-real-estate.lovable.app  
+**Guided CRM demo:** https://reims-gem-real-estate.lovable.app/demo
 
-Palette :
-
-- Blanc #FFFFFF (fond principal)
-
-- Bleu nuit #1B2D4F (titres, navbar, footer)
-
-- Or champagne #C9A96E (accents, CTA, séparateurs)
-
-- Gris clair #F5F5F3 (sections alternées)
-
-- Texte corps #4A4A4A
-
-Typographie :
-
-- Titres : Playfair Display (serif, élégant)
-
-- Corps : Inter (lisible, moderne)
-
-- Taille base : 16px
-
-Style général : cabinet parisien haut de gamme mais chaleureux. 
-
-Pas froid, pas clinique. Sobre, confiant, humain.
-
-Border-radius : 8px. Ombres douces. Pas de gradients criards.
+> Public demo only. The agency, agents, properties, prospects and operational data shown in the demo are fictional.
 
 ---
 
-## PAGE D'ACCUEIL — 7 sections
+## Problem
 
-### SECTION 1 — HERO
+Real-estate teams often receive demand through several disconnected entry points: listing forms, valuation requests, affordability calculators, rental simulations and direct contact.
 
-- Photo de fond plein écran de Reims : 
+The information may exist, but the team still needs to answer a more useful question:
 
-  utilise cette image libre de droits : 
+**What should we do next with this prospect?**
 
-  https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920
-
-  (si non disponible, cherche "Reims cathedral France" sur Unsplash API)
-
-- Overlay sombre 50% bleu nuit
-
-- Titre H1 centré blanc : "Votre bien immobilier à Reims, entre de bonnes mains"
-
-- Sous-titre : "Estimation gratuite · Accompagnement personnalisé · Résultats prouvés"
-
-- 2 boutons CTA côte à côte :
-
-  → "Estimer mon bien" (bouton or plein)
-
-  → "Voir les annonces" (bouton outline blanc)
-
-- Badge discret en bas à droite : "⭐ 4,9/5 — 160 avis Google"
-
-### SECTION 2 — CHIFFRES CLÉS
-
-Fond bleu nuit. 4 compteurs animés au scroll :
-
-- 🏠 "340+ biens vendus"
-
-- ⏱️ "47 jours" (délai moyen de vente)
-
-- ⭐ "4,9/5" (satisfaction clients)
-
-- 📍 "7 ans" (d'expertise à Reims)
-
-### SECTION 3 — LES 3 SERVICES PRINCIPAUX
-
-3 cartes égales avec icône, titre, description courte et lien :
-
-1. "Vendre mon bien" — Je vous accompagne de l'estimation à la signature
-
-2. "Louer mon bien" — Gestion locative complète et sérénisée  
-
-3. "Acheter ou investir" — Je trouve le bien qui correspond à votre projet
-
-### SECTION 4 — ANNONCES EN VEDETTE
-
-Titre : "Biens disponibles en ce moment"
-
-Affiche 3 cartes d'annonces (les 3 premières de la liste complète).
-
-Bouton "Voir toutes les annonces →"
-
-### SECTION 5 — COMMENT ÇA SE PASSE
-
-Titre : "Vendre avec Lestradet Immobilier, étape par étape"
-
-Timeline horizontale 5 étapes avec icônes :
-
-1. Estimation offerte (48h)
-
-2. Mise en valeur de votre bien (photos pro, description)
-
-3. Diffusion maximale (SeLoger, Leboncoin, site, réseaux)
-
-4. Visites qualifiées et feedback régulier
-
-5. Négociation et accompagnement jusqu'à la signature
-
-### SECTION 6 — TÉMOIGNAGES CLIENTS
-
-Titre : "Ils nous ont fait confiance"
-
-Carousel ou grille de 4 avis :
-
-Avis 1 — Marie L., vendeuse
-
-"Jérôme a vendu notre appartement en 3 semaines au prix demandé. 
-
-Son suivi était impeccable, on se sentait vraiment accompagnés."
-
-⭐⭐⭐⭐⭐
-
-Avis 2 — Thomas & Claire R., acheteurs
-
-"Nous cherchions depuis 6 mois. Jérôme a trouvé notre maison 
-
-en 2 visites. Il a négocié 8 000€ en notre faveur. Incroyable."
-
-⭐⭐⭐⭐⭐
-
-Avis 3 — Sophie D., propriétaire bailleresse
-
-"La gestion locative est parfaite. Zéro stress, tout est géré. 
-
-Je recommande les yeux fermés."
-
-⭐⭐⭐⭐⭐
-
-Avis 4 — Michel V., investisseur
-
-"3 appartements achetés avec Jérôme en 2 ans. Il connaît 
-
-le marché rémois comme personne. Un vrai partenaire."
-
-⭐⭐⭐⭐⭐
-
-### SECTION 7 — CTA FINAL + CONTACT RAPIDE
-
-Fond or champagne clair.
-
-Titre : "Prêt à avancer sur votre projet ?"
-
-Formulaire inline 3 champs : Prénom · Email · Téléphone
-
-Bouton : "Je veux être rappelé(e)"
-
-+ Liens réseaux sociaux : Facebook · Instagram · LinkedIn · Google Maps
+This demo explores a connected workflow where website interactions become structured CRM signals instead of isolated form submissions.
 
 ---
 
-## NAVBAR fixe au scroll
+## Product
 
-Logo "Lestradet Immobilier" à gauche (texte stylisé Playfair Display)
+### Public acquisition experience
 
-Liens : Accueil · Annonces · Vendre · Louer · Acheter · Dernières ventes · Contact
+- premium responsive real-estate website
+- property catalogue and detail pages
+- buying, selling and rental journeys
+- loan affordability calculator
+- rental-income calculator
+- candidate profile qualification
+- contact and application forms
 
-Bouton "Estimation gratuite" en or à droite
+### CRM workspace
 
-Menu hamburger sur mobile
+- 5-stage prospect pipeline
+- lead scoring and qualification
+- next-action tracking
+- internal notes
+- ownership / assignment
+- appointment and visit planning
+- prospect-to-property matching
+- operational dashboard and KPIs
+- source badges for calculators and candidate profiles
+- simulated follow-up actions for public testers
 
-## FOOTER
+### Guided public demo
 
-4 colonnes :
+Visitors can enter a dedicated sandbox and follow a short guided scenario through the CRM.
 
-- Logo + accroche + réseaux sociaux
+The demo account can interact with fictional records but cannot access real submissions, send real prospect emails or modify real business data.
 
-- Navigation rapide
+---
 
-- Coordonnées (adresse fictive Reims, tel fictif, email fictif)
+## Example workflow
 
-- Mentions légales + RGPD
+```text
+Website visitor
+      ↓
+Calculator / candidate profile / form
+      ↓
+Structured lead created
+      ↓
+CRM qualification
+      ↓
+Score + next action
+      ↓
+Appointment / visit
+      ↓
+Property matching
+      ↓
+Follow-up
+```
 
-Le site doit être 100% responsive mobile-first.
+For the public demo, calculator and candidate-profile conversions create **synthetic leads only**. No name, phone number or email address is required for those flows.
 
-This project was built with [Lovable](https://lovable.dev).
+---
 
-**Live app**: https://reims-gem-real-estate.lovable.app
+## Privacy and security
 
-## Build with Lovable
+The demo was designed with a clear separation between real administration and public testing.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/960b13a7-48c2-417d-b3cc-1226ce432c8f).
+- Supabase authentication for staff access
+- dedicated `admin` and `demo` roles
+- Row Level Security on CRM and property data
+- demo users restricted to `is_demo = true` records
+- tester feedback kept private from demo visitors
+- privileged server functions verify authorization before using elevated database access
+- Brevo credentials remain server-side
+- real email sending is disabled for demo CRM actions
+- admin area marked `noindex,nofollow`
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+The optional feedback form can store a tester email for reply purposes, but that information is available only to the real administrator and is never exposed in the public CRM sandbox.
 
-## Development
+---
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Product decisions
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+### 1. The website feeds the CRM
+
+A calculator is not only a marketing widget. In this demo, its result can become a qualified CRM entry with a source, score and next action.
+
+### 2. Public testing stays isolated
+
+The visitor experience uses fictional data and a dedicated demo role instead of opening the real admin workspace.
+
+### 3. Scoring remains transparent
+
+The current lead scores are deterministic business rules for demonstration purposes. They are not AI-generated eligibility decisions.
+
+### 4. Actions need visible consequences
+
+Pipeline changes, notes, visits, matching and simulated follow-up persist in the demo data so a tester can understand the operational workflow rather than just browse static screens.
+
+---
+
+## Stack
+
+- **Frontend:** React, TypeScript, TanStack Start
+- **UI:** Tailwind CSS, Radix UI, Lucide
+- **Backend / database:** Supabase
+- **Authentication:** Supabase Auth
+- **Security:** Supabase Row Level Security + server-side authorization
+- **Email:** Brevo
+- **Analytics:** Google Analytics 4
+- **Deployment / product workflow:** Lovable + GitHub
+
+---
+
+## Repository structure
+
+```text
+src/
+  components/
+    admin/        CRM, guided demo, feedback
+    site/         public website, calculators, profile
+  integrations/
+    supabase/     client and auth integration
+  lib/            CRM, server functions, analytics, email
+  routes/         public site, /demo, /auth, /admin
+supabase/
+  migrations/     schema, RLS and security migrations
+```
+
+---
+
+## Local development
+
+```bash
+git clone https://github.com/Sabrinaheydel/demo-real-estate-reims-prestige.git
+cd demo-real-estate-reims-prestige
+npm install
 npm run dev
 ```
+
+The repository contains only Supabase **publishable** configuration. Server credentials such as the Brevo API key and elevated Supabase credentials are configured in the hosting environment and are not committed to the repository.
+
+---
+
+## Status
+
+**Portfolio product demo, public beta.**
+
+The project is intended to demonstrate product thinking, UX, connected workflows, CRM architecture and secure public sandboxing. It is not a production real-estate CRM, a live agency service or a financial eligibility tool.
+
+Built by **Sabrina Heydel**, Founder of [Agence 360 Digital](https://www.agence360digital.fr/).
