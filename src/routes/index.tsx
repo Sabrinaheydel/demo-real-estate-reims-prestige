@@ -33,13 +33,25 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dupuis Immobilier · Agent immobilier à Reims" },
-      { name: "description", content: "Estimation gratuite · Vente · Location · Gestion locative à Reims" },
-      { property: "og:title", content: "Dupuis Immobilier · Agent immobilier à Reims" },
-      { property: "og:description", content: "Estimation gratuite · Vente · Location · Gestion locative à Reims" },
+      { title: "Démo immobilier · Site + CRM connecté" },
+      {
+        name: "description",
+        content:
+          "Démo publique d’un système immobilier fictif : site d’acquisition, calculateurs, qualification et CRM connecté.",
+      },
+      { property: "og:title", content: "Démo immobilier · Site + CRM connecté" },
+      {
+        property: "og:description",
+        content:
+          "Site d’acquisition + CRM immobilier en démonstration. Agence et données entièrement fictives.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:title", content: "Dupuis Immobilier · Agent immobilier à Reims" },
-      { name: "twitter:description", content: "Estimation gratuite · Vente · Location · Gestion locative à Reims" },
+      { name: "twitter:title", content: "Démo immobilier · Site + CRM connecté" },
+      {
+        name: "twitter:description",
+        content:
+          "Site d’acquisition + CRM immobilier en démonstration. Agence et données entièrement fictives.",
+      },
     ],
   }),
   component: HomePage,
@@ -310,6 +322,10 @@ function Hero() {
         </div>
         {/* BLOC 2 Texte */}
         <div className="bg-navy px-6 py-8">
+          <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 mb-4 text-[11px] font-medium tracking-wide text-gold">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+            Démo portfolio · Agence et données fictives
+          </span>
           <span className="inline-block text-gold text-xs font-medium tracking-[0.2em] uppercase mb-4">
             Agent indépendant · Reims
           </span>
@@ -370,6 +386,10 @@ function Hero() {
       />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32">
         <div className="max-w-2xl text-left">
+          <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-navy/40 backdrop-blur-sm px-3 py-1 mb-6 text-[11px] font-medium tracking-wide text-gold">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+            Démo portfolio · Agence et données fictives
+          </span>
           <span className="inline-block text-gold text-sm font-medium tracking-[0.2em] uppercase mb-6">
             Agent indépendant · Reims
           </span>
