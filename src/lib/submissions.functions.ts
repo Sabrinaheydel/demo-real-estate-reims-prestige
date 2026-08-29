@@ -31,13 +31,15 @@ export const listSubmissionsFn = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false })
       .limit(500);
-    // Demo visitors never see real leads.
-    if (role === "demo") query = query.eq("is_demo", true);
+    // Demo visitors see only synthetic demo leads. Feedback may contain a
+    // tester email, so it remains visible only to the real admin.
+    if (role === "demo") {
+      query = query.eq("is_demo", true).neq("form_type", "feedback-demo");
+    }
     const { data, error } = await query;
     if (error) throw new Error(error.message);
     return (data ?? []) as unknown as FormSubmission[];
   });
-
 
 const ToggleSchema = z.object({
   id: z.string().uuid(),
@@ -55,7 +57,9 @@ export const setSubmissionTraiteFn = createServerFn({ method: "POST" })
       .from("form_submissions")
       .update({ traite: data.traite, statut: data.traite ? "traite" : "nouveau" })
       .eq("id", data.id);
-    if (role === "demo") q = q.eq("is_demo", true);
+    if (role === "demo") {
+      q = q.eq("is_demo", true).neq("form_type", "feedback-demo");
+    }
     const { data: updated, error } = await q.select("id");
     if (error) throw new Error(error.message);
     if (!updated || updated.length === 0) throw new Error("Forbidden: donnée non accessible en mode démo");
@@ -113,7 +117,7 @@ export const resendConfirmationEmailFn = createServerFn({ method: "POST" })
           siteUrl: url?.startsWith("http") ? new URL(url).origin : undefined,
         }),
         sender: {
-          name: "Julien Dupuis — Dupuis Immobilier",
+          name: "Julien Dupuis - Dupuis Immobilier",
           email: "sabrina@agence360cabinets.fr",
         },
         replyTo: { email: "sabrina@agence360cabinets.fr", name: "Julien Dupuis" },
