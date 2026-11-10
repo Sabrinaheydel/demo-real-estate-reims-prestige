@@ -13,6 +13,20 @@ The product connects public acquisition flows, calculators and candidate profile
 
 ---
 
+## Use case framing
+
+| | |
+|---|---|
+| **Business need** | Demand reaches a real-estate agency through many entry points (listing forms, valuation requests, calculators, candidate profiles). Each one has to be qualified by hand before anyone knows what to do next. |
+| **Target users** | Agency agents and the agency manager. |
+| **Data** | Listings, leads coming from forms and calculators, visits, notes and ownership. In this demo, all records are fictional. |
+| **Scope** | Public website (catalogue, 3 journeys, 2 calculators, candidate profile) + CRM (5-stage pipeline, scoring, next actions, visits, matching, dashboard) + isolated guided demo. |
+| **Expected value** | Hypothesis to validate with a pilot agency: **3 to 5 hours saved per agent per week** on manual lead qualification and follow-up planning, and faster first response to new leads. Not measured yet. |
+| **How success is measured** | Time to first response, share of leads with a next action, visit-to-offer conversion (GA4 events on the public journeys). |
+| **Guardrails** | Separate admin and demo roles, Row Level Security, server-side authorization, no real email sent from the demo. |
+
+---
+
 ## Problem
 
 Real-estate teams often receive demand through several disconnected entry points: listing forms, valuation requests, affordability calculators, rental simulations and direct contact.
